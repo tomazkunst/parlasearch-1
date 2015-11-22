@@ -15,10 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from searchapi.views import regularQuery, filterQuery
+from searchapi.views import regularQuery, filterQuery, mltQuery
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^(?P<words>[a-zA-Z0-9 -]+)', regularQuery),
-    url(r'^filter/(?P<words>[a-zA-Z0-9 -]+)/(?P<people>[a-zA-Z0-9 -]+)/(?P<parties>[a-zA-Z0-9 -]+)', filterQuery),
+    url(r'^mlt/(?P<speech_i>[0-9]+)', mltQuery),
+    url(r'^filter/(?P<words>[a-zA-Z0-9 -]+)', filterQuery),
+    url(r'^q/(?P<words>[a-zA-Z0-9 -]+)', regularQuery),
 ]
