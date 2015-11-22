@@ -22,6 +22,21 @@ def regularQuery(request, words):
         'hl': 'true',
         'hl.fl': 'content_t',
     }
+    solr_params_no_date = {
+        'q': 'content_t:' + q,
+        'facet': 'true',
+        'facet.field': 'speaker_i&facet.field=party_i', # dirty hack
+        'facet.date': 'datetime_dt',
+        'facet.date.start': '2014-01-01T00:00:00.000Z',
+        'facet.date.gap': '%2B1MONTHS',
+        'facet.date.end': 'NOW',
+        # 'sort': 'datetime_dt desc',
+        'hl': 'true',
+        'hl.fl': 'content_t',
+    }
+
+    if ' ' in q:
+        solr_params = solr_params_no_date
 
 
     print q + 'asd'
@@ -49,7 +64,7 @@ def filterQuery(request, words):
     if people == None:
         fq = 'party_i:(' + parties + ')'
     elif parties == None:
-        fq = 'person_i:(' + people + ')'
+        fq = 'speaker_i:(' + people + ')'
     else:
         fq = 'speaker_i:(' + people + ') OR party_i:(' + parties + ')'
 
@@ -64,7 +79,7 @@ def filterQuery(request, words):
         'facet.date.start': '2014-01-01T00:00:00.000Z',
         'facet.date.gap': '%2B1MONTHS',
         'facet.date.end': 'NOW',
-        'sort': 'datetime_dt desc',
+        # 'sort': 'datetime_dt desc',
         'hl': 'true',
         'hl.fl': 'content_t',
     }

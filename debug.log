@@ -677,3 +677,7 @@ Traceback (most recent call last):
     raise ValueError("No JSON object could be decoded")
 ValueError: No JSON object could be decoded
 Not Found: /favicon.ico
+Not Found: /filter/
+Not Found: /vecina
+Not Found: /filter/"(Za je glasovalo" je
+Not Found: /begunci
