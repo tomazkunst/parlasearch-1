@@ -681,3 +681,120 @@ Not Found: /filter/
 Not Found: /vecina
 Not Found: /filter/"(Za je glasovalo" je
 Not Found: /begunci
+Not Found: /favicon.ico
+Not Found: /osamosvojitev
+Not Found: /favicon.ico
+Not Found: /
+Not Found: /favicon.ico
+Not Found: /smoke
+Not Found: /
+Not Found: /
+Not Found: /
+Not Found: /osamosvojitev
+Not Found: /
+Not Found: /^qsfkoafs
+Not Found: /
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /filter/
+Not Found: /filter
+Not Found: /q=safas
+Not Found: /favicon.ico
+Not Found: /q/šolstvo
+Not Found: /q/šolstvo
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Internal Server Error: /q/voda
+Traceback (most recent call last):
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/core/handlers/base.py", line 108, in get_response
+    response = middleware_method(request)
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/middleware/common.py", line 74, in process_request
+    if (not urlresolvers.is_valid_path(request.path_info, urlconf) and
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/core/urlresolvers.py", line 646, in is_valid_path
+    resolve(path, urlconf)
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/core/urlresolvers.py", line 521, in resolve
+    return get_resolver(urlconf).resolve(path)
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/core/urlresolvers.py", line 365, in resolve
+    for pattern in self.url_patterns:
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/core/urlresolvers.py", line 401, in url_patterns
+    patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/core/urlresolvers.py", line 395, in urlconf_module
+    self._urlconf_module = import_module(self.urlconf_name)
+  File "/usr/lib/python2.7/importlib/__init__.py", line 37, in import_module
+    __import__(name)
+  File "/home/parladaddy/parlasearch/parlasearch/urls.py", line 18, in <module>
+    from searchapi.views import regularQuery, filterQuery, mltQuery
+  File "/home/parladaddy/parlasearch/searchapi/views.py", line 17
+    'facet.date': 'datetime_dt',
+                ^
+SyntaxError: invalid syntax
+Internal Server Error: /favicon.ico
+Traceback (most recent call last):
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/core/handlers/base.py", line 108, in get_response
+    response = middleware_method(request)
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/middleware/common.py", line 74, in process_request
+    if (not urlresolvers.is_valid_path(request.path_info, urlconf) and
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/core/urlresolvers.py", line 646, in is_valid_path
+    resolve(path, urlconf)
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/core/urlresolvers.py", line 521, in resolve
+    return get_resolver(urlconf).resolve(path)
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/core/urlresolvers.py", line 365, in resolve
+    for pattern in self.url_patterns:
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/core/urlresolvers.py", line 401, in url_patterns
+    patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/core/urlresolvers.py", line 395, in urlconf_module
+    self._urlconf_module = import_module(self.urlconf_name)
+  File "/usr/lib/python2.7/importlib/__init__.py", line 37, in import_module
+    __import__(name)
+  File "/home/parladaddy/parlasearch/parlasearch/urls.py", line 18, in <module>
+    from searchapi.views import regularQuery, filterQuery, mltQuery
+  File "/home/parladaddy/parlasearch/searchapi/views.py", line 17
+    'facet.date': 'datetime_dt',
+                ^
+SyntaxError: invalid syntax
+Internal Server Error: /q/slovenija
+Traceback (most recent call last):
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/core/handlers/base.py", line 108, in get_response
+    response = middleware_method(request)
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/middleware/common.py", line 74, in process_request
+    if (not urlresolvers.is_valid_path(request.path_info, urlconf) and
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/core/urlresolvers.py", line 646, in is_valid_path
+    resolve(path, urlconf)
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/core/urlresolvers.py", line 521, in resolve
+    return get_resolver(urlconf).resolve(path)
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/core/urlresolvers.py", line 365, in resolve
+    for pattern in self.url_patterns:
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/core/urlresolvers.py", line 401, in url_patterns
+    patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+  File "/home/parladaddy/parlasearch/venv/local/lib/python2.7/site-packages/django/core/urlresolvers.py", line 395, in urlconf_module
+    self._urlconf_module = import_module(self.urlconf_name)
+  File "/usr/lib/python2.7/importlib/__init__.py", line 37, in import_module
+    __import__(name)
+  File "/home/parladaddy/parlasearch/parlasearch/urls.py", line 18, in <module>
+    from searchapi.views import regularQuery, filterQuery, mltQuery
+  File "/home/parladaddy/parlasearch/searchapi/views.py", line 17
+    'facet.date': 'datetime_dt',
+                ^
+SyntaxError: invalid syntax
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /robots.txt
+Not Found: /konoplja
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /robots.txt
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /q/žica
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+Not Found: /favicon.ico

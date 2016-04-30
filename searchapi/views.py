@@ -20,7 +20,7 @@ def regularQuery(request, words):
         'facet.date.end': 'NOW',
         'sort': 'datetime_dt desc',
         'hl': 'true',
-        'hl.fl': 'content_t',
+        'hl.fl': 'content_t'
     }
     solr_params_no_date = {
         'q': 'content_t:' + q,
@@ -32,7 +32,7 @@ def regularQuery(request, words):
         'facet.date.end': 'NOW',
         # 'sort': 'datetime_dt desc',
         'hl': 'true',
-        'hl.fl': 'content_t',
+        'hl.fl': 'content_t'
     }
 
     if ' ' in q:
