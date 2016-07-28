@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.http import JsonResponse
 import requests
 
+from utils import enrichQuery
+
 # Create your views here.
 
 def regularQuery(request, words):
@@ -49,7 +51,7 @@ def regularQuery(request, words):
 
     r = requests.get(url)
 
-    return JsonResponse(r.json())
+    return JsonResponse(enrichQuery(r.json()))
 
 def filterQuery(request, words):
 
