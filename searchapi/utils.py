@@ -11,8 +11,12 @@ def enrichQuery(data):
 
     for i, speaker in enumerate(data['facet_counts']['facet_fields']['speaker_i']):
         if i % 2 == 0 and i < 10:
-            results.append({'person': requests.get('https://analize.parlameter.si/v1/utils/getPersonData/' + speaker).json(), 'score': str(data['facet_counts']['facet_fields']['speaker_i'][i + 1])})
-            del data['facet_counts']['facet_fields']['speaker_i'][i]
+            try:
+                results.append({'person': requests.get('https://analize.parlameter.si/v1/utils/getPersonData/' + str(speaker)).json(), 'score': str(data['facet_counts']['facet_fields']['speaker_i'][i + 1])})
+                del data['facet_counts']['facet_fields']['speaker_i'][i]
+            except ValueError:
+                results.append({'person': {'party': {'acronym': 'unknown', 'id': 'unknown', 'name': 'unknown'}, 'name': 'unknown', 'gov_id': 'unknown', 'id': speaker}, 'score': str(data['facet_counts']['facet_fields']['speaker_i'][i + 1])})
+                del data['facet_counts']['facet_fields']['speaker_i'][i]
         else:
             del data['facet_counts']['facet_fields']['speaker_i'][i]
 
