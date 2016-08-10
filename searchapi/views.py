@@ -22,7 +22,11 @@ def regularQuery(request, words):
         'facet.date.end': 'NOW',
         'sort': 'datetime_dt desc',
         'hl': 'true',
-        'hl.fl': 'content_t'
+        'hl.fl': 'content_t',
+        'hl.fragmenter': 'regex',
+        'hl.regex.pattern': '[\w].*{100,300}[.!?]',
+        'hl.fragsize': '250',
+        'fq': 'tip_t:govor'
     }
     solr_params_no_date = {
         'q': 'content_t:' + q,
@@ -34,7 +38,11 @@ def regularQuery(request, words):
         'facet.date.end': 'NOW',
         # 'sort': 'datetime_dt desc',
         'hl': 'true',
-        'hl.fl': 'content_t'
+        'hl.fl': 'content_t',
+        'hl.fragmenter': 'regex',
+        'hl.regex.pattern': '[\w].*{100,300}[.!?]',
+        'hl.fragsize': '250',
+        'fq': 'tip_t:govor'
     }
 
     if ' ' in q:
@@ -83,7 +91,7 @@ def filterQuery(request, words):
         'facet.date.end': 'NOW',
         # 'sort': 'datetime_dt desc',
         'hl': 'true',
-        'hl.fl': 'content_t',
+        'hl.fl': 'content_t'
     }
 
     print q + 'asd'
