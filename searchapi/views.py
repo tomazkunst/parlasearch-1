@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 import requests
 
-from utils import enrichQuery
+from utils import enrichQuery, enrichHighlights
 
 # Create your views here.
 
@@ -59,7 +59,7 @@ def regularQuery(request, words):
 
     r = requests.get(url)
 
-    return JsonResponse(enrichQuery(r.json()))
+    return JsonResponse(enrichHighlights(enrichQuery(r.json())))
 
 def filterQuery(request, words):
 
