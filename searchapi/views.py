@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 import requests
 
-from utils import enrichQuery, enrichHighlights
+from utils import enrichQuery, enrichHighlights, enrichDocs
 
 # Create your views here.
 
@@ -108,11 +108,11 @@ def filterQuery(request, words):
 
 def mltQuery(request, speech_i):
 
-    solr_url = 'http://127.0.0.1:8983/solr/knedl/mlt?wt=json&mlt.count=5&q=id:g' + speech_i + '&fl=id,score,content_t,session_i,speaker_i,speech_i'
+    solr_url = 'http://127.0.0.1:8983/solr/knedl/mlt?wt=json&mlt.count=5&q=id:g' + speech_i + '&fl=id,score,content_t,session_i,speaker_i,speech_i&fq=tip_t:govor'
 
     print solr_url
     print 'bla'
 
     r = requests.get(solr_url)
 
-    return JsonResponse(r.json())
+    return JsonResponse(enrichDocs(r.json()))
