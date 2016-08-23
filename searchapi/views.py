@@ -125,6 +125,7 @@ def tfidfSessionQuery(request, session_i):
 
     try:
         output = enrichTFIDF(r.json())
+        output['session'] = requests.get('https://analize.parlameter.si/v1/utils/getSessionData/' + output['session']).json()
         return JsonResponse(output)
     except IndexError:
         raise Http404('No data for this session.')
