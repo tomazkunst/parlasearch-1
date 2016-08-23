@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 import requests
 
-from utils import enrichQuery, enrichHighlights, enrichDocs
+from utils import enrichQuery, enrichHighlights, enrichDocs, enrichTFIDF, groupSpeakerTFIDF
 
 # Create your views here.
 
@@ -24,8 +24,8 @@ def regularQuery(request, words):
         'hl': 'true',
         'hl.fl': 'content_t',
         'hl.fragmenter': 'regex',
-        'hl.regex.pattern': '[\w].*{100,300}[.!?]',
-        'hl.fragsize': '250',
+        'hl.regex.pattern': '[\w].*{30,100}[.!?]',
+        'hl.fragsize': '100',
         'fq': 'tip_t:govor'
     }
     solr_params_no_date = {
@@ -40,8 +40,8 @@ def regularQuery(request, words):
         'hl': 'true',
         'hl.fl': 'content_t',
         'hl.fragmenter': 'regex',
-        'hl.regex.pattern': '[\w].*{100,300}[.!?]',
-        'hl.fragsize': '250',
+        'hl.regex.pattern': '[\w].*{50,150}[.!?]',
+        'hl.fragsize': '100',
         'fq': 'tip_t:govor'
     }
 
@@ -116,3 +116,23 @@ def mltQuery(request, speech_i):
     r = requests.get(solr_url)
 
     return JsonResponse(enrichDocs(r.json()))
+
+def tfidfSessionQuery(request, session_i):
+
+    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=id:s' + session_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
+
+    r = requests.get(solr_url)
+
+    try:
+        output = enrichTFIDF(r.json())
+        return JsonResponse(output)
+    except IndexError:
+        raise Http404('No data for this session.')
+
+def tfidfSpeakerQuery(request, speaker_i):
+
+    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=speaker_i:' + speaker_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
+
+    r = requests.get(solr_url)
+
+    return JsonResponse(groupSpeakerTFIDF(r.json(), int(speaker_i)), safe=False)
