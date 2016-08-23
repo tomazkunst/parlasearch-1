@@ -15,11 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from searchapi.views import regularQuery, filterQuery, mltQuery
+from searchapi.views import regularQuery, filterQuery, mltQuery, tfidfSessionQuery, tfidfSpeakerQuery
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^mlt/(?P<speech_i>[0-9]+)', mltQuery),
     url(r'^filter/(?P<words>[a-zA-Z0-9 -]+)', filterQuery),
     url(r'^q/(?P<words>[a-zA-Z0-9 -]+)', regularQuery),
+    url(r'^tfidf/s/(?P<session_i>[0-9]+)', tfidfSessionQuery),
+    url(r'^tfidf/p/(?P<speaker_i>[0-9]+)', tfidfSpeakerQuery),
 ]

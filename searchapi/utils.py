@@ -65,3 +65,108 @@ def enrichDocs(data):
     enrichedData = data
 
     return enrichedData
+
+def removeDigrams(data):
+    newdata = []
+    for i, term in enumerate(data):
+        if ' ' not in term['term']:
+            newdata.append(term)
+
+    return newdata
+
+def removeSingles(data):
+    newdata = []
+    for i, term in enumerate(data):
+        if term['scores']['tf'] != 1:
+            newdata.append(term)
+
+    return newdata
+
+def removeNumbers(data):
+    newdata = []
+    for i, term in enumerate(data):
+        try:
+            float(term['term'])
+            pass
+        except ValueError:
+            newdata.append(term)
+
+    return newdata
+
+def enrichTFIDF(data):
+
+    results = []
+
+    for i, term in enumerate(data['termVectors'][1][3]):
+        if i % 2 == 0:
+
+            tkey = data['termVectors'][1][3][i]
+            tvalue = data['termVectors'][1][3][i + 1]
+
+            results.append({'term': tkey, 'scores': {tvalue[0]: tvalue[1], tvalue[2]: tvalue[3], tvalue[4]: tvalue[5]}})
+            del data['termVectors'][1][3][i]
+        else:
+            del data['termVectors'][1][3][i]
+
+    truncatedResults = removeNumbers(removeSingles(removeDigrams(results)))
+
+    sortedResults = sorted(truncatedResults, key=lambda k: k['scores']['tf-idf'], reverse=True)[:10]
+
+    enrichedData = {'session_id': data['termVectors'][0].split('s')[1], 'results': sortedResults}
+
+    return enrichedData
+
+def makeTFIDFObject(data):
+
+    results = []
+
+    for i, term in enumerate(data):
+        if i % 2 == 0:
+
+            tkey = data[i]
+            tvalue = data[i + 1]
+
+            results.append({'term': tkey, 'scores': {tvalue[0]: tvalue[1], tvalue[2]: tvalue[3], tvalue[4]: tvalue[5]}})
+            del data['termVectors'][1][3][i]
+        else:
+            del data['termVectors'][1][3][i]
+
+    return results
+
+def groupSpeakerTFIDF(rawdata, person_i):
+
+    allSpeeches = []
+
+    for i, speech in enumerate(rawdata['termVectors']):
+        if i % 2 == 1:
+
+            for i, term in enumerate(speech[3]):
+                if i % 2 == 0:
+
+                    tkey = speech[3][i]
+                    tvalue = speech[3][i + 1]
+
+                    allSpeeches.append({'term': tkey, 'scores': {tvalue[0]: tvalue[1], tvalue[2]: tvalue[3], tvalue[4]: tvalue[5]}})
+
+    dkeys = []
+    newdata = []
+
+    for term in allSpeeches:
+
+        tkey = term['term']
+
+        if tkey not in dkeys:
+            dkeys.append(tkey)
+            newdata.append(term)
+        else:
+            for i, ndterm in enumerate(newdata):
+                if ndterm['term'] == term['term']:
+                    newdata[i]['scores']['tf'] = newdata[i]['scores']['tf'] + term['scores']['tf']
+
+    truncatedResults = removeNumbers(removeSingles(removeDigrams(newdata)))
+
+    sortedResults = sorted(truncatedResults, key=lambda k: k['scores']['tf-idf'], reverse=True)[:10]
+
+    enrichedData = {'person': requests.get('https://analize.parlameter.si/v1/utils/getPersonData/' + str(person_i)).json(), 'results': sortedResults}
+
+    return enrichedData
