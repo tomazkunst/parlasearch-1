@@ -154,7 +154,7 @@ def tfidfPGQuery(request, party_i):
 
     return JsonResponse(groupSpeakerTFIDF(r.json(), int(speaker_i)), safe=False)
 
-def tfidfPGQuery(request, party_i, datetime_dt):
+def tfidfPGDateQuery(request, party_i, datetime_dt):
 
     solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=party_i:' + party_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
 
