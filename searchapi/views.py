@@ -26,6 +26,7 @@ def regularQuery(request, words):
         'hl.fragmenter': 'regex',
         'hl.regex.pattern': '[\w].*{30,100}[.!?]',
         'hl.fragsize': '1000',
+        'hl.mergeContiguous': 'true',
         'fq': 'tip_t:govor'
     }
     solr_params_no_date = {
@@ -42,6 +43,7 @@ def regularQuery(request, words):
         'hl.fragmenter': 'regex',
         'hl.regex.pattern': '[\w].*{30,100}[.!?]',
         'hl.fragsize': '1000',
+        'hl.mergeContiguous': 'true',
         'fq': 'tip_t:govor'
     }
 
