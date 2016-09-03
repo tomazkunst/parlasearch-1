@@ -3,7 +3,7 @@ import requests
 def enrichQuery(data):
 
     data['facet_counts'].pop('facet_heatmaps', None)
-    data['facet_counts'].pop('facet_ranges', None)
+    # data['facet_counts'].pop('facet_ranges', None)
     data['facet_counts'].pop('facet_queries', None)
     data['facet_counts'].pop('facet_intervals', None)
 

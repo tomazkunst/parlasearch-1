@@ -16,32 +16,32 @@ def regularQuery(request, words):
         'q': 'content_t:' + q,
         'facet': 'true',
         'facet.field': 'speaker_i&facet.field=party_i', # dirty hack
-        'facet.date': 'datetime_dt',
-        'facet.date.start': '2014-01-01T00:00:00.000Z',
-        'facet.date.gap': '%2B1MONTHS',
-        'facet.date.end': 'NOW',
+        'facet.range': 'datetime_dt',
+        'facet.range.start': '2014-01-01T00:00:00.000Z',
+        'facet.range.gap': '%2B1MONTHS',
+        'facet.range.end': 'NOW',
         'sort': 'datetime_dt desc',
         'hl': 'true',
         'hl.fl': 'content_t',
         'hl.fragmenter': 'regex',
         'hl.regex.pattern': '[\w].*{30,100}[.!?]',
-        'hl.fragsize': '100',
+        'hl.fragsize': '1000',
         'fq': 'tip_t:govor'
     }
     solr_params_no_date = {
         'q': 'content_t:' + q,
         'facet': 'true',
         'facet.field': 'speaker_i&facet.field=party_i', # dirty hack
-        'facet.date': 'datetime_dt',
-        'facet.date.start': '2014-01-01T00:00:00.000Z',
-        'facet.date.gap': '%2B1MONTHS',
-        'facet.date.end': 'NOW',
+        'facet.range': 'datetime_dt',
+        'facet.range.start': '2014-01-01T00:00:00.000Z',
+        'facet.range.gap': '%2B1MONTHS',
+        'facet.range.end': 'NOW',
         # 'sort': 'datetime_dt desc',
         'hl': 'true',
         'hl.fl': 'content_t',
         'hl.fragmenter': 'regex',
-        'hl.regex.pattern': '[\w].*{50,150}[.!?]',
-        'hl.fragsize': '100',
+        'hl.regex.pattern': '[\w].*{30,100}[.!?]',
+        'hl.fragsize': '1000',
         'fq': 'tip_t:govor'
     }
 
