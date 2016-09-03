@@ -170,3 +170,41 @@ def groupSpeakerTFIDF(rawdata, person_i):
     enrichedData = {'person': requests.get('https://analize.parlameter.si/v1/utils/getPersonData/' + str(person_i)).json(), 'results': sortedResults}
 
     return enrichedData
+
+def groupPartyTFIDF(rawdata, party_i):
+
+    allSpeeches = []
+
+    for i, speech in enumerate(rawdata['termVectors']):
+        if i % 2 == 1:
+
+            for i, term in enumerate(speech[3]):
+                if i % 2 == 0:
+
+                    tkey = speech[3][i]
+                    tvalue = speech[3][i + 1]
+
+                    allSpeeches.append({'term': tkey, 'scores': {tvalue[0]: tvalue[1], tvalue[2]: tvalue[3], tvalue[4]: tvalue[5]}})
+
+    dkeys = []
+    newdata = []
+
+    for term in allSpeeches:
+
+        tkey = term['term']
+
+        if tkey not in dkeys:
+            dkeys.append(tkey)
+            newdata.append(term)
+        else:
+            for i, ndterm in enumerate(newdata):
+                if ndterm['term'] == term['term']:
+                    newdata[i]['scores']['tf'] = newdata[i]['scores']['tf'] + term['scores']['tf']
+
+    truncatedResults = removeNumbers(removeSingles(removeDigrams(newdata)))
+
+    sortedResults = sorted(truncatedResults, key=lambda k: k['scores']['tf-idf'], reverse=True)[:10]
+
+    enrichedData = {'party': requests.get('https://analize.parlameter.si/v1/utils/getPgDataAPI/' + str(party_i)).json(), 'results': sortedResults}
+
+    return enrichedData
