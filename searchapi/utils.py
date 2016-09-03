@@ -32,7 +32,6 @@ def enrichHighlights(data):
 
     for i, hkey in enumerate(data['highlighting'].keys()):
 
-        # hkey = data['highlighting'].keys()[i]
         speechdata = requests.get('https://data.parlameter.si/v1/getSpeechData/' + hkey.split('g')[1]).json()
 
         try:

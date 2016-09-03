@@ -26,7 +26,8 @@ def regularQuery(request, words):
         'hl.fragmenter': 'regex',
         'hl.regex.pattern': '[\w].*{30,100}[.!?]',
         'hl.fragsize': '1000',
-        'fq': 'tip_t:govor'
+        'fq': 'tip_t:govor',
+        'rows': '50'
     }
     solr_params_no_date = {
         'q': 'content_t:' + q,
@@ -42,8 +43,13 @@ def regularQuery(request, words):
         'hl.fragmenter': 'regex',
         'hl.regex.pattern': '[\w].*{30,100}[.!?]',
         'hl.fragsize': '1000',
-        'fq': 'tip_t:govor'
+        'fq': 'tip_t:govor',
+        'rows': '50'
     }
+
+    # ROWS, START,
+    # http://parlameter.si:8983/solr/knedl/select?wt=json&sort=datetime_dt%20desc&fq=tip_t:govor%20AND%20datetime_dt:[*%20TO%202016-10-12T00:00:00.000Z]&facet.field=speaker_i&facet.field=party_i&facet.range.gap=%2B1MONTHS&facet.range.end=NOW&hl=true&hl.fl=content_t&facet=true&hl.fragsize=1000&hl.regex.pattern=[%5Cw].*{30,100}[.!?]&q=content_t:zdravstvo&facet.range=datetime_dt&hl.fragmenter=regex&rows=20&start=15&facet.range.start=2014-01-01T00:00:00.000Z
+    # http://parlameter.si:8983/solr/knedl/select?wt=json&sort=datetime_dt%20desc&fq=tip_t:govor&fq{!tag=ct}datetime_dt:[*%20TO%202016-01-12T00:00:00.000Z]&facet.field=speaker_i&facet.field=party_i&facet.range.gap=%2B1MONTHS&facet.range.end=NOW&hl=true&hl.fl=content_t&facet=true&hl.fragsize=1000&hl.regex.pattern=[%5Cw].*{30,100}[.!?]&q=content_t:zdravstvo&facet.range={!ex=ct}datetime_dt&hl.fragmenter=regex&rows=20&start=15&facet.range.start=2014-01-01T00:00:00.000Z
 
     if ' ' in q:
         solr_params = solr_params_no_date
