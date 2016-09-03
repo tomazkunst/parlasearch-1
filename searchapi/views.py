@@ -36,7 +36,7 @@ def regularQuery(request, words):
         'facet.range.start': '2014-01-01T00:00:00.000Z',
         'facet.range.gap': '%2B1MONTHS',
         'facet.range.end': 'NOW',
-        # 'sort': 'datetime_dt desc',
+        'sort': 'datetime_dt desc',
         'hl': 'true',
         'hl.fl': 'content_t',
         'hl.fragmenter': 'regex',
