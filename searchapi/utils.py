@@ -45,7 +45,7 @@ def enrichHighlights(data):
         except ValueError:
             results.append({'person': {'party': {'acronym': 'unknown', 'id': 'unknown', 'name': 'unknown'}, 'name': 'unknown', 'gov_id': 'unknown', 'id': speechdata['speaker_id']}, 'content_t': data['highlighting'][hkey]['content_t'], 'date': speechdata['date'], 'speech_id': int(hkey.split('g')[1])})
 
-    data['highlighting'] = results
+    data['highlighting'] = sortedResults = sorted(results, key=lambda k: k['date'], reverse=True)
 
     enrichedData = data
 
