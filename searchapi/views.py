@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse, Http404
 import requests
 
-from utils import enrichQuery, enrichHighlights, enrichDocs, enrichTFIDF, groupSpeakerTFIDF
+from utils import enrichQuery, enrichHighlights, enrichDocs, enrichTFIDF, groupSpeakerTFIDF, groupPartyTFIDF
 
 # Create your views here.
 
