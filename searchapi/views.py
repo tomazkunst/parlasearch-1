@@ -152,7 +152,7 @@ def tfidfPGQuery(request, party_i):
 
     r = requests.get(solr_url)
 
-    return JsonResponse(groupSpeakerTFIDF(r.json(), int(speaker_i)), safe=False)
+    return JsonResponse(groupPartyTFIDF(r.json(), int(party_i)), safe=False)
 
 def tfidfPGDateQuery(request, party_i, datetime_dt):
 
@@ -160,4 +160,4 @@ def tfidfPGDateQuery(request, party_i, datetime_dt):
 
     r = requests.get(solr_url)
 
-    return JsonResponse(groupSpeakerTFIDF(r.json(), int(speaker_i)), safe=False)
+    return JsonResponse(groupPartyTFIDF(r.json(), int(party_i)), safe=False)
