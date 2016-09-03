@@ -137,3 +137,27 @@ def tfidfSpeakerQuery(request, speaker_i):
     r = requests.get(solr_url)
 
     return JsonResponse(groupSpeakerTFIDF(r.json(), int(speaker_i)), safe=False)
+
+def tfidfSpeakerDateQuery(request, speaker_i, datetime_dt):
+
+    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=speaker_i:' + speaker_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
+
+    r = requests.get(solr_url)
+
+    return JsonResponse(groupSpeakerTFIDF(r.json(), int(speaker_i)), safe=False)
+
+def tfidfPGQuery(request, party_i):
+
+    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=party_i:' + party_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
+
+    r = requests.get(solr_url)
+
+    return JsonResponse(groupSpeakerTFIDF(r.json(), int(speaker_i)), safe=False)
+
+def tfidfPGQuery(request, party_i, datetime_dt):
+
+    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=party_i:' + party_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
+
+    r = requests.get(solr_url)
+
+    return JsonResponse(groupSpeakerTFIDF(r.json(), int(speaker_i)), safe=False)
