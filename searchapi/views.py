@@ -28,7 +28,7 @@ def regularQuery(request, words):
         'hl.fragsize': '1000',
         'hl.mergeContiguous': 'true',
         'fq': 'tip_t:govor',
-        'rows': 50
+        'rows': '50'
     }
     solr_params_no_date = {
         'q': 'content_t:' + q,
