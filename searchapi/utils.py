@@ -36,7 +36,12 @@ def enrichHighlights(data):
         speechdata = requests.get('https://data.parlameter.si/v1/getSpeechData/' + hkey.split('g')[1]).json()
 
         try:
-            results.append({'person': requests.get('https://analize.parlameter.si/v1/utils/getPersonData/' + str(speechdata['speaker_id'])).json(), 'content_t': data['highlighting'][hkey]['content_t'], 'date': speechdata['date'], 'speech_id': int(hkey.split('g')[1])})
+            results.append({
+                'person': requests.get('https://analize.parlameter.si/v1/utils/getPersonData/' + str(speechdata['speaker_id'])).json(),
+                'content_t': data['highlighting'][hkey]['content_t'] if 'content_t' in data['highlighting'][hkey].keys() else None,
+                'date': speechdata['date'],
+                'speech_id': int(hkey.split('g')[1])
+            })
         except ValueError:
             results.append({'person': {'party': {'acronym': 'unknown', 'id': 'unknown', 'name': 'unknown'}, 'name': 'unknown', 'gov_id': 'unknown', 'id': speechdata['speaker_id']}, 'content_t': data['highlighting'][hkey]['content_t'], 'date': speechdata['date'], 'speech_id': int(hkey.split('g')[1])})
 
