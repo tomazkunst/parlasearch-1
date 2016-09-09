@@ -32,5 +32,5 @@ urlpatterns = [
     url(r'^tfidf/p/(?P<speaker_i>[0-9]+)/(?P<datetime_dt>[\w].+)', tfidfSpeakerDateQuery),
 
     url(r'^tfidf/ps/(?P<party_i>[0-9]+)', tfidfPGQuery),
-    url(r'^tfidf/p/(?P<speaker_i>[0-9]+/(?P<datetime_dt>[\w].+)', tfidfPGDateQuery),
+    url(r'^tfidf/p/(?P<speaker_i>[0-9]+)/(?P<datetime_dt>[\w].+)', tfidfPGDateQuery),
 ]
