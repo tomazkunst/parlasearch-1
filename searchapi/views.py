@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse, Http404
 import requests
 
-from utils import enrichQuery, enrichHighlights, enrichDocs, enrichTFIDF, groupSpeakerTFIDF, groupPartyTFIDF, groupSpeakerTFIDFALL
+from utils import enrichQuery, enrichHighlights, enrichDocs, enrichTFIDF, groupSpeakerTFIDF, groupPartyTFIDF, groupSpeakerTFIDFALL, groupPartyTFIDFALL, groupDFALL
 
 # Create your views here.
 
@@ -177,3 +177,19 @@ def tfidfSpeakerQueryALL(request, speaker_i):
     r = requests.get(solr_url)
 
     return JsonResponse(groupSpeakerTFIDFALL(r.json(), int(speaker_i)), safe=False)
+
+def tfidfPGQueryALL(request, party_i):
+
+    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=party_i:' + party_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
+
+    r = requests.get(solr_url)
+
+    return JsonResponse(groupPartyTFIDFALL(r.json(), int(party_i)), safe=False)
+
+def dfALL(request):
+
+    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=tip_t:govor&tv.df=true&wt=json&fl=id&tv.fl=content_t'
+
+    r = requests.get(solr_url)
+
+    return JsonResponse(groupDFALL(r.json(), safe=False)

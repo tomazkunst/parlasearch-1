@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from searchapi.views import regularQuery, filterQuery, mltQuery, tfidfSessionQuery, tfidfSpeakerQuery, tfidfSpeakerDateQuery, tfidfPGQuery, tfidfPGDateQuery, tfidfSpeakerQueryALL
+from searchapi.views import regularQuery, filterQuery, mltQuery, tfidfSessionQuery, tfidfSpeakerQuery, tfidfSpeakerDateQuery, tfidfPGQuery, tfidfPGDateQuery, tfidfSpeakerQueryALL, tfidfPGQueryALL, dfALL
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
@@ -32,8 +32,14 @@ urlpatterns = [
     url(r'^tfidf/p/(?P<speaker_i>[0-9]+)/(?P<datetime_dt>[\w].+)', tfidfSpeakerDateQuery),
 
     url(r'^tfidf/ps/(?P<party_i>[0-9]+)', tfidfPGQuery),
-    url(r'^tfidf/p/(?P<speaker_i>[0-9]+)/(?P<datetime_dt>[\w].+)', tfidfPGDateQuery),
+    url(r'^tfidf/p/(?P<party_i>[0-9]+)/(?P<datetime_dt>[\w].+)', tfidfPGDateQuery),
 
     url(r'^tfidfALL/p/(?P<speaker_i>[0-9]+)', tfidfSpeakerQueryALL),
     # url(r'^tfidf/p/(?P<speaker_i>[0-9]+)/(?P<datetime_dt>[\w].+)', tfidfSpeakerDateQuery),
+
+    url(r'^tfidfALL/p/(?P<party_i>[0-9]+)', tfidfPGQueryALL),
+    # url(r'^tfidf/p/(?P<party_i>[0-9]+)/(?P<datetime_dt>[\w].+)', tfidfPGDateQuery),
+
+    url(r'^dfall', dfALL),
+    # url(r'^dfall', dfDateALL),
 ]
