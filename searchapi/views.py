@@ -192,4 +192,4 @@ def dfALL(request):
 
     r = requests.get(solr_url)
 
-    return JsonResponse(groupDFALL(r.json(), safe=False)
+    return JsonResponse(groupDFALL(r.json(), safe=False))
