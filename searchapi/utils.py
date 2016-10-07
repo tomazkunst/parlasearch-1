@@ -291,37 +291,52 @@ def groupPartyTFIDFALL(rawdata, party_i):
 
 def groupDFALL(rawdata):
 
-    allSpeeches = []
+    print 'beginning groupDFALL'
 
-    for i, speech in enumerate(rawdata['termVectors']):
+    allSessions = []
+
+    print 'beginning iteration through sessions'
+
+    for i, session in enumerate(rawdata['termVectors']):
+
+        print i
+
         if i % 2 == 1:
 
-            for i, term in enumerate(speech[3]):
-                if i % 2 == 0:
+            if len(session) == 4:
 
-                    tkey = speech[3][i]
-                    tvalue = speech[3][i + 1]
+                for i, term in enumerate(session[3]):
+                    if i % 2 == 0:
 
-                    allSpeeches.append({'term': tkey, 'scores': {tvalue[0]: tvalue[1], tvalue[2]: tvalue[3], tvalue[4]: tvalue[5]}})
+                        tkey = session[3][i]
+                        tvalue = session[3][i + 1][1]
+
+                        allSessions.append({'term': tkey, 'df': tvalue})
+
+    print 'iterated through sessions'
 
     dkeys = []
     newdata = []
 
-    for term in allSpeeches:
+    print 'iterating through terms'
 
-        tkey = term['term']
+    # for term in allSessions:
+    #
+    #     tkey = term['term']
+    #
+    #     if tkey not in dkeys:
+    #         dkeys.append(tkey)
+    #         newdata.append(term)
+    #     # else:
+    #     #     for i, ndterm in enumerate(newdata):
+    #     #         if ndterm['term'] == term['term']:
+    #     #             newdata[i]['df'] = newdata[i]['df'] + term['df']
 
-        if tkey not in dkeys:
-            dkeys.append(tkey)
-            newdata.append(term)
-        else:
-            for i, ndterm in enumerate(newdata):
-                if ndterm['term'] == term['term']:
-                    newdata[i]['scores']['tf'] = newdata[i]['scores']['tf'] + term['scores']['tf']
+    newdata = {v['term']:v for v in allSessions}.values()
 
-    truncatedResults = removeNumbers(removeSingles(removeDigrams(newdata)))
+    truncatedResults = removeNumbers(removeDigrams(newdata))
 
-    sortedResults = sorted(truncatedResults, key=lambda k: k['scores']['tf-idf'], reverse=True)[:10]
+    sortedResults = sorted(truncatedResults, key=lambda k: k['df'], reverse=True)
 
     # enrichedData = {'party': requests.get('https://analize.parlameter.si/v1/utils/getPgDataAPI/' + str(party_i)).json(), 'results': sortedResults}
 

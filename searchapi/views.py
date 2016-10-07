@@ -188,8 +188,12 @@ def tfidfPGQueryALL(request, party_i):
 
 def dfALL(request):
 
-    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=tip_t:govor&tv.df=true&wt=json&fl=id&tv.fl=content_t'
+    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=tip_t:seja&tv.df=true&wt=json&fl=id&tv.fl=content_t'
 
+    # solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=tip_t:govor&tv.df=true&wt=json&fl=id&tv.fl=content_t'
+
+    print 'calling solr'
     r = requests.get(solr_url)
+    print 'solr responded'
 
     return JsonResponse(groupDFALL(r.json()), safe=False)
