@@ -194,7 +194,7 @@ def tfidfPGQueryALL(request, party_i):
 
     return JsonResponse(groupPartyTFIDFALL(r.json(), int(party_i)), safe=False)
 
-def tfidfPGQueryALL(request, party_i, datetime_dt): #TODO
+def tfidfPGDateQueryALL(request, party_i, datetime_dt): #TODO
 
     solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=party_i:' + party_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
 
