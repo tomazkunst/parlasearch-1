@@ -1,4 +1,5 @@
 import requests
+import re
 
 def enrichQuery(data):
 
@@ -26,6 +27,10 @@ def enrichQuery(data):
 
     return enrichedData
 
+def trimHighlight(highlight):
+    p = re.compile('[A-Z].*\<em\>.*\.')
+    return p.search(highlight).group()
+
 def enrichHighlights(data):
 
     results = []
@@ -37,7 +42,7 @@ def enrichHighlights(data):
         try:
             results.append({
                 'person': requests.get('https://analize.parlameter.si/v1/utils/getPersonData/' + str(speechdata['speaker_id'])).json(),
-                'content_t': data['highlighting'][hkey]['content_t'] if 'content_t' in data['highlighting'][hkey].keys() else None,
+                'content_t': trimHighlight(data['highlighting'][hkey]['content_t']) if 'content_t' in data['highlighting'][hkey].keys() else None,
                 'date': speechdata['date'],
                 'speech_id': int(hkey.split('g')[1])
             })
