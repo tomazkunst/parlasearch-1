@@ -26,7 +26,7 @@ def regularQuery(request, words):
         'hl.fragmenter': 'regex',
         'hl.regex.pattern': '\w[^\.!\?]{400,600}[\.!\?]',
         'hl.fragsize': '1000',
-        'hl.mergeContiguous': 'true',
+        'hl.mergeContiguous': 'false',
         'fq': 'tip_t:govor',
         'rows': '50'
     }
@@ -42,9 +42,10 @@ def regularQuery(request, words):
         'hl': 'true',
         'hl.fl': 'content_t',
         'hl.fragmenter': 'regex',
-        'hl.regex.pattern': '[A-Z]{1}\w[^\.!\?]{1,300}[\.!\?]',
-#        'hl.fragsize': '300',
-        'hl.mergeContiguous': 'true',
+        'hl.regex.pattern': '\w[^\.!\?]{400,600}[\.!\?]',
+        # 'hl.regex.pattern': '[A-Z]{1}\w[^\.!\?]{1,300}[\.!\?]',
+        'hl.fragsize': '1000',
+        'hl.mergeContiguous': 'false',
         'fq': 'tip_t:govor',
         'rows': '50'
     }

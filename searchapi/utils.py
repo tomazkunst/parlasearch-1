@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import requests
 import re
 
@@ -28,8 +30,11 @@ def enrichQuery(data):
     return enrichedData
 
 def trimHighlight(highlight):
-    p = re.compile('[A-Z].*\<em\>.*\.')
-    return p.search(highlight).group()
+    m = re.search('[A-Ž][^\.\?\!]*<em.*\.?', highlight, re.UNICODE)
+    if m:
+        return m.group()
+    else:
+        return ''
 
 def enrichHighlights(data):
 
@@ -39,15 +44,19 @@ def enrichHighlights(data):
 
         speechdata = requests.get('https://data.parlameter.si/v1/getSpeechData/' + hkey.split('g')[1]).json()
 
-        try:
-            results.append({
-                'person': requests.get('https://analize.parlameter.si/v1/utils/getPersonData/' + str(speechdata['speaker_id'])).json(),
-                'content_t': trimHighlight(data['highlighting'][hkey]['content_t']) if 'content_t' in data['highlighting'][hkey].keys() else None,
-                'date': speechdata['date'],
-                'speech_id': int(hkey.split('g')[1])
-            })
-        except ValueError:
-            results.append({'person': {'party': {'acronym': 'unknown', 'id': 'unknown', 'name': 'unknown'}, 'name': 'unknown', 'gov_id': 'unknown', 'id': speechdata['speaker_id']}, 'content_t': data['highlighting'][hkey]['content_t'], 'date': speechdata['date'], 'speech_id': int(hkey.split('g')[1])})
+        content_t = trimHighlight(data['highlighting'][hkey]['content_t'][0]) if 'content_t' in data['highlighting'][hkey].keys() else None
+
+        if content_t != '' and content_t != None:
+
+            try:
+                results.append({
+                    'person': requests.get('https://analize.parlameter.si/v1/utils/getPersonData/' + str(speechdata['speaker_id'])).json(),
+                    'content_t': trimHighlight(content_t),
+                    'date': speechdata['date'],
+                    'speech_id': int(hkey.split('g')[1])
+                })
+            except ValueError:
+                results.append({'person': {'party': {'acronym': 'unknown', 'id': 'unknown', 'name': 'unknown'}, 'name': 'unknown', 'gov_id': 'unknown', 'id': speechdata['speaker_id']}, 'content_t': trimHighlight(content_t), 'date': speechdata['date'], 'speech_id': int(hkey.split('g')[1])})
 
     data['highlighting'] = sortedResults = sorted(results, key=lambda k: k['date'], reverse=True)
 
@@ -288,7 +297,7 @@ def groupPartyTFIDFALL(rawdata, party_i):
 
     truncatedResults = removeNumbers(removeSingles(removeDigrams(newdata)))
 
-    sortedResults = sorted(truncatedResults, key=lambda k: k['scores']['tf-idf'], reverse=True)[:10]
+    sortedResults = sorted(truncatedResults, key=lambda k: k['scores']['tf-idf'], reverse=True)
 
     enrichedData = {'party': requests.get('https://analize.parlameter.si/v1/utils/getPgDataAPI/' + str(party_i)).json(), 'results': sortedResults}
 
