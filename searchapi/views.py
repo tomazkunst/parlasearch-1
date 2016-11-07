@@ -160,7 +160,7 @@ def tfidfSpeakerDateQuery(request, speaker_i, datetime_dt): #TODO
 
     return JsonResponse(groupSpeakerTFIDF(r.json(), int(speaker_i)), safe=False)
 
-def tfidfPGQuery(request, party_i): #TODO poslance združiti
+def tfidfPGQuery(request, party_i): #TODO poslance zdruziti
 
     solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=party_i:' + party_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
 
@@ -168,7 +168,7 @@ def tfidfPGQuery(request, party_i): #TODO poslance združiti
 
     return JsonResponse(groupPartyTFIDF(r.json(), int(party_i)), safe=False)
 
-def tfidfPGDateQuery(request, party_i, datetime_dt): #TODO poslance združiti in datum dodati
+def tfidfPGDateQuery(request, party_i, datetime_dt): #TODO poslance zdruziti in datum dodati
 
     solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=party_i:' + party_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t&fq=datetime_dt:[*%20TO%20' + datetime.strptime(datetime_dt, '%d.%m.%Y').strftime('%Y-%m-%dT%H:%M:%SZ') + ']'
 
