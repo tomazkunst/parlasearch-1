@@ -141,13 +141,13 @@ def tfidfSessionQuery(request, session_i):
 
 def tfidfSpeakerQuery(request, speaker_i):
 
-    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=speaker_i:' + speaker_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
+    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=id:p' + speaker_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
 
     r = requests.get(solr_url)
 
     return JsonResponse(groupSpeakerTFIDF(r.json(), int(speaker_i)), safe=False)
 
-def tfidfSpeakerDateQuery(request, speaker_i, datetime_dt):
+def tfidfSpeakerDateQuery(request, speaker_i, datetime_dt): #TODO
 
     solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=speaker_i:' + speaker_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t&fq=datetime_dt:[*%20TO%20' + datetime_dt.split('.')[2] + '-' + datetime_dt.split('.')[1] + '-' + datetime_dt.split('.')[0] + 'T00:00:01Z]'
 
@@ -155,7 +155,7 @@ def tfidfSpeakerDateQuery(request, speaker_i, datetime_dt):
 
     return JsonResponse(groupSpeakerTFIDF(r.json(), int(speaker_i)), safe=False)
 
-def tfidfPGQuery(request, party_i):
+def tfidfPGQuery(request, party_i): #TODO poslance združiti
 
     solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=party_i:' + party_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
 
@@ -163,7 +163,7 @@ def tfidfPGQuery(request, party_i):
 
     return JsonResponse(groupPartyTFIDF(r.json(), int(party_i)), safe=False)
 
-def tfidfPGDateQuery(request, party_i, datetime_dt):
+def tfidfPGDateQuery(request, party_i, datetime_dt): #TODO poslance združiti in datum dodati
 
     solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=party_i:' + party_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t&fq=datetime_dt:[*%20TO%20' + datetime_dt.split('.')[2] + '-' + datetime_dt.split('.')[1] + '-' + datetime_dt.split('.')[0] + 'T00:00:01Z]'
 
