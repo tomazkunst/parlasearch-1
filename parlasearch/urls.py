@@ -28,18 +28,18 @@ urlpatterns = [
 
     url(r'^tfidf/s/(?P<session_i>[0-9]+)', tfidfSessionQuery),
 
-    url(r'^tfidf/p/(?P<speaker_i>[0-9]+)', tfidfSpeakerQuery),
-    url(r'^tfidf/p/(?P<speaker_i>[0-9]+)/(?P<datetime_dt>[\w].+)', tfidfSpeakerDateQuery),
+    url(r'^tfidf/p/(?P<speaker_i>[0-9]+)/$', tfidfSpeakerQuery),
+    url(r'^tfidf/p/(?P<speaker_i>[0-9]+)/(?P<datetime_dt>[\w].+)/', tfidfSpeakerDateQuery),
 
-    url(r'^tfidf/ps/(?P<party_i>[0-9]+)', tfidfPGQuery),
-    url(r'^tfidf/p/(?P<party_i>[0-9]+)/(?P<datetime_dt>[\w].+)', tfidfPGDateQuery),
+    url(r'^tfidf/ps/(?P<party_i>[0-9]+)/$', tfidfPGQuery),
+    url(r'^tfidf/ps/(?P<party_i>[0-9]+)/(?P<datetime_dt>[\w].+)/', tfidfPGDateQuery),
 
-    url(r'^tfidfALL/p/(?P<speaker_i>[0-9]+)', tfidfSpeakerQueryALL),
-    url(r'^tfidfALL/p/(?P<speaker_i>[0-9]+)/(?P<datetime_dt>[\w].+)', tfidfSpeakerDateQueryALL),
+    url(r'^tfidfALL/p/(?P<speaker_i>[0-9]+)/$', tfidfSpeakerQueryALL),
+    url(r'^tfidfALL/p/(?P<speaker_i>[0-9]+)/(?P<datetime_dt>[\w].+)/', tfidfSpeakerDateQueryALL),
 
-    url(r'^tfidfALL/ps/(?P<party_i>[0-9]+)', tfidfPGQueryALL),
-    url(r'^tfidfALL/ps/(?P<party_i>[0-9]+)/(?P<datetime_dt>[\w].+)', tfidfPGDateQueryALL),
+    url(r'^tfidfALL/ps/(?P<party_i>[0-9]+)/$', tfidfPGQueryALL),
+    url(r'^tfidfALL/ps/(?P<party_i>[0-9]+)/(?P<datetime_dt>[\w].+)/', tfidfPGDateQueryALL),
 
-    url(r'^dfall', dfALL),
-    url(r'^dfall/(?P<datetime_dt>[\w].+)', dfDateALL),
+    url(r'^dfall/$', dfALL),
+    url(r'^dfall/(?P<datetime_dt>[\w].+)/', dfDateALL),
 ]
