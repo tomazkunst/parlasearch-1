@@ -2,6 +2,23 @@
 
 import requests
 import re
+from parlasearch.settings import SOLR_URL, ANALIZE_URL
+
+def tryHard(url):
+    data = None
+    counter = 0
+    while data is None:
+        try:
+            if counter > 10:
+                print "Ne gre vec"
+                return None
+                #client.captureMessage(url+" je zahinavu več ko 10x.")
+            data = requests.get(url)
+        except:
+            counter += 1
+            time.sleep(30)
+            pass
+    return data
 
 def enrichQuery(data):
 
@@ -110,6 +127,19 @@ def removeNumbers(data):
             newdata.append(term)
 
     return newdata
+
+def isDigram(word):
+    if ' ' in word:
+        return True
+    else:
+        return False
+
+def isNumber(word):
+    try:
+        float(word)
+        return True
+    except ValueError:
+        return False
 
 def enrichTFIDF(data):
 
@@ -355,3 +385,49 @@ def groupDFALL(rawdata):
     # enrichedData = {'party': requests.get('https://analize.parlameter.si/v1/utils/getPgDataAPI/' + str(party_i)).json(), 'results': sortedResults}
 
     return sortedResults
+
+def appendTFIDFALL(rawdata, data):
+    ex_words = data.keys()
+
+    for i, speech in enumerate(rawdata['termVectors']):
+        if i % 2 == 1:
+
+            for i, term in enumerate(speech[3]):
+                if i % 2 == 0:
+
+                    tkey = speech[3][i]
+                    tvalue = speech[3][i + 1]
+
+                    if isNumber(tkey) or isDigram(tkey):
+                        continue
+
+                    if tkey in ex_words:
+                        data[tkey]["scores"]["tf"] + tvalue[1]
+
+                    else:
+                        data[tkey] = {"term": tkey, "scores":{tvalue[0]: tvalue[1], tvalue[2]: tvalue[3], tvalue[4]: tvalue[5]}}
+                        ex_words.append(tkey)
+
+
+def getTFIDFofSpeeches(speeches):
+    data = {}
+    for speech_id in speeches:
+        temp_data = tryHard(SOLR_URL + '/tvrh/?q=id:g' + str(speech_id) + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t').json()
+        appendTFIDFALL(temp_data, data)
+
+    for word in data:
+        data[word]["scores"]["tf-idf"] = float(data[word]["scores"]["tf"]) / data[word]["scores"]["df"]
+
+    data = sorted(data.values(), key=lambda k,: k["scores"]['tf-idf'], reverse=True) 
+
+    return data
+
+
+def enrichPersonData(data, person_id):
+    enrichedData = {'person': tryHard(ANALIZE_URL + '/utils/getPersonData/' + str(person_id)).json(), 'results': data}
+    return enrichedData
+
+
+def enrichPartyData(data, party_id):
+    enrichedData = {'party': tryHard(ANALIZE_URL + '/utils/getPgDataAPI/' + str(party_id)).json(), 'results': data}
+    return enrichedData
