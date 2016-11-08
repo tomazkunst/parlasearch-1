@@ -2,8 +2,9 @@ from django.shortcuts import render
 from django.http import JsonResponse, Http404
 import requests
 from datetime import datetime
+from parlasearch.settings import SOLR_URL, API_URL
 
-from utils import enrichQuery, enrichHighlights, enrichDocs, enrichTFIDF, groupSpeakerTFIDF, groupPartyTFIDF, groupSpeakerTFIDFALL, groupPartyTFIDFALL, groupDFALL
+from utils import enrichQuery, enrichHighlights, enrichDocs, enrichTFIDF, groupSpeakerTFIDF, groupPartyTFIDF, groupSpeakerTFIDFALL, groupPartyTFIDFALL, groupDFALL, tryHard, getTFIDFofSpeeches, enrichPersonData, enrichPartyData
 
 # Create your views here.
 
@@ -118,7 +119,7 @@ def filterQuery(request, words):
 
 def mltQuery(request, speech_i):
 
-    solr_url = 'http://127.0.0.1:8983/solr/knedl/mlt?wt=json&mlt.count=5&q=id:g' + speech_i + '&fl=id,score,content_t,session_i,speaker_i,speech_i&fq=tip_t:govor'
+    solr_url = SOLR_URL + '/mlt?wt=json&mlt.count=5&q=id:g' + speech_i + '&fl=id,score,content_t,session_i,speaker_i,speech_i&fq=tip_t:govor'
 
     print solr_url
     print 'bla'
@@ -129,7 +130,7 @@ def mltQuery(request, speech_i):
 
 def tfidfSessionQuery(request, session_i):
 
-    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=id:s' + session_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
+    solr_url = SOLR_URL + '/tvrh/?q=id:s' + session_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
 
     r = requests.get(solr_url)
 
@@ -142,7 +143,7 @@ def tfidfSessionQuery(request, session_i):
 
 def tfidfSpeakerQuery(request, speaker_i):
 
-    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=id:p' + speaker_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
+    solr_url = SOLR_URL + '/tvrh/?q=id:p' + speaker_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
 
     print solr_url
 
@@ -150,35 +151,31 @@ def tfidfSpeakerQuery(request, speaker_i):
 
     return JsonResponse(groupSpeakerTFIDF(r.json(), int(speaker_i)), safe=False)
 
-def tfidfSpeakerDateQuery(request, speaker_i, datetime_dt): #TODO
+def tfidfSpeakerDateQuery(request, speaker_i, datetime_dt): #TODO__________________________________________________________________________________
+    speeches = tryHard(API_URL + '/getMPSpeechesIDs/' + speaker_i + "/" + datetime_dt).json()
 
-    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=speaker_i:' + speaker_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t&fq=datetime_dt:[*%20TO%20' + datetime.strptime(datetime_dt, '%d.%m.%Y').strftime('%Y-%m-%dT%H:%M:%SZ') + ']'
+    data = getTFIDFofSpeeches(speeches)
 
-    print solr_url
-
-    r = requests.get(solr_url)
-
-    return JsonResponse(groupSpeakerTFIDF(r.json(), int(speaker_i)), safe=False)
+    return JsonResponse(enrichPersonData(data, speaker_i), safe=False)
 
 def tfidfPGQuery(request, party_i): #TODO poslance zdruziti
 
-    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=party_i:' + party_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
+    solr_url = SOLR_URL + '/tvrh/?q=party_i:' + party_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
 
     r = requests.get(solr_url)
 
     return JsonResponse(groupPartyTFIDF(r.json(), int(party_i)), safe=False)
 
-def tfidfPGDateQuery(request, party_i, datetime_dt): #TODO poslance zdruziti in datum dodati
+def tfidfPGDateQuery(request, party_i, datetime_dt): #TODO poslance zdruziti in datum dodati________________________________________________________
+    speeches = tryHard(API_URL + '/getPGsSpeechesIDs/' + party_i + "/" + datetime_dt).json()
 
-    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=party_i:' + party_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t&fq=datetime_dt:[*%20TO%20' + datetime.strptime(datetime_dt, '%d.%m.%Y').strftime('%Y-%m-%dT%H:%M:%SZ') + ']'
+    data = getTFIDFofSpeeches(speeches)
 
-    r = requests.get(solr_url)
-
-    return JsonResponse(groupPartyTFIDF(r.json(), int(party_i)), safe=False)
+    return JsonResponse(enrichPartyData(data, party_i), safe=False)
 
 def tfidfSpeakerQueryALL(request, speaker_i):
 
-    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=speaker_i:' + speaker_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
+    solr_url = SOLR_URL + '/tvrh/?q=speaker_i:' + speaker_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
 
     r = requests.get(solr_url)
 
@@ -186,7 +183,7 @@ def tfidfSpeakerQueryALL(request, speaker_i):
 
 def tfidfSpeakerDateQueryALL(request, speaker_i, datetime_dt): #TODO
 
-    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=speaker_i:' + speaker_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t&fq=datetime_dt:[*%20TO%20' + datetime.strptime(datetime_dt, '%d.%m.%Y').strftime('%Y-%m-%dT%H:%M:%SZ') + ']'
+    solr_url = SOLR_URL + '/tvrh/?q=speaker_i:' + speaker_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t&fq=datetime_dt:[*%20TO%20' + datetime.strptime(datetime_dt, '%d.%m.%Y').strftime('%Y-%m-%dT%H:%M:%SZ') + ']'
 
     r = requests.get(solr_url)
 
@@ -194,7 +191,7 @@ def tfidfSpeakerDateQueryALL(request, speaker_i, datetime_dt): #TODO
 
 def tfidfPGQueryALL(request, party_i):
 
-    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=party_i:' + party_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
+    solr_url = SOLR_URL + '/tvrh/?q=party_i:' + party_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
 
     r = requests.get(solr_url)
 
@@ -202,7 +199,7 @@ def tfidfPGQueryALL(request, party_i):
 
 def tfidfPGDateQueryALL(request, party_i, datetime_dt): #TODO
 
-    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=party_i:' + party_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t&fq=datetime_dt:[*%20TO%20' + datetime.strptime(datetime_dt, '%d.%m.%Y').strftime('%Y-%m-%dT%H:%M:%SZ') + ']'
+    solr_url = SOLR_URL + '/tvrh/?q=party_i:' + party_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t&fq=datetime_dt:[*%20TO%20' + datetime.strptime(datetime_dt, '%d.%m.%Y').strftime('%Y-%m-%dT%H:%M:%SZ') + ']'
 
     r = requests.get(solr_url)
 
@@ -210,9 +207,9 @@ def tfidfPGDateQueryALL(request, party_i, datetime_dt): #TODO
 
 def dfALL(request):
 
-    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=tip_t:seja&tv.df=true&wt=json&fl=id&tv.fl=content_t'
+    solr_url = SOLR_URL + '/tvrh/?q=tip_t:seja&tv.df=true&wt=json&fl=id&tv.fl=content_t'
 
-    # solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=tip_t:govor&tv.df=true&wt=json&fl=id&tv.fl=content_t'
+    # solr_url = SOLR_URL + '/tvrh/?q=tip_t:govor&tv.df=true&wt=json&fl=id&tv.fl=content_t'
 
     print 'calling solr'
     r = requests.get(solr_url)
@@ -222,7 +219,7 @@ def dfALL(request):
 
 def dfDateALL(request, datetime_dt): #TODO
 
-    solr_url = 'http://parlameter.si:8983/solr/knedl/tvrh/?q=tip_t:seja&tv.df=true&wt=json&fl=id&tv.fl=content_t&fq=datetime_dt:[*%20TO%20' + datetime.strptime(datetime_dt, '%d.%m.%Y').strftime('%Y-%m-%dT%H:%M:%SZ') + ']'
+    solr_url = SOLR_URL + '/tvrh/?q=tip_t:seja&tv.df=true&wt=json&fl=id&tv.fl=content_t&fq=datetime_dt:[*%20TO%20' + datetime.strptime(datetime_dt, '%d.%m.%Y').strftime('%Y-%m-%dT%H:%M:%SZ') + ']'
 
     print 'calling solr'
     r = requests.get(solr_url)
