@@ -127,11 +127,13 @@ VOTE_MAP = {
 }
 
 if DEVELOPMENT:
-    API_URL = "http://localhost:8000/v1"
+    API_URL = "https://localhost:8000/v1"
 else:
     API_URL = "http://data.parlameter.si/v1"
 
-BASE_URL = 'http://analize.parlameter.si/v1'
+ANALIZE_URL = 'https://analize.parlameter.si/v1'
+
+SOLR_URL = 'http://parlameter.si:8983/solr/knedl'
 
 
 LOGGING = {
