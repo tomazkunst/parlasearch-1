@@ -3,6 +3,8 @@
 import requests
 import re
 from parlasearch.settings import SOLR_URL, ANALIZE_URL
+from django.core.cache import cache
+import time
 
 def tryHard(url):
     data = None
@@ -394,7 +396,8 @@ def appendTFIDFALL(rawdata, data):
 
             for i, term in enumerate(speech[3]):
                 if i % 2 == 0:
-
+                    if len(speech)<4:
+                        continue
                     tkey = speech[3][i]
                     tvalue = speech[3][i + 1]
 
@@ -412,7 +415,10 @@ def appendTFIDFALL(rawdata, data):
 def getTFIDFofSpeeches(speeches):
     data = {}
     for speech_id in speeches:
-        temp_data = tryHard(SOLR_URL + '/tvrh/?q=id:g' + str(speech_id) + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t').json()
+        temp_data = cache.get("govor_"+str(speech_id))
+        if not temp_data:
+            temp_data = tryHard(SOLR_URL + '/tvrh/?q=id:g' + str(speech_id) + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t').json()
+            cache.set("govor_"+str(speech_id), temp_data, 86400)
         appendTFIDFALL(temp_data, data)
 
     for word in data:
