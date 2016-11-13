@@ -106,8 +106,6 @@ def filterQuery(request, words):
         'hl.fl': 'content_t'
     }
 
-    print q + 'asd'
-
     url = solr_url
     for key in solr_params:
         url = url + '&' + key + '=' + solr_params[key]
