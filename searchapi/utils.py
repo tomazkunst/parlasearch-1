@@ -418,7 +418,7 @@ def getTFIDFofSpeeches(speeches):
         temp_data = cache.get("govor_"+str(speech_id))
         if not temp_data:
             temp_data = tryHard(SOLR_URL + '/tvrh/?q=id:g' + str(speech_id) + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t').json()
-            cache.set("govor_"+str(speech_id), temp_data, 86400)
+            cache.set("govor_"+str(speech_id), temp_data, None)
         appendTFIDFALL(temp_data, data)
 
     for word in data:
