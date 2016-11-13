@@ -49,7 +49,7 @@ def enrichQuery(data):
     return enrichedData
 
 def trimHighlight(highlight):
-    m = re.search('[A-Ž][^\.\?\!]*<em.*\.?', unicode(highlight, 'UTF-8'), re.UNICODE)
+    m = re.search('[A-Ž][^\.\?\!]*<em.*\.?', highlight, 'UTF-8', re.UNICODE)
     if m:
         return m.group()
     else:
