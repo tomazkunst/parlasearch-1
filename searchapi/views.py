@@ -27,7 +27,7 @@ def regularQuery(request, words):
         'hl.fl': 'content_t',
         'hl.fragmenter': 'regex',
         'hl.regex.pattern': '\w[^\.!\?]{400,600}[\.!\?]',
-        'hl.fragsize': '1000',
+        'hl.fragsize': '5000',
         'hl.mergeContiguous': 'false',
         'fq': 'tip_t:govor',
         'rows': '50'
@@ -46,7 +46,7 @@ def regularQuery(request, words):
         'hl.fragmenter': 'regex',
         'hl.regex.pattern': '\w[^\.!\?]{400,600}[\.!\?]',
         # 'hl.regex.pattern': '[A-Z]{1}\w[^\.!\?]{1,300}[\.!\?]',
-        'hl.fragsize': '1000',
+        'hl.fragsize': '5000',
         'hl.mergeContiguous': 'false',
         'fq': 'tip_t:govor',
         'rows': '50'
@@ -105,8 +105,6 @@ def filterQuery(request, words):
         'hl': 'true',
         'hl.fl': 'content_t'
     }
-
-    print q + 'asd'
 
     url = solr_url
     for key in solr_params:

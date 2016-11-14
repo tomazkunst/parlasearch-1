@@ -49,7 +49,7 @@ def enrichQuery(data):
     return enrichedData
 
 def trimHighlight(highlight):
-    m = re.search('[A-Ž][^\.\?\!]*<em.*\.?', highlight, re.UNICODE)
+    m = re.search('[A-ZĆČŽŠ][^\.\?\!]*<em.*\.?', highlight, re.UNICODE)
     if m:
         return m.group()
     else:
@@ -418,7 +418,7 @@ def getTFIDFofSpeeches(speeches, tfidf):
         temp_data = cache.get("govor_"+str(speech_id))
         if not temp_data:
             temp_data = tryHard(SOLR_URL + '/tvrh/?q=id:g' + str(speech_id) + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t').json()
-            cache.set("govor_"+str(speech_id), temp_data, 86400)
+            cache.set("govor_"+str(speech_id), temp_data, None)
         appendTFIDFALL(temp_data, data, tfidf)
 
     for word in data:
