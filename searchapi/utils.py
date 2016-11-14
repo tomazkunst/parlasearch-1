@@ -388,7 +388,7 @@ def groupDFALL(rawdata):
 
     return sortedResults
 
-def appendTFIDFALL(rawdata, data):
+def appendTFIDFALL(rawdata, data, tfidf):
     ex_words = data.keys()
 
     for i, speech in enumerate(rawdata['termVectors']):
@@ -401,25 +401,25 @@ def appendTFIDFALL(rawdata, data):
                     tkey = speech[3][i]
                     tvalue = speech[3][i + 1]
 
-                    if isNumber(tkey) or isDigram(tkey):
+                    if isNumber(tkey) or ( tfidf and isDigram(tkey)):
                         continue
 
                     if tkey in ex_words:
-                        data[tkey]["scores"]["tf"] + tvalue[1]
+                        data[tkey]["scores"]["tf"] += tvalue[1]
 
                     else:
                         data[tkey] = {"term": tkey, "scores":{tvalue[0]: tvalue[1], tvalue[2]: tvalue[3], tvalue[4]: tvalue[5]}}
                         ex_words.append(tkey)
 
 
-def getTFIDFofSpeeches(speeches):
+def getTFIDFofSpeeches(speeches, tfidf):
     data = {}
     for speech_id in speeches:
         temp_data = cache.get("govor_"+str(speech_id))
         if not temp_data:
             temp_data = tryHard(SOLR_URL + '/tvrh/?q=id:g' + str(speech_id) + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t').json()
             cache.set("govor_"+str(speech_id), temp_data, None)
-        appendTFIDFALL(temp_data, data)
+        appendTFIDFALL(temp_data, data, tfidf)
 
     for word in data:
         data[word]["scores"]["tf-idf"] = float(data[word]["scores"]["tf"]) / data[word]["scores"]["df"]
