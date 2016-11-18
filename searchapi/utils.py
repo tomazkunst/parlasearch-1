@@ -114,7 +114,7 @@ def removeDigrams(data):
 def removeSingles(data):
     newdata = []
     for i, term in enumerate(data):
-        if term['scores']['tf'] != 1:
+        if term['scores']['tf'] > 30:
             newdata.append(term)
 
     return newdata
