@@ -114,7 +114,7 @@ def removeDigrams(data):
 def removeSingles(data):
     newdata = []
     for i, term in enumerate(data):
-        if term['scores']['tf'] > 30:
+        if term['scores']['tf'] > 10:
             newdata.append(term)
 
     return newdata
@@ -424,7 +424,7 @@ def getTFIDFofSpeeches(speeches, tfidf):
     for word in data:
         data[word]["scores"]["tf-idf"] = float(data[word]["scores"]["tf"]) / data[word]["scores"]["df"]
 
-    data = sorted(data.values(), key=lambda k,: k["scores"]['tf-idf'], reverse=True) 
+    data = sorted(data.values(), key=lambda k,: k["scores"]['tf-idf'], reverse=True)
 
     return data
 
