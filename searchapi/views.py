@@ -15,7 +15,7 @@ def regularQuery(request, words):
     q = words.replace('+', ' ')
 
     solr_params = {
-        'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '+'),
+        'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '%2B'),
         'facet': 'true',
         'facet.field': 'speaker_i&facet.field=party_i', # dirty hack
         'facet.range': 'datetime_dt',
