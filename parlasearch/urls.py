@@ -22,9 +22,9 @@ urlpatterns = [
 
     url(r'^mlt/(?P<speech_i>[0-9]+)', mltQuery),
 
-    url(r'^filter/(?P<words>[a-zA-Z0-9 -]+)', filterQuery),
+    url(r'^filter/(?P<words>[a-zA-Z0-9 \-\+!"]+)', filterQuery),
 
-    url(r'^q/(?P<words>[a-zA-Z0-9 -\+]+)', regularQuery),
+    url(r'^q/(?P<words>[a-zA-Z0-9 \-\+!"']+)', regularQuery),
 
     url(r'^tfidf/s/(?P<session_i>[0-9]+)', tfidfSessionQuery),
 
