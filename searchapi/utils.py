@@ -107,7 +107,7 @@ def enrichDocs(data):
 def truncateTFIDF(data):
     newdata = []
     for term in data:
-        if ' ' not in term:
+        if ' ' not in term['term']:
             if term['scores']['tf'] > 10:
                 try:
                     float(term['term'])
@@ -227,7 +227,7 @@ def groupSpeakerTFIDF(rawdata, person_i):
                 if ndterm['term'] == term['term']:
                     newdata[i]['scores']['tf'] = newdata[i]['scores']['tf'] + term['scores']['tf']
 
-    truncatedResults = removeNumbers(removeSingles(removeDigrams(newdata)))
+    truncatedResults = truncateTFIDF(newdata)
 
     sortedResults = sorted(truncatedResults, key=lambda k: k['scores']['tf-idf'], reverse=True)[:10]
 
