@@ -436,7 +436,10 @@ def getTFIDFofSpeeches(speeches, tfidf):
         appendTFIDFALL(temp_data, data, tfidf)
 
     for word in data:
-        data[word]["scores"]["tf-idf"] = float(data[word]["scores"]["tf"]) / data[word]["scores"]["df"]
+        if data[word]['scores']['df'] < 10:
+            del data[word]
+        else:
+            data[word]["scores"]["tf-idf"] = float(data[word]["scores"]["tf"]) / data[word]["scores"]["df"]
 
     data = sorted(data.values(), key=lambda k,: k["scores"]['tf-idf'], reverse=True)
 
