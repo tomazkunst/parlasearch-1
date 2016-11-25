@@ -436,7 +436,23 @@ def getTFIDFofSpeeches(speeches, tfidf):
         appendTFIDFALL(temp_data, data, tfidf)
 
     for word in data:
-        if data[word]['scores']['df'] < 10:
+        data[word]["scores"]["tf-idf"] = float(data[word]["scores"]["tf"]) / data[word]["scores"]["df"]
+
+    data = sorted(data.values(), key=lambda k,: k["scores"]['tf-idf'], reverse=True)
+
+    return data
+
+def getTFIDFofSpeeches2(speeches, tfidf):
+    data = {}
+    for speech_id in speeches:
+        temp_data = cache.get("govor_"+str(speech_id))
+        if not temp_data:
+            temp_data = tryHard(SOLR_URL + '/tvrh/?q=id:g' + str(speech_id) + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t').json()
+            cache.set("govor_"+str(speech_id), temp_data, None)
+        appendTFIDFALL(temp_data, data, tfidf)
+
+    for word in data:
+        if data[word]['scores']['df'] > 10:
             del data[word]
         else:
             data[word]["scores"]["tf-idf"] = float(data[word]["scores"]["tf"]) / data[word]["scores"]["df"]
