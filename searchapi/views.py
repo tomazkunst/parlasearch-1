@@ -4,7 +4,7 @@ import requests
 from datetime import datetime
 from parlasearch.settings import SOLR_URL, API_URL, API_DATE_FORMAT
 
-from utils import enrichQuery, enrichHighlights, enrichDocs, enrichTFIDF, groupSpeakerTFIDF, groupPartyTFIDF, groupSpeakerTFIDFALL, groupPartyTFIDFALL, groupDFALL, tryHard, getTFIDFofSpeeches, enrichPersonData, enrichPartyData
+from utils import enrichQuery, enrichHighlights, enrichDocs, enrichTFIDF, groupSpeakerTFIDF, groupPartyTFIDF, groupSpeakerTFIDFALL, groupPartyTFIDFALL, groupDFALL, tryHard, getTFIDFofSpeeches, enrichPersonData, enrichPartyData, getTFIDFofSpeeches2
 
 # Create your views here.
 
