@@ -104,6 +104,17 @@ def enrichDocs(data):
 
     return enrichedData
 
+def truncateTFIDF(data):
+    newdata = []
+    for i, term in enumerate(data):
+        if ' ' not in term and term['scores']['tf'] > 10:
+            try:
+                float(term['term'])
+                pass
+            except ValueError:
+                newdata.append(term)
+    return newdata
+
 def removeDigrams(data):
     newdata = []
     for i, term in enumerate(data):
@@ -159,7 +170,7 @@ def enrichTFIDF(data):
         else:
             del data['termVectors'][1][3][i]
 
-    truncatedResults = removeNumbers(removeSingles(removeDigrams(results)))
+    truncatedResults = truncateTFIDF(results)
 
     sortedResults = sorted(truncatedResults, key=lambda k: k['scores']['tf-idf'], reverse=True)[:10]
 
