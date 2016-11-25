@@ -106,13 +106,15 @@ def enrichDocs(data):
 
 def truncateTFIDF(data):
     newdata = []
-    for i, term in enumerate(data):
-        if ' ' not in term and term['scores']['tf'] > 10:
-            try:
-                float(term['term'])
-                pass
-            except ValueError:
-                newdata.append(term)
+    for term in data:
+        if ' ' not in term:
+            if term['scores']['tf'] > 10:
+                try:
+                    float(term['term'])
+                    pass
+                except ValueError:
+                    newdata.append(term)
+    
     return newdata
 
 def removeDigrams(data):
