@@ -127,6 +127,13 @@ def tfidfSpeakerQuery(request, speaker_i):
 
     return JsonResponse(groupSpeakerTFIDF(r.json(), int(speaker_i)), safe=False)
 
+def tfidfSpeakerQuery2(request, speaker_i, datetime_dt):
+    speeches = tryHard(API_URL + '/getMPSpeechesIDs/' + speaker_i + "/" + datetime.today().strftime('%d.%m.%Y')).json()
+
+    data = getTFIDFofSpeeches(speeches, True)[:10]
+
+    return JsonResponse(enrichPersonData(data, speaker_i), safe=False)
+
 def tfidfSpeakerDateQuery(request, speaker_i, datetime_dt):
     speeches = tryHard(API_URL + '/getMPSpeechesIDs/' + speaker_i + "/" + datetime_dt).json()
 
