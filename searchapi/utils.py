@@ -453,9 +453,9 @@ def getTFIDFofSpeeches2(speeches, tfidf):
 
     for word in data:
         if data[word]['scores']['df'] > 10:
-            del data[word]
-        else:
             data[word]["scores"]["tf-idf"] = float(data[word]["scores"]["tf"]) / data[word]["scores"]["df"]
+        else:
+            data[word]["scores"]["tf-idf"] = float(0)
 
     data = sorted(data.values(), key=lambda k,: k["scores"]['tf-idf'], reverse=True)
 
