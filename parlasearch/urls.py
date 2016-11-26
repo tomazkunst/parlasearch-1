@@ -20,26 +20,26 @@ from searchapi.views import regularQuery, filterQuery, mltQuery, tfidfSessionQue
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
 
-    url(r'^mlt/(?P<speech_i>[0-9]+)', mltQuery),
+    url(ur'^mlt/(?P<speech_i>[0-9]+)', mltQuery),
 
-    url(r'^filter/(?P<words>[a-zA-Z0-9 \-\+!"]+)', filterQuery),
+    url(ur'^filter/(?P<words>[a-zA-Z0-9 \-\+!"]+)', filterQuery),
 
-    url(r'^q/(?P<words>[a-zA-Z0-9 \-\+!"]+)', regularQuery),
+    url(ur'^q/(?P<words>[a-zA-Z0-9 \-\+!"]+)', regularQuery),
 
-    url(r'^tfidf/s/(?P<session_i>[0-9]+)', tfidfSessionQuery),
+    url(ur'^tfidf/s/(?P<session_i>[0-9]+)', tfidfSessionQuery),
 
-    url(r'^tfidf/p/(?P<speaker_i>[0-9]+)/$', tfidfSpeakerQuery2),
-    url(r'^tfidf/p/(?P<speaker_i>[0-9]+)/(?P<datetime_dt>[\w].+)/', tfidfSpeakerDateQuery),
+    url(ur'^tfidf/p/(?P<speaker_i>[0-9]+)/$', tfidfSpeakerQuery2),
+    url(ur'^tfidf/p/(?P<speaker_i>[0-9]+)/(?P<datetime_dt>[\w].+)/', tfidfSpeakerDateQuery),
 
-    url(r'^tfidf/ps/(?P<party_i>[0-9]+)/$', tfidfPGQuery),
-    url(r'^tfidf/ps/(?P<party_i>[0-9]+)/(?P<datetime_dt>[\w].+)/', tfidfPGDateQuery),
+    url(ur'^tfidf/ps/(?P<party_i>[0-9]+)/$', tfidfPGQuery),
+    url(ur'^tfidf/ps/(?P<party_i>[0-9]+)/(?P<datetime_dt>[\w].+)/', tfidfPGDateQuery),
 
-    url(r'^tfidfALL/p/(?P<speaker_i>[0-9]+)/$', tfidfSpeakerQueryALL),
-    url(r'^tfidfALL/p/(?P<speaker_i>[0-9]+)/(?P<datetime_dt>[\w].+)/', tfidfSpeakerDateQueryALL),
+    url(ur'^tfidfALL/p/(?P<speaker_i>[0-9]+)/$', tfidfSpeakerQueryALL),
+    url(ur'^tfidfALL/p/(?P<speaker_i>[0-9]+)/(?P<datetime_dt>[\w].+)/', tfidfSpeakerDateQueryALL),
 
-    url(r'^tfidfALL/ps/(?P<party_i>[0-9]+)/$', tfidfPGQueryALL),
-    url(r'^tfidfALL/ps/(?P<party_i>[0-9]+)/(?P<datetime_dt>[\w].+)/', tfidfPGDateQueryALL),
+    url(ur'^tfidfALL/ps/(?P<party_i>[0-9]+)/$', tfidfPGQueryALL),
+    url(ur'^tfidfALL/ps/(?P<party_i>[0-9]+)/(?P<datetime_dt>[\w].+)/', tfidfPGDateQueryALL),
 
-    url(r'^dfall/$', dfALL),
-    url(r'^dfall/(?P<datetime_dt>[\w].+)/', dfDateALL),
+    url(ur'^dfall/$', dfALL),
+    url(ur'^dfall/(?P<datetime_dt>[\w].+)/', dfDateALL),
 ]
