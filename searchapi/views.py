@@ -12,8 +12,6 @@ def regularQuery(request, words):
 
     solr_url = 'http://127.0.0.1:8983/solr/knedl/select?wt=json'
 
-    print words
-
     q = words.replace('+', ' ')
 
     solr_params = {
