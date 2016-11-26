@@ -452,7 +452,7 @@ def getTFIDFofSpeeches2(speeches, tfidf):
         appendTFIDFALL(temp_data, data, tfidf)
 
     for word in data:
-        if data[word]['scores']['df'] > 10:
+        if data[word]['scores']['tf'] > 10:
             data[word]["scores"]["tf-idf"] = float(data[word]["scores"]["tf"]) / data[word]["scores"]["df"]
         else:
             data[word]["scores"]["tf-idf"] = float(0)
