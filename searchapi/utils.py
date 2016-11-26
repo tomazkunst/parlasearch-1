@@ -461,6 +461,16 @@ def getTFIDFofSpeeches2(speeches, tfidf):
 
     return data
 
+def getTFIDFofSpeeches3(speeches, tfidf):
+    data = {}
+    for speech_id in speeches:
+        temp_data = cache.get("govor_"+str(speech_id))
+        if not temp_data:
+            temp_data = tryHard(SOLR_URL + '/tvrh/?q=id:g' + str(speech_id) + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t').json()
+            cache.set("govor_"+str(speech_id), temp_data, None)
+        appendTFIDFALL(temp_data, data, tfidf)
+
+    return data
 
 def enrichPersonData(data, person_id):
     enrichedData = {'person': tryHard(ANALIZE_URL + '/utils/getPersonData/' + str(person_id)).json(), 'results': data}
