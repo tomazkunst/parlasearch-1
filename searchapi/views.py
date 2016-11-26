@@ -39,7 +39,7 @@ def regularQuery(request, words):
     for key in solr_params:
         url = url + '&' + key + '=' + solr_params[key]
 
-    print url
+    # print url
 
     r = requests.get(url)
 
