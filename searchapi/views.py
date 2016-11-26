@@ -165,7 +165,7 @@ def tfidfSpeakerQueryALL(request, speaker_i):
 def tfidfSpeakerDateQueryALL(request, speaker_i, datetime_dt):
     speeches = tryHard(API_URL + '/getMPSpeechesIDs/' + speaker_i + "/" + datetime_dt).json()
 
-    data = getTFIDFofSpeeches(speeches, False)
+    data = getTFIDFofSpeeches2(speeches, False)
 
     return JsonResponse(enrichPersonData(data, speaker_i), safe=False)
 
