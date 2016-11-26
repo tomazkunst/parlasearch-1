@@ -165,7 +165,7 @@ def tfidfSpeakerQueryALL(request, speaker_i):
 def tfidfSpeakerDateQueryALL(request, speaker_i, datetime_dt):
     speeches = tryHard(API_URL + '/getMPSpeechesIDs/' + speaker_i + "/" + datetime_dt).json()
 
-    data = getTFIDFofSpeeches3(speeches, False)
+    data = getTFIDFofSpeeches3(speeches, True)
 
     return JsonResponse(enrichPersonData(data, speaker_i), safe=False)
 
@@ -180,7 +180,7 @@ def tfidfPGDateQueryALL(request, party_i, datetime_dt):
     date_str = datetime.now().strftime(API_DATE_FORMAT)
     speeches = tryHard(API_URL + '/getPGsSpeechesIDs/' + party_i + "/" + datetime_dt).json()
 
-    data = getTFIDFofSpeeches(speeches, False)
+    data = getTFIDFofSpeeches(speeches, True)
 
     return JsonResponse(enrichPartyData(data, party_i), safe=False)
 
