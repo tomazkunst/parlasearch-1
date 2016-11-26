@@ -33,7 +33,7 @@ def regularQuery(request, words):
         'rows': '50'
     }
 
-    print q + 'asd'
+    # print q + 'asd'
 
     url = solr_url
     for key in solr_params:
