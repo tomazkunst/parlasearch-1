@@ -48,37 +48,58 @@ def regularQuery(request, words):
 
 def filterQuery(request, words):
 
-    solr_url = 'http://127.0.0.1:8983/solr/knedl/select?wt=json'
+    solr_url = SOLR_URL+'/select?wt=json'
 
     q = words.replace('+', ' ')
-    people = request.GET.get('people')
-    parties = request.GET.get('parties')
+    people = request.GET.get('people')#
+    parties = request.GET.get('parties')#
+    from_date = request.GET.get('from')
+    to_date = request.GET.get('to')
+    is_dz = request.GET.get('dz')#
+    is_council = request.GET.get('council') #
+    working_bodies = request.GET.get('wb') #
 
-    fq = ''
+    f_date = datetime.strptime(from_date, API_DATE_FORMAT) if from_date else None
+    t_date = datetime.strptime(to_date, API_DATE_FORMAT) if to_date else None
 
-    if people == None:
-        fq = 'party_i:(' + parties + ')'
-    elif parties == None:
-        fq = 'speaker_i:(' + people + ')'
-    else:
-        fq = 'speaker_i:(' + people + ') OR party_i:(' + parties + ')'
+    filters_speakers = []
+
+    filters_orgs = []
+
+    if parties:
+        filters_speakers.append('party_i:(' + " OR ".join(parties.split(",")) + ')')
+        print 'party_i:(' + " OR ".join(parties.split(",")) + ')'
+    if people:
+        filters_speakers.append('speaker_i:(' + " OR ".join(people.split(",")) + ')')
+    if is_dz:
+        filters_orgs.append('org_i:( 95 )')
+    if working_bodies:
+        filters_orgs.append('org_i:(' + " OR ".join(working_bodies.split(",")) + ')')
+    if is_council:
+        filters_orgs.append('org_i:( 9 )')
+
+    print "org_filter", filters_orgs
 
     print people, parties
-
     solr_params = {
-        'q': 'content_t:' + q,
-        'fq': fq,
+        'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '%2B'),
+        'fq': "("+" OR ".join(filters_speakers) + ")" + (" AND ("+" OR ".join(filters_orgs) + ")") if filters_orgs else "",
         'facet': 'true',
-        'facet.field': 'speaker_i&facet.field=party_i', # dirty hack
-        'facet.date': 'datetime_dt',
-        'facet.date.start': '2014-01-01T00:00:00.000Z',
-        'facet.date.gap': '%2B1MONTHS',
-        'facet.date.end': 'NOW',
-        # 'sort': 'datetime_dt desc',
+        'facet.field': 'speaker_i&facet.field=party_i&facet.field=org_i', # dirty hack
+        'facet.range': 'datetime_dt',
+        'facet.range.start': (f_date.strftime('%Y-%m-%d') if f_date else '2014-01-01')+'T00:00:00.000Z',
+        'facet.range.gap': '%2B1MONTHS',
+        'facet.range.end': ( t_date.strftime('%Y-%m-%d') + 'T00:00:00.000Z' ) if t_date else 'NOW',
+        'sort': 'datetime_dt desc',
         'hl': 'true',
-        'hl.fl': 'content_t'
+        'hl.fl': 'content_t',
+        'hl.fragmenter': 'regex',
+        'hl.regex.pattern': '\w[^\.!\?]{400,600}[\.!\?]',
+        'hl.fragsize': '5000',
+        'hl.mergeContiguous': 'false',
+        'rows': '50'
     }
-
+    print solr_params
     url = solr_url
     for key in solr_params:
         url = url + '&' + key + '=' + solr_params[key]
