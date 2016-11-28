@@ -422,22 +422,25 @@ def appendTFIDFALL(rawdata, data, tfidf):
                         data[tkey]["scores"]["tf"] += tvalue[1]
 
                     else:
-                        data[tkey] = {"term": tkey, "scores":{tvalue[0]: tvalue[1], tvalue[2]: tvalue[3], tvalue[4]: tvalue[5]}}
+                        data[tkey] = {"term": tkey, "scores":{tvalue[0]: tvalue[1], tvalue[2]: tvalue[3]}}
                         ex_words.append(tkey)
 
 
 def getTFIDFofSpeeches(speeches, tfidf):
     data = {}
-    for speech_id in speeches:
-        temp_data = cache.get("govor_"+str(speech_id))
-        if not temp_data:
-            temp_data = tryHard(SOLR_URL + '/tvrh/?q=id:g' + str(speech_id) + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t').json()
-            cache.set("govor_"+str(speech_id), temp_data, None)
+    speeches = ["g"+str(speech) for speech in speeches]
+
+    temp = []
+    hundret_speeches = [speeches[i:i+500] for i in range(0,len(speeches),500)]
+    for speech_ids in hundret_speeches:
+        temp_data = tryHard(SOLR_URL + '/tvrh/?q=id:(' + " OR ".join(speech_ids) + ')&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t').json()
         appendTFIDFALL(temp_data, data, tfidf)
 
     for word in data:
-        data[word]["scores"]["tf-idf"] = float(data[word]["scores"]["tf"]) / data[word]["scores"]["df"]
-
+        if data[word]['scores']['tf'] > 10:
+            data[word]["scores"]["tf-idf"] = float(data[word]["scores"]["tf"]) / data[word]["scores"]["df"]
+        else:
+            data[word]["scores"]["tf-idf"] = float(0)
     data = sorted(data.values(), key=lambda k,: k["scores"]['tf-idf'], reverse=True)
 
     return data
@@ -463,13 +466,12 @@ def getTFIDFofSpeeches2(speeches, tfidf):
 
 def getTFIDFofSpeeches3(speeches, tfidf):
     data = {}
-    for speech_id in speeches:
-        temp_data = cache.get("govor_"+str(speech_id))
-        if not temp_data:
-            temp_data = tryHard(SOLR_URL + '/tvrh/?q=id:g' + str(speech_id) + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t').json()
-            cache.set("govor_"+str(speech_id), temp_data, None)
+    speeches = ["g"+str(speech) for speech in speeches]
+    for speech_ids in hundret_speeches:
+        temp_data = tryHard(SOLR_URL + '/tvrh/?q=id:(' + " OR ".join(speech_ids) + ')&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t').json()
         appendTFIDFALL(temp_data, data, tfidf)
 
+    data = sorted(data.values(), key=lambda k,: k["scores"]['tf-idf'], reverse=True)
     return data
 
 def enrichPersonData(data, person_id):
