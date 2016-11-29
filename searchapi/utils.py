@@ -415,7 +415,7 @@ def appendTFIDFALL(rawdata, data, tfidf):
                     tkey = speech[3][i]
                     tvalue = speech[3][i + 1]
 
-                    if isNumber(tkey) or ( tfidf and isDigram(tkey)):
+                    if isNumber(tkey) or ( not tfidf and isDigram(tkey)):
                         continue
 
                     if tkey in ex_words:
