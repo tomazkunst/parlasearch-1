@@ -411,7 +411,8 @@ def appendTFIDFALL(rawdata, data, with_digrams):
 
     for i, speech in enumerate(rawdata['termVectors']):
         if i % 2 == 1:
-
+            if len(speech)<4:
+                continue
             for i, term in enumerate(speech[3]):
                 if i % 2 == 0:
                     if len(speech)<4:
