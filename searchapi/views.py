@@ -31,6 +31,7 @@ def regularQuery(request, words, start_page=None):
         'hl.regex.pattern': '\w[^\.!\?]{400,600}[\.!\?]',
         'hl.fragsize': '5000',
         'hl.mergeContiguous': 'false',
+        'hl.snippets': '1',
         'fq': 'tip_t:govor',
         'rows': str(rows),
         'start': str(int(start_page) * rows) if start_page else '0',
@@ -101,6 +102,7 @@ def filterQuery(request, words, start_page=None):
         'hl.regex.pattern': '\w[^\.!\?]{400,600}[\.!\?]',
         'hl.fragsize': '5000',
         'hl.mergeContiguous': 'false',
+        'hl.snippets': '1',
         'rows': str(rows),
         'start': str(int(start_page) * rows) if start_page else '0',
     }
@@ -184,7 +186,7 @@ def tfidfPGQuery(request, party_i):
 def tfidfPGDateQuery(request, party_i, datetime_dt):
     speeches = tryHard(API_URL + '/getPGsSpeechesIDs/' + party_i + "/" + datetime_dt).json()
 
-    data = getTFIDFofSpeeches(speeches, True)[:10]
+    data = getTFIDFofSpeeches2(speeches, True)[:10]
 
     return JsonResponse(enrichPartyData(data, party_i), safe=False)
 
