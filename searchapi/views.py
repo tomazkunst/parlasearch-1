@@ -204,6 +204,14 @@ def tfidfPGDateQuery(request, party_i, datetime_dt):
 
     return JsonResponse(enrichPartyData(data, party_i), safe=False)
 
+def tfidfPGQueryWithoutDigrams(request, party_i):
+    speeches = tryHard(API_URL + '/getPGsSpeechesIDs/' + party_i + "/" + datetime.today().strftime(API_DATE_FORMAT)).json()
+
+    data = getTFIDFofSpeeches2(speeches, False)[:10]
+
+    return JsonResponse(enrichPartyData(data, party_i), safe=False)
+
+
 
 #ALL TFIDF Speeker
 def tfidfSpeakerQueryALL(request, speaker_i):
