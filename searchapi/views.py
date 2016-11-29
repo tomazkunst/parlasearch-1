@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from django.http import JsonResponse, Http404
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 from parlasearch.settings import SOLR_URL, API_URL, API_DATE_FORMAT
+import calendar
 
-from utils import enrichQuery, enrichHighlights, enrichDocs, enrichTFIDF, groupSpeakerTFIDF, groupPartyTFIDF, groupSpeakerTFIDFALL, groupPartyTFIDFALL, groupDFALL, tryHard, getTFIDFofSpeeches, enrichPersonData, enrichPartyData, getTFIDFofSpeeches2, getTFIDFofSpeeches3
+from utils import enrichQuery, enrichHighlights, enrichDocs, enrichTFIDF, groupSpeakerTFIDF, groupPartyTFIDF, groupSpeakerTFIDFALL, groupPartyTFIDFALL, groupDFALL, tryHard, getTFIDFofSpeeches, enrichPersonData, enrichPartyData, getTFIDFofSpeeches2, getTFIDFofSpeeches3, add_months
 
 # Create your views here.
 
@@ -63,13 +64,13 @@ def filterQuery(request, words, start_page=None):
     is_dz = request.GET.get('dz')#
     is_council = request.GET.get('council') #
     working_bodies = request.GET.get('wb') #
-
-    f_date = datetime.strptime(from_date, API_DATE_FORMAT) if from_date else None
-    t_date = datetime.strptime(to_date, API_DATE_FORMAT) if to_date else None
+    time_filter = request.GET.get('time_filter')
 
     filters_speakers = []
 
     filters_orgs = []
+
+    working_bodies = working_bodies.split(",") if working_bodies else []
 
     if parties:
         filters_speakers.append('party_i:(' + " OR ".join(parties.split(",")) + ')')
@@ -77,18 +78,31 @@ def filterQuery(request, words, start_page=None):
     if people:
         filters_speakers.append('speaker_i:(' + " OR ".join(people.split(",")) + ')')
     if is_dz:
-        filters_orgs.append('org_i:( 95 )')
-    if working_bodies:
-        filters_orgs.append('org_i:(' + " OR ".join(working_bodies.split(",")) + ')')
+        working_bodies.append("95")
     if is_council:
-        filters_orgs.append('org_i:( 9 )')
+        working_bodies.append("9")
+    if working_bodies:
+        filters_orgs.append('org_i:(' + " OR ".join(working_bodies) + ')')
+
 
     print "org_filter", filters_orgs
 
+    time_filter = [datetime.strptime(t_filter, API_DATE_FORMAT) for t_filter in time_filter.split(",")]
+
+    f_date = min(time_filter) if time_filter else None
+    t_date = add_months(max(time_filter), 1) if time_filter else None
+
+    time_query = "datetime_dt:(" + " OR ".join(["["+ t_time.strftime('%Y-%m-%d') + 'T00:00:00.000Z' + " TO " + add_months(t_time, 1).strftime('%Y-%m-%d') + 'T00:00:00.000Z'"]" for t_time in time_filter ])+")"  if time_filter else None
+
+    print time_query
+
     print people, parties
+
     solr_params = {
         'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '%2B'),
-        'fq': "("+" OR ".join(filters_speakers) + ")" + (" AND ("+" OR ".join(filters_orgs) + ")") if filters_orgs else "",
+        'fq': " OR ".join(filters_speakers)
+              + (" AND " if filters_speakers and filters_orgs else "") + ((" OR ".join(filters_orgs)) if filters_orgs else "")
+              + (" AND " if (filters_speakers or filters_orgs) and time_query else "") + (time_query if time_query else ""),
         'facet': 'true',
         'facet.field': 'speaker_i&facet.field=party_i&facet.field=org_i', # dirty hack
         'facet.range': 'datetime_dt',

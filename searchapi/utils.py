@@ -5,6 +5,8 @@ import re
 from parlasearch.settings import SOLR_URL, ANALIZE_URL
 from django.core.cache import cache
 import time
+import datetime
+import calendar
 
 def tryHard(url):
     data = None
@@ -487,3 +489,10 @@ def enrichPersonData(data, person_id):
 def enrichPartyData(data, party_id):
     enrichedData = {'party': tryHard(ANALIZE_URL + '/utils/getPgDataAPI/' + str(party_id)).json(), 'results': data}
     return enrichedData
+
+def add_months(sourcedate,months):
+    month = sourcedate.month - 1 + months
+    year = int(sourcedate.year + month / 12 )
+    month = month % 12 + 1
+    day = min(sourcedate.day,calendar.monthrange(year,month)[1])
+    return datetime.date(year,month,day)
