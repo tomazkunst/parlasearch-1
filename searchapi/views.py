@@ -29,6 +29,7 @@ def regularQuery(request, words):
         'hl.regex.pattern': '\w[^\.!\?]{400,600}[\.!\?]',
         'hl.fragsize': '5000',
         'hl.mergeContiguous': 'false',
+        'hl.snippets': '1',
         'fq': 'tip_t:govor',
         'rows': '50'
     }
@@ -97,6 +98,7 @@ def filterQuery(request, words):
         'hl.regex.pattern': '\w[^\.!\?]{400,600}[\.!\?]',
         'hl.fragsize': '5000',
         'hl.mergeContiguous': 'false',
+        'hl.snippets': '1',
         'rows': '50'
     }
     print solr_params
