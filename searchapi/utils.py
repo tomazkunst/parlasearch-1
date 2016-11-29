@@ -404,7 +404,7 @@ def groupDFALL(rawdata):
 
     return sortedResults
 
-def appendTFIDFALL(rawdata, data, tfidf):
+def appendTFIDFALL(rawdata, data, with_digrams):
     ex_words = data.keys()
 
     for i, speech in enumerate(rawdata['termVectors']):
@@ -417,7 +417,7 @@ def appendTFIDFALL(rawdata, data, tfidf):
                     tkey = speech[3][i]
                     tvalue = speech[3][i + 1]
 
-                    if isNumber(tkey) or ( not tfidf and isDigram(tkey)):
+                    if isNumber(tkey) or ( not with_digrams and isDigram(tkey)):
                         continue
 
                     if tkey in ex_words:
@@ -432,9 +432,10 @@ def getTFIDFofSpeeches(speeches, tfidf):
     data = {}
     speeches = ["g"+str(speech) for speech in speeches]
 
-    hundret_speeches = [speeches[i:i+10] for i in range(0, len(speeches), 10)]
+    hundret_speeches = [speeches[i:i+20] for i in range(0, len(speeches), 20)]
     for speech_ids in hundret_speeches:
-        temp_data = tryHard(SOLR_URL + '/tvrh/?q=id:(' + " OR ".join(speech_ids) + ')&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t').json()
+        print SOLR_URL + '/tvrh/?q=id:(' + " ".join(speech_ids) + ')&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
+        temp_data = tryHard(SOLR_URL + '/tvrh/?q=id:('+ " ".join(speech_ids) + ')&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t').json()
         appendTFIDFALL(temp_data, data, tfidf)
 
     for word in data:
@@ -469,13 +470,13 @@ def getTFIDFofSpeeches3(speeches, tfidf):
     data = {}
     speeches = ["g"+str(speech) for speech in speeches]
 
-    hundret_speeches = [speeches[i:i+10] for i in range(0, len(speeches), 10)]
+    hundret_speeches = [speeches[i:i+20] for i in range(0, len(speeches), 20)]
     for speech_ids in hundret_speeches:
         temp_data = tryHard(SOLR_URL + '/tvrh/?q=id:(' + " OR ".join(speech_ids) + ')&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t').json()
         appendTFIDFALL(temp_data, data, tfidf)
 
     data = sorted(data.values(), key=lambda k,: k["scores"]['df'], reverse=True)
-    
+
     return data
 
 def enrichPersonData(data, person_id):
