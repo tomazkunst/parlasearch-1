@@ -37,6 +37,7 @@ urlpatterns = [
 
     url(ur'^tfidf/ps/(?P<party_i>[0-9]+)/$', tfidfPGQuery),
     url(ur'^tfidf/ps/(?P<party_i>[0-9]+)/(?P<datetime_dt>[\w].+)/', tfidfPGDateQuery),
+    url(ur'^tfidf/nodigrams/ps/(?P<party_i>[0-9]+)/$', tfidfPGQueryWithoutDigrams),
 
     url(ur'^tfidfALL/p/(?P<speaker_i>[0-9]+)/$', tfidfSpeakerQueryALL),
     url(ur'^tfidfALL/p/(?P<speaker_i>[0-9]+)/(?P<datetime_dt>[\w].+)/', tfidfSpeakerDateQueryALL),
