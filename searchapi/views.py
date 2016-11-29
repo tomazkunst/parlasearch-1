@@ -8,9 +8,11 @@ from utils import enrichQuery, enrichHighlights, enrichDocs, enrichTFIDF, groupS
 
 # Create your views here.
 
-def regularQuery(request, words):
+def regularQuery(request, words, start_page=None):
 
-    solr_url = 'http://127.0.0.1:8983/solr/knedl/select?wt=json'
+    rows = 50
+    #solr_url = 'http://127.0.0.1:8983/solr/knedl/select?wt=json'
+    solr_url = SOLR_URL+'/select?wt=json'
 
     q = words.replace('+', ' ')
 
@@ -31,7 +33,8 @@ def regularQuery(request, words):
         'hl.mergeContiguous': 'false',
         'hl.snippets': '1',
         'fq': 'tip_t:govor',
-        'rows': '50'
+        'rows': str(rows),
+        'start': str(int(start_page) * rows) if start_page else '0',
     }
 
     # print q + 'asd'
@@ -40,15 +43,16 @@ def regularQuery(request, words):
     for key in solr_params:
         url = url + '&' + key + '=' + solr_params[key]
 
-    # print url
+    print url
 
     r = requests.get(url)
 
     return JsonResponse(enrichHighlights(enrichQuery(r.json())))
 
 
-def filterQuery(request, words):
+def filterQuery(request, words, start_page=None):
 
+    rows = 50
     solr_url = SOLR_URL+'/select?wt=json'
 
     q = words.replace('+', ' ')
@@ -99,7 +103,8 @@ def filterQuery(request, words):
         'hl.fragsize': '5000',
         'hl.mergeContiguous': 'false',
         'hl.snippets': '1',
-        'rows': '50'
+        'rows': str(rows),
+        'start': str(int(start_page) * rows) if start_page else '0',
     }
     print solr_params
     url = solr_url
