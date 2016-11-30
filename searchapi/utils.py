@@ -2,7 +2,7 @@
 
 import requests
 import re
-from parlasearch.settings import SOLR_URL, ANALIZE_URL
+from parlasearch.settings import SOLR_URL, ANALIZE_URL, API_URL, API_DATE_FORMAT
 from django.core.cache import cache
 import time
 import datetime
@@ -19,6 +19,7 @@ def tryHard(url):
                 #client.captureMessage(url+" je zahinavu več ko 10x.")
             data = requests.get(url)
         except:
+            print "try Harder"
             counter += 1
             time.sleep(30)
             pass
@@ -495,3 +496,17 @@ def add_months(sourcedate,months):
     month = month % 12 + 1
     day = min(sourcedate.day,calendar.monthrange(year,month)[1])
     return datetime.date(year,month,day)
+
+
+def tfidf_to_file():
+    membersOfPGsRanges = tryHard('https://data.parlameter.si/v1/getMembersOfPGsRanges/14.11.2016').json()
+    IDs = [key for key, value in membersOfPGsRanges[-1]["members"].items()]
+    IDs = [97]
+    for ID in IDs:
+        with open('tfidfs/tdidf_pg_' + str(ID) + '.json', 'w') as f:
+            speeches = tryHard(API_URL + '/getPGsSpeechesIDs/' + str(ID) + "/" + datetime.datetime.now().strftime(API_DATE_FORMAT)).json()
+
+            data = getTFIDFofSpeeches2 (speeches, False)[:10]
+
+            read_data = f.write(enrichPartyData(data, ID))
+        f.closed
