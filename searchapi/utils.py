@@ -7,6 +7,7 @@ from django.core.cache import cache
 import time
 import datetime
 import calendar
+import json
 
 def tryHard(url):
     data = None
@@ -501,12 +502,12 @@ def add_months(sourcedate,months):
 def tfidf_to_file():
     membersOfPGsRanges = tryHard('https://data.parlameter.si/v1/getMembersOfPGsRanges/14.11.2016').json()
     IDs = [key for key, value in membersOfPGsRanges[-1]["members"].items()]
-    IDs = [97]
     for ID in IDs:
-        with open('tfidfs/tdidf_pg_' + str(ID) + '.json', 'w') as f:
+        with open('tfidfs/tfidf_pg_' + str(ID) + '.json', 'w') as f:
+	    print "delam zdej ", ID
             speeches = tryHard(API_URL + '/getPGsSpeechesIDs/' + str(ID) + "/" + datetime.datetime.now().strftime(API_DATE_FORMAT)).json()
 
             data = getTFIDFofSpeeches2 (speeches, False)[:10]
 
-            read_data = f.write(enrichPartyData(data, ID))
+            read_data = f.write(json.dumps(enrichPartyData(data, ID)))
         f.closed
