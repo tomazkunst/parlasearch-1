@@ -44,7 +44,7 @@ def regularQuery(request, words, start_page=None):
     for key in solr_params:
         url = url + '&' + key + '=' + solr_params[key]
 
-    print url
+    #print url
 
     r = requests.get(url)
 
@@ -85,7 +85,7 @@ def filterQuery(request, words, start_page=None):
         filters_orgs.append('org_i:(' + " OR ".join(working_bodies) + ')')
 
 
-    print "org_filter", filters_orgs
+    #print "org_filter", filters_orgs
 
     time_filter = [datetime.strptime(t_filter, API_DATE_FORMAT) for t_filter in time_filter.split(",")]
 
@@ -94,9 +94,9 @@ def filterQuery(request, words, start_page=None):
 
     time_query = "datetime_dt:(" + " OR ".join(["["+ t_time.strftime('%Y-%m-%d') + 'T00:00:00.000Z' + " TO " + add_months(t_time, 1).strftime('%Y-%m-%d') + 'T00:00:00.000Z'"]" for t_time in time_filter ])+")"  if time_filter else None
 
-    print time_query
+    #print time_query
 
-    print people, parties
+    #print people, parties
 
     solr_params = {
         'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '%2B'),
@@ -120,12 +120,12 @@ def filterQuery(request, words, start_page=None):
         'rows': str(rows),
         'start': str(int(start_page) * rows) if start_page else '0',
     }
-    print solr_params
+    #print solr_params
     url = solr_url
     for key in solr_params:
         url = url + '&' + key + '=' + solr_params[key]
 
-    print url
+    #print url
 
     r = requests.get(url)
 
