@@ -471,11 +471,11 @@ def getTFIDFofSpeeches2(speeches, tfidf):
 
 def getTFIDFofSpeeches3(speeches, tfidf):
     data = {}
-    speeches = ["g"+str(speech) for speech in speeches]
-
-    hundret_speeches = [speeches[i:i+20] for i in range(0, len(speeches), 20)]
-    for speech_ids in hundret_speeches:
-        temp_data = tryHard(SOLR_URL + '/tvrh/?q=id:(' + " OR ".join(speech_ids) + ')&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t').json()
+    for speech_id in speeches:
+        temp_data = cache.get("govor_"+str(speech_id))
+        if not temp_data:
+            temp_data = tryHard(SOLR_URL + '/tvrh/?q=id:g' + str(speech_id) + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t').json()
+            cache.set("govor_"+str(speech_id), temp_data, None)
         appendTFIDFALL(temp_data, data, tfidf)
 
     data = sorted(data.values(), key=lambda k,: k["scores"]['df'], reverse=True)
