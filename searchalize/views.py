@@ -1,10 +1,9 @@
 from django.shortcuts import render
 from kvalifikatorji.scripts import getCountListPG, getScores, problematicno, privzdignjeno, preprosto
-from searchapi.utils import tryHard
+from searchapi.utils import tryHard, enrichPartyData, getTFIDFofSpeeches2
 from parlasearch.settings import SOLR_URL, API_URL, API_DATE_FORMAT, ANALIZE_URL
 from datetime import datetime
 from collections import Counter
-from searchapi.utils import getTFIDFofSpeeches2
 
 import json
 import requests
