@@ -20,6 +20,7 @@ def tryHard(url):
                 #client.captureMessage(url+" je zahinavu več ko 10x.")
             data = requests.get(url)
         except:
+            print url
             print "try Harder"
             counter += 1
             time.sleep(30)
