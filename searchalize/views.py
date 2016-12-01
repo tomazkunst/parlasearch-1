@@ -24,22 +24,22 @@ def setStyleScoresPGsALL(date_=None):
     scores = {}
     for pg in pgs:
         print 'PG id: ' + str(pg)
-
         # get word counts with solr
         counter = Counter(getCountListPG(int(pg), date_))
         total = sum(counter.values())
-
         scores_local = getScores([problematicno, privzdignjeno, preprosto], counter, total)
-
-        #average = average_scores
 
         print scores_local, #average
         scores[pg] = scores_local
 
 
     print scores
-    average = {"problematicno": sum([score['problematicno'] for score in scores.values()])/len(scores), "privzdignjeno": sum([score['privzdignjeno'] for score in scores.values()])/len(scores), "preprosto": sum([score['preprosto'] for score in scores.values()])/len(scores)}
+    average = {"problematicno": sum([score['problematicno'] for score in scores.values()])/len(scores),
+               "privzdignjeno": sum([score['privzdignjeno'] for score in scores.values()])/len(scores), 
+               "preprosto": sum([score['preprosto'] for score in scores.values()])/len(scores)}
+
     data = []
+
     for pg, score in scores.items():
         data.append({"party": pg,
                      "problematicno": score['problematicno'],
@@ -48,5 +48,6 @@ def setStyleScoresPGsALL(date_=None):
                      "problematicno_average": average['problematicno'],
                      "privzdignjeno_average": average['privzdignjeno'],
                      "preprosto_average": average['preprosto']})
-    r = requests.post(ANALIZE_URL + "/pg/setAllPGsStyleScoresFromSearch/", json={"data": data})
+
+    r = requests.post(ANALIZE_URL + "/pg/setAllPGsStyleScoresFromSearch/", json=data)
     return r.content
