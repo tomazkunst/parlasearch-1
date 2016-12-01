@@ -51,3 +51,23 @@ def setStyleScoresPGsALL(date_=None):
 
     r = requests.post(ANALIZE_URL + "/pg/setAllPGsStyleScoresFromSearch/", json=data)
     return r.content
+
+
+def setTFIDFforPGsALL(date_=None):
+    if date_:
+        date_of = datetime.strptime(date_, API_DATE_FORMAT).date()
+    else:
+        date_of = datetime.now().date()
+        date_=date_of.strftime(API_DATE_FORMAT)
+
+    membersOfPGsRanges = tryHard('https://data.parlameter.si/v1/getMembersOfPGsRanges/'+date_).json()
+
+    IDs = [key for key, value in membersOfPGsRanges[-1]["members"].items()]
+    data_for_post = []
+    for ID in IDs:
+            speeches = tryHard(API_URL + '/getPGsSpeechesIDs/' + str(ID) + "/" + datetime.datetime.now().strftime(API_DATE_FORMAT)).json()
+            data = getTFIDFofSpeeches2 (speeches, False)[:10]
+            data_for_post.append(enrichPartyData(data, ID))
+
+    r = requests.post(ANALIZE_URL + "/pg/setAllPGsTFIDFsFromSearch/", json=data_for_post)
+    return r.content
