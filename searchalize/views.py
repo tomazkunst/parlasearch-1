@@ -1,9 +1,10 @@
 from django.shortcuts import render
-from kvalifikatorji.scripts import getCountListPG, getScores
+from kvalifikatorji.scripts import getCountListPG, getScores, problematicno, privzdignjeno, preprosto
 from searchapi.utils import tryHard
 from parlasearch.settings import SOLR_URL, API_URL, API_DATE_FORMAT, ANALIZE_URL
 from datetime import datetime
 from collections import Counter
+from searchapi.utils import getTFIDFofSpeeches2
 
 import json
 import requests
@@ -65,8 +66,9 @@ def setTFIDFforPGsALL(date_=None):
     IDs = [key for key, value in membersOfPGsRanges[-1]["members"].items()]
     data_for_post = []
     for ID in IDs:
-            speeches = tryHard(API_URL + '/getPGsSpeechesIDs/' + str(ID) + "/" + datetime.datetime.now().strftime(API_DATE_FORMAT)).json()
-            data = getTFIDFofSpeeches2 (speeches, False)[:10]
+            print "tfidf ", ID
+            speeches = tryHard(API_URL + '/getPGsSpeechesIDs/' + str(ID) + "/" + datetime.now().strftime(API_DATE_FORMAT)).json()
+            data = getTFIDFofSpeeches2 (speeches, False)[:15]
             data_for_post.append(enrichPartyData(data, ID))
 
     r = requests.post(ANALIZE_URL + "/pg/setAllPGsTFIDFsFromSearch/", json=data_for_post)
