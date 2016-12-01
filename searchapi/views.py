@@ -237,7 +237,7 @@ def tfidfPGDateQueryALL(request, party_i, datetime_dt):
     date_str = datetime.now().strftime(API_DATE_FORMAT)
     speeches = tryHard(API_URL + '/getPGsSpeechesIDs/' + party_i + "/" + datetime_dt).json()
 
-    data = getTFIDFofSpeeches3(speeches, True)
+    data = getTFIDFofSpeeches3(speeches, False)
 
     return JsonResponse(enrichPartyData(data, party_i), safe=False)
 
