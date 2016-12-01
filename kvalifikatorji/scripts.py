@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #import slopos, nltk
-from nltk.tokenize import word_tokenize
+#from nltk.tokenize import word_tokenize
 from string import maketrans, punctuation
 from collections import Counter
 #import lemmagen.lemmatizer
@@ -31,11 +31,11 @@ preprosto = getWordsDict('kvalifikatorji/preprosto.txt')
 
 text = 'Tudi v Poslanski skupini Socialnih demokratov ne bomo podprli proračunov za leti 2013 in 2014. Že v uvodnem nagovoru v imenu poslanske skupine smo opozorili, da ta dva proračuna nista odgovor na dogajanje v Sloveniji. Ljudje pričakujejo, da bosta ta dva proračuna omogočala gospodarski razvoj, da bosta omogočala zagotavljanje novih delovnih mest, da bosta omogočala nadaljnji obstoj in razvoj javnega šolstva, tako osnovnega kot tudi do nivoja univerz, in predvsem da bomo imeli vsi tudi temu primerno socialno varnost. Vseh teh problemov ta dva proračuna ne odpravljata, nasprotno. Kaže se, da vladajoča koalicija razume in sledi samo cilju čimprejšnje razprodaje državnega premoženja in želi pri tem omogočiti vsem tistim, ki imajo te informacije, da se vključijo v ta proces na način, da dajo prioriteto osebnim interesom, ne pa interesom države, ne interesom ljudi, ki pričakujejo, da bomo ravnali po našem mnenju, tudi v Državnem zboru, povsem drugače kot je zapisano v teh dveh proračunih.'
 
-def numberOfWords(text):
+"""def numberOfWords(text):
     exclude = set(punctuation)
     text_lower = text.lower()
     text_nopunct_lower = ''.join(ch for ch in text_lower if ch not in exclude)
-    return len(word_tokenize(text_nopunct_lower))
+    return len(word_tokenize(text_nopunct_lower))"""
 
 """def lemmatizeTokens(tokens):
 
