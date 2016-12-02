@@ -29,7 +29,7 @@ def regularQuery(request, words, start_page=None):
         'hl': 'true',
         'hl.fl': 'content_t',
         'hl.fragmenter': 'regex',
-        'hl.regex.pattern': '\w[^\.!\?]{400,600}[\.!\?]',
+        'hl.regex.pattern': '\w[^\.!\?]{100,600}[\.!\?]',
         'hl.fragsize': '5000',
         'hl.mergeContiguous': 'false',
         'hl.snippets': '1',
