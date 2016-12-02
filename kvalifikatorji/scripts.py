@@ -14,6 +14,7 @@ from itertools import repeat
 from searchapi.utils import tryHard
 from searchapi.views import tfidfPGDateQueryALL
 import requests
+import json
 
 def getWords(filename):
     f = open(filename, 'r')
@@ -78,6 +79,7 @@ def getCountList(speaker_id, date_):
 def getCountListPG(party_id, date_):
     #data = tryHard('https://isci.parlameter.si/tfidfALL/ps/' + str(party_id) + "/" + date_).json()
     data=tfidfPGDateQueryALL(None, str(party_id), date_)
+    data = json.loads(data.content)
     wordlist = data['results']
 
     wordlist_new = {word["term"]: word["scores"]["tf"] for word in wordlist}
