@@ -46,6 +46,9 @@ def enrichQuery(data):
         else:
             del data['facet_counts']['facet_fields']['speaker_i'][i]
 
+    for result in results:
+        result.update({"score": int(result["score"])})
+
     data['facet_counts']['facet_fields']['speaker_i'] = sorted(results, key=lambda k: k['score'], reverse=True)
 
     enrichedData = data
