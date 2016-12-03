@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse, Http404
 import requests
 from datetime import datetime, timedelta
-from parlasearch.settings import SOLR_URL, API_URL, API_DATE_FORMAT
+from parlasearch.settings import SOLR_URL, API_URL, API_DATE_FORMAT, ANALIZE_URL
 import calendar
 
 from utils import enrichQuery, enrichHighlights, enrichDocs, enrichTFIDF, groupSpeakerTFIDF, groupPartyTFIDF, groupSpeakerTFIDFALL, groupPartyTFIDFALL, groupDFALL, tryHard, getTFIDFofSpeeches, enrichPersonData, enrichPartyData, getTFIDFofSpeeches2, getTFIDFofSpeeches3, add_months
@@ -130,6 +130,46 @@ def filterQuery(request, words, start_page=None):
     r = requests.get(url)
 
     return JsonResponse(r.json())
+
+
+def motionQuery(request, words, start_page=None):
+
+    rows = 50
+    #solr_url = 'http://127.0.0.1:8983/solr/knedl/select?wt=json'
+    solr_url = SOLR_URL+'/select?wt=json'
+
+    q = words.replace('+', ' ')
+
+    solr_params = {
+        'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '%2B'),
+        'sort': 'datetime_dt desc',
+        'hl': 'true',
+        'hl.fl': 'content_t',
+        'fq': 'tip_t:v',
+        'rows': str(rows),
+        'start': str(int(start_page) * rows) if start_page else '0',
+    }
+
+    url = solr_url
+    for key in solr_params:
+        url = url + '&' + key + '=' + solr_params[key]
+
+    print url
+
+    r = requests.get(url).json()
+    ids = []
+    try:
+        docs = r["response"]["docs"]
+        for doc in docs:
+            ids.append(str(doc["voteid_i"]))
+    except:
+        JsonResponse({"status": "no votes with this word"})
+
+    url2 = ANALIZE_URL+ "/s/getMotionOfSessionVotes/"+",".join(ids)
+    print url2
+    resp = tryHard(url2).json()
+
+    return JsonResponse(resp, safe=False)
 
 
 def mltQuery(request, speech_i):
