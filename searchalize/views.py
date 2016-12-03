@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from kvalifikatorji.scripts import getCountListPG, getScores
-from searchapi.utils import tryHard
+from kvalifikatorji.scripts import getCountListPG, getScores, problematicno, privzdignjeno, preprosto
+from searchapi.utils import tryHard, enrichPartyData, getTFIDFofSpeeches2
 from parlasearch.settings import SOLR_URL, API_URL, API_DATE_FORMAT, ANALIZE_URL
 from datetime import datetime
 from collections import Counter
@@ -48,7 +48,9 @@ def setStyleScoresPGsALL(date_=None):
                      "problematicno_average": average['problematicno'],
                      "privzdignjeno_average": average['privzdignjeno'],
                      "preprosto_average": average['preprosto']})
-
+    with open('tfidfs/style_score_PGs.json', 'w') as f:
+        f.write(json.dumps(data))
+    f.close()
     r = requests.post(ANALIZE_URL + "/pg/setAllPGsStyleScoresFromSearch/", json=data)
     return r.content
 
@@ -61,13 +63,18 @@ def setTFIDFforPGsALL(date_=None):
         date_=date_of.strftime(API_DATE_FORMAT)
 
     membersOfPGsRanges = tryHard('https://data.parlameter.si/v1/getMembersOfPGsRanges/'+date_).json()
-
-    IDs = [key for key, value in membersOfPGsRanges[-1]["members"].items()]
-    data_for_post = []
-    for ID in IDs:
-            speeches = tryHard(API_URL + '/getPGsSpeechesIDs/' + str(ID) + "/" + datetime.datetime.now().strftime(API_DATE_FORMAT)).json()
-            data = getTFIDFofSpeeches2 (speeches, False)[:10]
-            data_for_post.append(enrichPartyData(data, ID))
-
+    with open('tfidfs/tdidf_pg_ALL.json', 'w') as f:
+        IDs = [key for key, value in membersOfPGsRanges[-1]["members"].items()]
+        data_for_post = []
+        for ID in IDs:
+            try:
+                print "tfidf ", ID
+                speeches = tryHard(API_URL + '/getPGsSpeechesIDs/' + str(ID) + "/" + datetime.now().strftime(API_DATE_FORMAT)).json()
+                data = getTFIDFofSpeeches2 (speeches, False)[:15]
+                data_for_post.append(enrichPartyData(data, ID))
+            except:
+                print "neki je slo narobe"
+        f.write(json.dumps(data_for_post))
+    f.closed
     r = requests.post(ANALIZE_URL + "/pg/setAllPGsTFIDFsFromSearch/", json=data_for_post)
     return r.content

@@ -7,6 +7,7 @@ from django.core.cache import cache
 import time
 import datetime
 import calendar
+import json
 
 def tryHard(url):
     data = None
@@ -74,18 +75,16 @@ def enrichHighlights(data):
 
         if content_t != '' and content_t != None:
 
-            if speechdata['date'] not in [result['date'] for result in results]:
-
-                try:
-                    results.append({
-                        'person': requests.get('https://analize.parlameter.si/v1/utils/getPersonData/' + str(speechdata['speaker_id'])).json(),
-                        'content_t': trimHighlight(content_t),
-                        'date': speechdata['date'],
-                        'speech_id': int(hkey.split('g')[1]),
-                        'session_id': speechdata['session_id']
-                    })
-                except ValueError:
-                    results.append({'person': {'party': {'acronym': 'unknown', 'id': 'unknown', 'name': 'unknown'}, 'name': 'unknown', 'gov_id': 'unknown', 'id': speechdata['speaker_id']}, 'content_t': trimHighlight(content_t), 'date': speechdata['date'], 'speech_id': int(hkey.split('g')[1])})
+            try:
+                results.append({
+                    'person': requests.get('https://analize.parlameter.si/v1/utils/getPersonData/' + str(speechdata['speaker_id'])).json(),
+                    'content_t': trimHighlight(content_t),
+                    'date': speechdata['date'],
+                    'speech_id': int(hkey.split('g')[1]),
+                    'session_id': speechdata['session_id']
+                })
+            except ValueError:
+                results.append({'person': {'party': {'acronym': 'unknown', 'id': 'unknown', 'name': 'unknown'}, 'name': 'unknown', 'gov_id': 'unknown', 'id': speechdata['speaker_id']}, 'content_t': trimHighlight(content_t), 'date': speechdata['date'], 'speech_id': int(hkey.split('g')[1])})
 
     data['highlighting'] = sortedResults = sorted(results, key=lambda k: k['date'], reverse=True)
 
@@ -183,7 +182,7 @@ def enrichTFIDF(data):
 
     truncatedResults = truncateTFIDF(results)
 
-    sortedResults = sorted(truncatedResults, key=lambda k: k['scores']['tf-idf'], reverse=True)[:10]
+    sortedResults = sorted(truncatedResults, key=lambda k: k['scores']['tf-idf'], reverse=True)[:15]
 
     enrichedData = {'session': data['termVectors'][0].split('s')[1], 'results': sortedResults}
 
@@ -507,12 +506,12 @@ def add_months(sourcedate,months):
 def tfidf_to_file():
     membersOfPGsRanges = tryHard('https://data.parlameter.si/v1/getMembersOfPGsRanges/14.11.2016').json()
     IDs = [key for key, value in membersOfPGsRanges[-1]["members"].items()]
-    IDs = [97]
     for ID in IDs:
-        with open('tfidfs/tdidf_pg_' + str(ID) + '.json', 'w') as f:
+        with open('tfidfs/tfidf_pg_' + str(ID) + '.json', 'w') as f:
+	    print "delam zdej ", ID
             speeches = tryHard(API_URL + '/getPGsSpeechesIDs/' + str(ID) + "/" + datetime.datetime.now().strftime(API_DATE_FORMAT)).json()
 
             data = getTFIDFofSpeeches2 (speeches, False)[:10]
 
-            read_data = f.write(enrichPartyData(data, ID))
+            read_data = f.write(json.dumps(enrichPartyData(data, ID)))
         f.closed
