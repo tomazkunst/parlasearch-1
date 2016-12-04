@@ -25,7 +25,7 @@ def regularQuery(request, words, start_page=None):
         'facet.range.start': '2014-01-01T00:00:00.000Z',
         'facet.range.gap': '%2B1MONTHS',
         'facet.range.end': 'NOW',
-        'sort': 'datetime_dt desc',
+        # 'sort': 'datetime_dt desc',
         'hl': 'true',
         'hl.fl': 'content_t',
         'hl.fragmenter': 'regex',
@@ -109,7 +109,7 @@ def filterQuery(request, words, start_page=None):
         'facet.range.start': (f_date.strftime('%Y-%m-%d') if f_date else '2014-01-01')+'T00:00:00.000Z',
         'facet.range.gap': '%2B1MONTHS',
         'facet.range.end': ( t_date.strftime('%Y-%m-%d') + 'T00:00:00.000Z' ) if t_date else 'NOW',
-        'sort': 'datetime_dt desc',
+        # 'sort': 'datetime_dt desc',
         'hl': 'true',
         'hl.fl': 'content_t',
         'hl.fragmenter': 'regex',
@@ -142,7 +142,7 @@ def motionQuery(request, words, start_page=None):
 
     solr_params = {
         'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '%2B'),
-        'sort': 'datetime_dt desc',
+        # 'sort': 'datetime_dt desc',
         'hl': 'true',
         'hl.fl': 'content_t',
         'fq': 'tip_t:v',
