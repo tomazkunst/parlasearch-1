@@ -154,8 +154,6 @@ def motionQuery(request, words, start_page=None):
     for key in solr_params:
         url = url + '&' + key + '=' + solr_params[key]
 
-    print url
-
     r = requests.get(url).json()
     ids = []
     try:
@@ -165,9 +163,12 @@ def motionQuery(request, words, start_page=None):
     except:
         JsonResponse({"status": "no votes with this word"})
 
-    url2 = ANALIZE_URL+ "/s/getMotionOfSessionVotes/"+",".join(ids)
-    print url2
-    resp = tryHard(url2).json()
+    if len(ids) > 0:
+        url2 = ANALIZE_URL+ "/s/getMotionOfSessionVotes/"+",".join(ids)
+        resp = tryHard(url2).json()
+    
+    else:
+        resp = []
 
     return JsonResponse(resp, safe=False)
 
