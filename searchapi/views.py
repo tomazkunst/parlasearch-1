@@ -220,7 +220,7 @@ def tfidfSpeakerQuery2(request, speaker_i):
 def tfidfSpeakerQueryWithoutDigrams(request, speaker_i):
     speeches = tryHard(API_URL + '/getMPSpeechesIDs/' + speaker_i + "/" + datetime.today().strftime('%d.%m.%Y')).json()
 
-    data = getTFIDFofSpeeches2(speeches, False)[:15]
+    data = getTFIDFofSpeeches2(speeches, False)[:25]
 
     return JsonResponse(enrichPersonData(data, speaker_i), safe=False)
 
