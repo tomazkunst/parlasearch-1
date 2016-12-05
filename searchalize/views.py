@@ -76,5 +76,6 @@ def setTFIDFforPGsALL(date_=None):
                 print "neki je slo narobe"
         f.write(json.dumps(data_for_post))
     f.closed
-    r = requests.post(ANALIZE_URL + "/pg/setAllPGsTFIDFsFromSearch/", json=data_for_post)
-    return r.content
+    #r = requests.post(ANALIZE_URL + "/pg/setAllPGsTFIDFsFromSearch/", json=data_for_post)
+    #return r.content
+    return "Pa sem naredu vse"
