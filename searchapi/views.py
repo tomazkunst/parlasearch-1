@@ -18,7 +18,7 @@ def regularQuery(request, words, start_page=None):
     q = words.replace('+', ' ')
 
     solr_params = {
-        'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '%2B'),
+        'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '+'),
         'facet': 'true',
         'facet.field': 'speaker_i&facet.field=party_i', # dirty hack
         'facet.range': 'datetime_dt',
@@ -166,7 +166,7 @@ def motionQuery(request, words, start_page=None):
     if len(ids) > 0:
         url2 = ANALIZE_URL+ "/s/getMotionOfSessionVotes/"+",".join(ids)
         resp = tryHard(url2).json()
-    
+
     else:
         resp = []
 
