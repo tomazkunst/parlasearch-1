@@ -65,16 +65,18 @@ def setTFIDFforPGsALL(date_=None):
     membersOfPGsRanges = tryHard('https://data.parlameter.si/v1/getMembersOfPGsRanges/'+date_).json()
     with open('tfidfs/tdidf_pg_ALL.json', 'w') as f:
         IDs = [key for key, value in membersOfPGsRanges[-1]["members"].items()]
+        #IDs = [1]
         data_for_post = []
         for ID in IDs:
             try:
                 print "tfidf ", ID
                 speeches = tryHard(API_URL + '/getPGsSpeechesIDs/' + str(ID) + "/" + datetime.now().strftime(API_DATE_FORMAT)).json()
-                data = getTFIDFofSpeeches2 (speeches, False)[:15]
+                data = getTFIDFofSpeeches2 (speeches, False)[:25]
                 data_for_post.append(enrichPartyData(data, ID))
             except:
                 print "neki je slo narobe"
         f.write(json.dumps(data_for_post))
     f.closed
-    r = requests.post(ANALIZE_URL + "/pg/setAllPGsTFIDFsFromSearch/", json=data_for_post)
-    return r.content
+    #r = requests.post(ANALIZE_URL + "/pg/setAllPGsTFIDFsFromSearch/", json=data_for_post)
+    #return r.content
+    return "Pa sem naredu vse"

@@ -18,14 +18,14 @@ def regularQuery(request, words, start_page=None):
     q = words.replace('+', ' ')
 
     solr_params = {
-        'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '%2B'),
+        'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '+'),
         'facet': 'true',
         'facet.field': 'speaker_i&facet.field=party_i', # dirty hack
         'facet.range': 'datetime_dt',
         'facet.range.start': '2014-01-01T00:00:00.000Z',
         'facet.range.gap': '%2B1MONTHS',
         'facet.range.end': 'NOW',
-        'sort': 'datetime_dt desc',
+        # 'sort': 'datetime_dt desc',
         'hl': 'true',
         'hl.fl': 'content_t',
         'hl.fragmenter': 'regex',
@@ -110,7 +110,7 @@ def filterQuery(request, words, start_page=None):
         'facet.range.start': (f_date.strftime('%Y-%m-%d') if f_date else '2014-01-01')+'T00:00:00.000Z',
         'facet.range.gap': '%2B1MONTHS',
         'facet.range.end': ( t_date.strftime('%Y-%m-%d') + 'T00:00:00.000Z' ) if t_date else 'NOW',
-        'sort': 'datetime_dt desc',
+        # 'sort': 'datetime_dt desc',
         'hl': 'true',
         'hl.fl': 'content_t',
         'hl.fragmenter': 'regex',
@@ -143,7 +143,7 @@ def motionQuery(request, words, start_page=None):
 
     solr_params = {
         'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '%2B'),
-        'sort': 'datetime_dt desc',
+        # 'sort': 'datetime_dt desc',
         'hl': 'true',
         'hl.fl': 'content_t',
         'fq': 'tip_t:v',
@@ -155,8 +155,6 @@ def motionQuery(request, words, start_page=None):
     for key in solr_params:
         url = url + '&' + key + '=' + solr_params[key]
 
-    print url
-
     r = requests.get(url).json()
     ids = []
     try:
@@ -166,9 +164,12 @@ def motionQuery(request, words, start_page=None):
     except:
         JsonResponse({"status": "no votes with this word"})
 
-    url2 = ANALIZE_URL+ "/s/getMotionOfSessionVotes/"+",".join(ids)
-    print url2
-    resp = tryHard(url2).json()
+    if len(ids) > 0:
+        url2 = ANALIZE_URL+ "/s/getMotionOfSessionVotes/"+",".join(ids)
+        resp = tryHard(url2).json()
+
+    else:
+        resp = []
 
     return JsonResponse(resp, safe=False)
 
@@ -220,7 +221,7 @@ def tfidfSpeakerQuery2(request, speaker_i):
 def tfidfSpeakerQueryWithoutDigrams(request, speaker_i):
     speeches = tryHard(API_URL + '/getMPSpeechesIDs/' + speaker_i + "/" + datetime.today().strftime('%d.%m.%Y')).json()
 
-    data = getTFIDFofSpeeches2(speeches, False)[:15]
+    data = getTFIDFofSpeeches2(speeches, False)[:25]
 
     return JsonResponse(enrichPersonData(data, speaker_i), safe=False)
 
