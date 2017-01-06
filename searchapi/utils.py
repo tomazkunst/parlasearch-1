@@ -28,7 +28,7 @@ def tryHard(url):
     return data
 
 
-def enrichQuery(data):
+def enrichQuery(data, show_all=False):
 
     data['facet_counts'].pop('facet_heatmaps', None)
     # data['facet_counts'].pop('facet_ranges', None)
@@ -38,7 +38,7 @@ def enrichQuery(data):
     results = []
 
     for i, speaker in enumerate(data['facet_counts']['facet_fields']['speaker_i']):
-        if i < 5:
+        if i < 5 or show_all:
             print i
             try:
                 results.append({'person': requests.get('https://analize.parlameter.si/v1/utils/getPersonData/' + str(speaker)).json(), 'score': str(data['facet_counts']['facet_fields']['speaker_i'][i + 1])})
