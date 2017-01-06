@@ -130,7 +130,7 @@ def filterQuery(request, words, start_page=None):
 
     r = requests.get(url)
 
-    return JsonResponse(enrichHighlights(enrichQuery(r.json())))
+    return JsonResponse(enrichHighlights(enrichQuery(r.json(), show_all=True)))
 
 
 def motionQuery(request, words, start_page=None):
