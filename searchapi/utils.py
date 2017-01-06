@@ -27,6 +27,7 @@ def tryHard(url):
             pass
     return data
 
+
 def enrichQuery(data):
 
     data['facet_counts'].pop('facet_heatmaps', None)
