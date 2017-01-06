@@ -86,8 +86,9 @@ def filterQuery(request, words, start_page=None):
 
 
     #print "org_filter", filters_orgs
-
-    time_filter = [datetime.strptime(t_filter, API_DATE_FORMAT) for t_filter in time_filter.split(",")]
+    if time_filter:
+        time_filter = [datetime.strptime(t_filter, API_DATE_FORMAT)
+                       for t_filter in time_filter.split(",")]
 
     f_date = min(time_filter) if time_filter else None
     t_date = add_months(max(time_filter), 1) if time_filter else None
@@ -99,7 +100,7 @@ def filterQuery(request, words, start_page=None):
     #print people, parties
 
     solr_params = {
-        'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '%2B'),
+        'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '+'),
         'fq': " OR ".join(filters_speakers)
               + (" AND " if filters_speakers and filters_orgs else "") + ((" OR ".join(filters_orgs)) if filters_orgs else "")
               + (" AND " if (filters_speakers or filters_orgs) and time_query else "") + (time_query if time_query else ""),
