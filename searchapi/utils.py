@@ -43,13 +43,19 @@ def enrichQuery(data, show_all=False):
                 results.append({'person': requests.get('https://analize.parlameter.si/v1/utils/getPersonData/' + str(speaker)).json(), 'score': str(data['facet_counts']['facet_fields']['speaker_i'][i + 1])})
                 del data['facet_counts']['facet_fields']['speaker_i'][i]
             except ValueError:
-                results.append({'person': {'party': {'acronym': 'unknown', 'id': 'unknown', 'name': 'unknown'}, 'name': 'unknown' + speaker, 'gov_id': 'unknown', 'id': speaker}, 'score': str(data['facet_counts']['facet_fields']['speaker_i'][i + 1])})
+                results.append({'person': {'party': {'acronym': 'unknown',
+                                                     'id': 'unknown',
+                                                     'name': 'unknown'},
+                                           'name': 'unknown' + speaker,
+                                           'gov_id': 'unknown',
+                                           'id': speaker},
+                                'score': str(data['facet_counts']['facet_fields']['speaker_i'][i + 1])})
                 del data['facet_counts']['facet_fields']['speaker_i'][i]
         else:
             del data['facet_counts']['facet_fields']['speaker_i'][i]
 
     for result in results:
-        result.update({"score": int(result["score"])})
+        result.update({'score': int(result['score'])})
 
     data['facet_counts']['facet_fields']['speaker_i'] = sorted(results, key=lambda k: k['score'], reverse=True)
 
@@ -60,12 +66,18 @@ def enrichQuery(data, show_all=False):
     for i, speaker in enumerate(data['facet_counts']['facet_fields']['party_i']):
         if i % 2 == 0:
             try:
-                results.append({'person': requests.get('https://analize.parlameter.si/v1/utils/getPgDataAPI/' + str(speaker)).json(), 'score': str(data['facet_counts']['facet_fields']['party_i'][i + 1])})
+                results.append({'party': requests.get('https://analize.parlameter.si/v1/utils/getPgDataAPI/' + str(speaker)).json(), 
+                                'score': str(data['facet_counts']['facet_fields']['party_i'][i + 1])})
             except ValueError:
-                results.append({'person': {'party': {'acronym': 'unknown', 'id': 'unknown', 'name': 'unknown'}, 'name': 'unknown' + speaker, 'gov_id': 'unknown', 'id': speaker}, 'score': str(data['facet_counts']['facet_fields']['party_i'][i + 1])})
+                results.append({'party': {'acronym': 'unknown',
+                                          'is_coalition': unknown,
+                                          'name': 'unknown',
+                                          'id': speaker},
+                                'score': str(data['facet_counts']['facet_fields']['party_i'][i + 1])
+                                })
 
     for result in results:
-        result.update({"score": int(result["score"])})
+        result.update({'score': int(result['score'])})
 
     data['facet_counts']['facet_fields']['party_e'] = sorted(results, key=lambda k: k['score'], reverse=True)
 
