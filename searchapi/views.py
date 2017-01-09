@@ -100,7 +100,7 @@ def filterQuery(request, words, start_page=None):
     #print people, parties
 
     solr_params = {
-        'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '+'),
+        'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '%2B') + " AND tip_t:govor",
         'fq': " OR ".join(filters_speakers)
               + (" AND " if filters_speakers and filters_orgs else "") + ((" OR ".join(filters_orgs)) if filters_orgs else "")
               + (" AND " if (filters_speakers or filters_orgs) and time_query else "") + (time_query if time_query else ""),
