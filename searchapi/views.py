@@ -129,8 +129,9 @@ def filterQuery(request, words, start_page=None):
     #print url
 
     r = requests.get(url)
-
-    return JsonResponse(enrichHighlights(enrichQuery(r.json(), show_all=True)))
+    out = enrichHighlights(enrichQuery(r.json(), show_all=True))
+    out.update({'WBs': requests.get(ANALIZE_URL + '/s/getWorkingBodies/').json()})
+    return JsonResponse(out)
 
 
 def motionQuery(request, words, start_page=None):
