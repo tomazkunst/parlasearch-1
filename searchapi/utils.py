@@ -121,6 +121,23 @@ def enrichHighlights(data):
 
     return enrichedData
 
+def addOrganizations(data):
+    WBs = requests.get(ANALIZE_URL + '/s/getWorkingBodies/').json()
+    orgs = {}
+    for i, speaker in enumerate(data['facet_counts']['facet_fields']['org_i']):
+        if i % 2 == 0:
+            if int(data['facet_counts']['facet_fields']['org_i'][i+1]) != 0:
+                orgs[str(speaker)] = data['facet_counts']['facet_fields']['org_i'][i+1]
+    data['organizations'] = []
+    for wb in WBs:
+        if str(wb['id']) in orgs.keys():
+            wb.update({'score': orgs[str(wb['id'])]})
+            data['organizations'].append(wb)
+    data['has_dz_score'] = True if '95' in orgs.keys() else False
+    data['has_council_score'] = True if '9' in orgs.keys() else False
+    return data
+
+
 def enrichDocs(data):
 
     results = []

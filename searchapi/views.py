@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from parlasearch.settings import SOLR_URL, API_URL, API_DATE_FORMAT, ANALIZE_URL
 import calendar
 
-from utils import enrichQuery, enrichHighlights, enrichDocs, enrichTFIDF, groupSpeakerTFIDF, groupPartyTFIDF, groupSpeakerTFIDFALL, groupPartyTFIDFALL, groupDFALL, tryHard, getTFIDFofSpeeches, enrichPersonData, enrichPartyData, getTFIDFofSpeeches2, getTFIDFofSpeeches3, add_months
+from utils import enrichQuery, enrichHighlights, enrichDocs, enrichTFIDF, groupSpeakerTFIDF, groupPartyTFIDF, groupSpeakerTFIDFALL, groupPartyTFIDFALL, groupDFALL, tryHard, getTFIDFofSpeeches, enrichPersonData, enrichPartyData, getTFIDFofSpeeches2, getTFIDFofSpeeches3, add_months, addOrganizations
 
 # Create your views here.
 
@@ -129,8 +129,7 @@ def filterQuery(request, words, start_page=None):
     #print url
 
     r = requests.get(url)
-    out = enrichHighlights(enrichQuery(r.json(), show_all=True))
-    out.update({'WBs': requests.get(ANALIZE_URL + '/s/getWorkingBodies/').json()})
+    out = addOrganizations(enrichHighlights(enrichQuery(r.json(), show_all=True)))
     return JsonResponse(out)
 
 
