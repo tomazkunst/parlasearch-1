@@ -44,7 +44,7 @@ def enrichQuery(data, show_all=False):
             try:
                 results.append({'person': static_data['persons'][str(speaker)], 'score': str(data['facet_counts']['facet_fields']['speaker_i'][i + 1])})
                 del data['facet_counts']['facet_fields']['speaker_i'][i]
-            except ValueError:
+            except (ValueError, KeyError) as e:
                 results.append({'person': {'party': {'acronym': 'unknown',
                                                      'id': 'unknown',
                                                      'name': 'unknown'},
@@ -116,7 +116,7 @@ def enrichHighlights(data):
                     'speech_id': int(hkey.split('g')[1]),
                     'session_id': speechdata['session_id']
                 })
-            except ValueError:
+            except (ValueError, KeyError) as e:
                 results.append({'person': {'party': {'acronym': 'unknown', 'id': 'unknown', 'name': 'unknown'}, 'name': 'unknown', 'gov_id': 'unknown', 'id': speechdata['speaker_id']}, 'content_t': trimHighlight(content_t), 'date': speechdata['date'], 'speech_id': int(hkey.split('g')[1])})
 
     data['highlighting'] = sortedResults = sorted(results, key=lambda k: k['date'], reverse=True)
@@ -124,6 +124,7 @@ def enrichHighlights(data):
     enrichedData = data
 
     return enrichedData
+
 
 def addOrganizations(data):
     WBs = requests.get(ANALIZE_URL + '/s/getWorkingBodies/').json()
