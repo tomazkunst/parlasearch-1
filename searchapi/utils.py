@@ -88,7 +88,7 @@ def enrichQuery(data, show_all=False):
     return enrichedData
 
 def trimHighlight(highlight):
-    m = re.search('[A-ZĆČŽŠ][^\.\?\!]*<em.*\/em>.*\.?', highlight, re.UNICODE)
+    m = re.search('[A-ZĆČŽŠĐ^\.\?\!]*<em.*\/em>.*\.?', highlight, re.UNICODE)
     if m:
         return m.group() + '</em>'
     else:
@@ -100,11 +100,11 @@ def enrichHighlights(data):
 
     static_data = requests.get('https://analize.parlameter.si/v1/utils/getAllStaticData/').json()
 
-    for i, hkey in enumerate(data['highlighting'].keys()):
+    for hkey in data['highlighting'].keys():
 
         speechdata = requests.get('https://data.parlameter.si/v1/getSpeechData/' + hkey.split('g')[1]).json()
 
-        content_t = trimHighlight(data['highlighting'][hkey]['content_t'][0]) if 'content_t' in data['highlighting'][hkey].keys() else None
+        content_t = (data['highlighting'][hkey]['content_t'][0]) if 'content_t' in data['highlighting'][hkey].keys() else None
 
         if content_t != '' and content_t != None:
 
