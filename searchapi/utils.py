@@ -98,6 +98,8 @@ def enrichHighlights(data):
 
     results = []
 
+    static_data = requests.get('https://analize.parlameter.si/v1/utils/getAllStaticData/').json()
+
     for i, hkey in enumerate(data['highlighting'].keys()):
 
         speechdata = requests.get('https://data.parlameter.si/v1/getSpeechData/' + hkey.split('g')[1]).json()
@@ -108,7 +110,7 @@ def enrichHighlights(data):
 
             try:
                 results.append({
-                    'person': requests.get('https://analize.parlameter.si/v1/utils/getPersonData/' + str(speechdata['speaker_id'])).json(),
+                    'person': static_data['persons'][str(speechdata['speaker_id'])],
                     'content_t': trimHighlight(content_t),
                     'date': speechdata['date'],
                     'speech_id': int(hkey.split('g')[1]),
