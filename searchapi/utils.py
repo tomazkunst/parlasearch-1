@@ -37,10 +37,12 @@ def enrichQuery(data, show_all=False):
 
     results = []
 
+    static_data = requests.get('https://analize.parlameter.si/v1/utils/getAllStaticData/').json()
+
     for i, speaker in enumerate(data['facet_counts']['facet_fields']['speaker_i']):
         if i < 5 or show_all:
             try:
-                results.append({'person': requests.get('https://analize.parlameter.si/v1/utils/getPersonData/' + str(speaker)).json(), 'score': str(data['facet_counts']['facet_fields']['speaker_i'][i + 1])})
+                results.append({'person': static_data['persons'][str(speaker)], 'score': str(data['facet_counts']['facet_fields']['speaker_i'][i + 1])})
                 del data['facet_counts']['facet_fields']['speaker_i'][i]
             except ValueError:
                 results.append({'person': {'party': {'acronym': 'unknown',
@@ -66,7 +68,7 @@ def enrichQuery(data, show_all=False):
     for i, speaker in enumerate(data['facet_counts']['facet_fields']['party_i']):
         if i % 2 == 0:
             try:
-                results.append({'party': requests.get('https://analize.parlameter.si/v1/utils/getPgDataAPI/' + str(speaker)).json(), 
+                results.append({'party': static_data['partys'][str(speaker)],
                                 'score': str(data['facet_counts']['facet_fields']['party_i'][i + 1])})
             except ValueError:
                 results.append({'party': {'acronym': 'unknown',
