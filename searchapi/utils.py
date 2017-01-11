@@ -102,7 +102,7 @@ def enrichHighlights(data):
 
     for hkey in data['highlighting'].keys():
 
-        speechdata = requests.get('https://data.parlameter.si/v1/getSpeechData/' + hkey.split('g')[1]).json()
+        speechdata = getSpeechData(hkey.split('g')[1])
 
         content_t = (data['highlighting'][hkey]['content_t'][0]) if 'content_t' in data['highlighting'][hkey].keys() else None
 
@@ -150,7 +150,7 @@ def enrichDocs(data):
     for i, doc in enumerate(data['response']['docs']):
 
         hkey = doc['id']
-        speechdata = requests.get('https://data.parlameter.si/v1/getSpeechData/' + hkey.split('g')[1]).json()
+        speechdata = getSpeechData(hkey.split('g')[1])
 
         try:
             results.append({'person': requests.get('https://analize.parlameter.si/v1/utils/getPersonData/' + str(speechdata['speaker_id'])).json(), 'content_t': doc['content_t'], 'date': speechdata['date'], 'speech_id': int(hkey.split('g')[1]), 'session_id': doc['session_i'], 'session_name': speechdata['session_name'], 'score': doc['score']})
@@ -566,3 +566,12 @@ def tfidf_to_file():
 
             read_data = f.write(json.dumps(enrichPartyData(data, ID)))
         f.closed
+
+
+def getSpeechData(speech_id):
+    data = cache.get("s_data_" + str(speech_id))
+    if not data:
+        url = 'https://data.parlameter.si/v1/getSpeechData/' + str(speech_id)
+        data = requests.get(url).json()
+        cache.set("s_data_" + str(speech_id), data, 60 * 60 * 24 * 7)
+    return data
