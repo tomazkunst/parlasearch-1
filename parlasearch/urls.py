@@ -53,5 +53,5 @@ urlpatterns = [
     url(ur'^dfall/$', dfALL),
     url(ur'^dfall/(?P<datetime_dt>[\w].+)/', dfDateALL),
 
-    (r'^monitoring/', monitorMe),
+    url(r'^monitoring/', monitorMe),
 ]
