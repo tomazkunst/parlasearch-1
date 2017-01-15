@@ -9,6 +9,8 @@ import datetime
 import calendar
 import json
 
+from django.http import HttpResponse
+
 def tryHard(url):
     data = None
     counter = 0
