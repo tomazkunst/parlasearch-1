@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from searchapi.views import motionQuery, tfidfPGQueryWithoutDigrams, regularQuery, filterQuery, mltQuery, tfidfSessionQuery, tfidfSpeakerQuery, tfidfSpeakerDateQuery, tfidfPGQuery, tfidfPGDateQuery, tfidfSpeakerQueryALL, tfidfPGQueryALL, dfALL, tfidfSpeakerDateQueryALL, tfidfPGDateQueryALL, dfDateALL, tfidfSpeakerQuery2, tfidfSpeakerQueryWithoutDigrams, monitorMe
+from searchapi.views import motionQuery, tfidfPGQueryWithoutDigrams, regularQuery, filterQuery, mltQuery, tfidfSessionQuery, tfidfSpeakerQuery, tfidfSpeakerDateQuery, tfidfPGQuery, tfidfPGDateQuery, tfidfSpeakerQueryALL, tfidfPGQueryALL, dfALL, tfidfSpeakerDateQueryALL, tfidfPGDateQueryALL, dfDateALL, tfidfSpeakerQuery2, tfidfSpeakerQueryWithoutDigrams
+
+from searchapi.utils import monitorMe
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
