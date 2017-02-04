@@ -9,6 +9,8 @@ import datetime
 import calendar
 import json
 
+from django.http import HttpResponse
+
 def tryHard(url):
     data = None
     counter = 0
@@ -575,3 +577,11 @@ def getSpeechData(speech_id):
         data = requests.get(url).json()
         cache.set("s_data_" + str(speech_id), data, 60 * 60 * 24 * 7)
     return data
+
+def monitorMe(request):
+
+    r = requests.get('https://isci.parlameter.si/q/krompir')
+    if r.status_code == 200:
+        return HttpResponse('All iz well.')
+    else:
+        return HttpResponse('PANIC!')
