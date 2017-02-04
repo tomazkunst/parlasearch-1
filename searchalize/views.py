@@ -89,6 +89,8 @@ def setTFIDFforMPsALL(date_=None):
         date_of = datetime.now().date()
         date_ = date_of.strftime(API_DATE_FORMAT)
 
+    api_url = ANALIZE_URL + "/p/setAllMPsTFIDFsFromSearch/"
+
     members = tryHard('https://data.parlameter.si/v1/getMPs').json()
     with open('tfidfs/tdidf_MPs_ALL.json', 'w') as f:
         data_for_post = []
@@ -99,7 +101,10 @@ def setTFIDFforMPsALL(date_=None):
                 data = getTFIDFofSpeeches2(speeches, False)[:25]
                 e_data = enrichPersonData(data, str(member['id']))
                 data_for_post.append(e_data)
-                print e_data
+
+                r = requests.post(api_url,
+                                  json=e_data)
+                print json.dumps(e_data), r
             except:
                 print "neki je slo narobe"
         f.write(json.dumps(data_for_post))
