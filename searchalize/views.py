@@ -95,7 +95,7 @@ def setTFIDFforMPsALL(date_=None):
         for member in members:
             try:
                 print "tfidf member ", member['id']
-                speeches = tryHard(API_URL + '/getSpeechesIDs/' + str(member['id']) + "/" + datetime.now().strftime(API_DATE_FORMAT)).json()
+                speeches = tryHard(API_URL + '/getMPSpeechesIDs/' + str(member['id']) + "/" + datetime.now().strftime(API_DATE_FORMAT)).json()
                 data = getTFIDFofSpeeches2(speeches, False)[:25]
                 e_data = enrichPersonData(data, str(member['id']))
                 data_for_post.append(e_data)
