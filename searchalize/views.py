@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from kvalifikatorji.scripts import getCountListPG, getScores, problematicno, privzdignjeno, preprosto
-from searchapi.utils import tryHard, enrichPartyData, getTFIDFofSpeeches2
+from searchapi.utils import tryHard, enrichPartyData, getTFIDFofSpeeches2, enrichPersonData
 from parlasearch.settings import SOLR_URL, API_URL, API_DATE_FORMAT, ANALIZE_URL
 from datetime import datetime
 from collections import Counter
@@ -73,6 +73,33 @@ def setTFIDFforPGsALL(date_=None):
                 speeches = tryHard(API_URL + '/getPGsSpeechesIDs/' + str(ID) + "/" + datetime.now().strftime(API_DATE_FORMAT)).json()
                 data = getTFIDFofSpeeches2 (speeches, False)[:25]
                 data_for_post.append(enrichPartyData(data, ID))
+            except:
+                print "neki je slo narobe"
+        f.write(json.dumps(data_for_post))
+    f.closed
+    #r = requests.post(ANALIZE_URL + "/pg/setAllPGsTFIDFsFromSearch/", json=data_for_post)
+    #return r.content
+    return "Pa sem naredu vse"
+
+
+def setTFIDFforMPsALL(date_=None):
+    if date_:
+        date_of = datetime.strptime(date_, API_DATE_FORMAT).date()
+    else:
+        date_of = datetime.now().date()
+        date_ = date_of.strftime(API_DATE_FORMAT)
+
+    members = tryHard('https://data.parlameter.si/v1/getMPs').json()
+    with open('tfidfs/tdidf_MPs_ALL.json', 'w') as f:
+        data_for_post = []
+        for member in members:
+            try:
+                print "tfidf member ", ID
+                speeches = tryHard(API_URL + '/getSpeechesIDs/' + str(ID) + "/" + datetime.now().strftime(API_DATE_FORMAT)).json()
+                data = getTFIDFofSpeeches2(speeches, False)[:25]
+                e_data = enrichPersonData(data, ID)
+                data_for_post.append(e_data)
+                print e_data
             except:
                 print "neki je slo narobe"
         f.write(json.dumps(data_for_post))
