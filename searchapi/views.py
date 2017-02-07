@@ -68,12 +68,14 @@ def filterQuery(request, words, start_page=None):
 
     filters_speakers = []
 
+    filters_partys = []
+
     filters_orgs = []
 
     working_bodies = working_bodies.split(",") if working_bodies else []
 
     if parties:
-        filters_speakers.append('party_i:(' + " OR ".join(parties.split(",")) + ')')
+        filters_partys.append('party_i:(' + " OR ".join(parties.split(",")) + ')')
         print 'party_i:(' + " OR ".join(parties.split(",")) + ')'
     if people:
         filters_speakers.append('speaker_i:(' + " OR ".join(people.split(",")) + ')')
@@ -101,9 +103,10 @@ def filterQuery(request, words, start_page=None):
 
     solr_params = {
         'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '%2B') + " AND tip_t:govor",
-        'fq': " OR ".join(filters_speakers)
-              + (" AND " if filters_speakers and filters_orgs else "") + ((" OR ".join(filters_orgs)) if filters_orgs else "")
-              + (" AND " if (filters_speakers or filters_orgs) and time_query else "") + (time_query if time_query else ""),
+        'fq': " OR ".join(filters_partys)
+              + (" AND " if filters_partys and filters_speakers else "") + ((" OR ".join(filters_speakers)) if filters_speakers else "")
+              + (" AND " if (filters_partys or filters_speakers) and filters_orgs else "") + ((" OR ".join(filters_orgs)) if filters_orgs else "")
+              + (" AND " if (filters_partys or filters_speakers or filters_orgs) and time_query else "") + (time_query if time_query else ""),
         'facet': 'true',
         'facet.field': 'speaker_i&facet.field=party_i&facet.field=org_i', # dirty hack
         'facet.range': 'datetime_dt',
