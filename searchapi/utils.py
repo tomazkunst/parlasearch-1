@@ -94,7 +94,7 @@ def trimHighlight(highlight):
     if m:
         return m.group() + '</em>'
     else:
-        return ''
+        return highlight
 
 def enrichHighlights(data):
 
