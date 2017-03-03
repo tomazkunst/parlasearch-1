@@ -9,10 +9,11 @@ from utils import enrichQuery, enrichHighlights, enrichDocs, enrichTFIDF, groupS
 
 # Create your views here.
 
+
 def regularQuery(request, words, start_page=None):
 
     rows = 50
-    #solr_url = 'http://127.0.0.1:8983/solr/knedl/select?wt=json'
+    # solr_url = 'http://127.0.0.1:8983/solr/knedl/select?wt=json'
     solr_url = SOLR_URL+'/select?wt=json'
 
     q = words.replace('+', ' ')
@@ -44,7 +45,7 @@ def regularQuery(request, words, start_page=None):
     for key in solr_params:
         url = url + '&' + key + '=' + solr_params[key]
 
-    #print url
+    # print url
 
     r = requests.get(url)
 
@@ -57,13 +58,13 @@ def filterQuery(request, words, start_page=None):
     solr_url = SOLR_URL+'/select?wt=json'
 
     q = words.replace('+', ' ')
-    people = request.GET.get('people')#
-    parties = request.GET.get('parties')#
+    people = request.GET.get('people')
+    parties = request.GET.get('parties')
     from_date = request.GET.get('from')
     to_date = request.GET.get('to')
-    is_dz = request.GET.get('dz')#
-    is_council = request.GET.get('council') #
-    working_bodies = request.GET.get('wb', []) #
+    is_dz = request.GET.get('dz')
+    is_council = request.GET.get('council')
+    working_bodies = request.GET.get('wb', [])
     time_filter = request.GET.get('time_filter')
 
     filters_speakers = []
@@ -72,47 +73,55 @@ def filterQuery(request, words, start_page=None):
 
     filters_orgs = []
 
-    working_bodies = working_bodies.split(",") if working_bodies else []
+    working_bodies = working_bodies.split(',') if working_bodies else []
 
     if parties:
-        filters_partys.append('party_i:(' + " OR ".join(parties.split(",")) + ')')
-        print 'party_i:(' + " OR ".join(parties.split(",")) + ')'
+        parties_str = 'party_i:(' + ' OR '.join(parties.split(',')) + ')'
+        filters_partys.append(parties_str)
     if people:
-        filters_speakers.append('speaker_i:(' + " OR ".join(people.split(",")) + ')')
+        speakers = 'speaker_i:(' + ' OR '.join(people.split(',')) + ')'
+        filters_speakers.append(speakers)
     if is_dz:
-        working_bodies.append("95")
+        working_bodies.append('95')
     if is_council:
-        working_bodies.append("9")
+        working_bodies.append('9')
     if working_bodies:
-        filters_orgs.append('org_i:(' + " OR ".join(working_bodies) + ')')
+        filters_orgs.append('org_i:(' + ' OR '.join(working_bodies) + ')')
 
-
-    #print "org_filter", filters_orgs
+    # print 'org_filter', filters_orgs
     if time_filter:
         time_filter = [datetime.strptime(t_filter, API_DATE_FORMAT)
-                       for t_filter in time_filter.split(",")]
+                       for t_filter in time_filter.split(',')]
+
+        time_filter = [(t_time.strftime('%Y-%m-%d') + 'T00:00:00.000Z',
+                        add_months(t_time, 1).strftime('%Y-%m-%d') + 'T00:00:00.000Z]')
+                       for t_time in time_filter]
+        time_str = ['[' + t_time(0) + ' TO ' + t_time(1)
+                    for t_time in time_filter]
+
+        time_query = 'datetime_dt:(' + ' OR '.join(time_str) + ')'
+    else:
+        time_query = None
 
     f_date = min(time_filter) if time_filter else None
     t_date = add_months(max(time_filter), 1) if time_filter else None
 
-    time_query = "datetime_dt:(" + " OR ".join(["["+ t_time.strftime('%Y-%m-%d') + 'T00:00:00.000Z' + " TO " + add_months(t_time, 1).strftime('%Y-%m-%d') + 'T00:00:00.000Z'"]" for t_time in time_filter ])+")"  if time_filter else None
+    # print time_query
 
-    #print time_query
-
-    #print people, parties
+    # print people, parties
 
     solr_params = {
-        'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '%2B') + " AND tip_t:govor",
-        'fq': " OR ".join(filters_partys)
-              + (" AND " if filters_partys and filters_speakers else "") + ((" OR ".join(filters_speakers)) if filters_speakers else "")
-              + (" AND " if (filters_partys or filters_speakers) and filters_orgs else "") + ((" OR ".join(filters_orgs)) if filters_orgs else "")
-              + (" AND " if (filters_partys or filters_speakers or filters_orgs) and time_query else "") + (time_query if time_query else ""),
+        'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '%2B') + ' AND tip_t:govor',
+        'fq': ' OR '.join(filters_partys)
+              + (' AND ' if filters_partys and filters_speakers else '') + ((' OR '.join(filters_speakers)) if filters_speakers else '')
+              + (' AND ' if (filters_partys or filters_speakers) and filters_orgs else '') + ((' OR '.join(filters_orgs)) if filters_orgs else '')
+              + (' AND ' if (filters_partys or filters_speakers or filters_orgs) and time_query else '') + (time_query if time_query else ''),
         'facet': 'true',
         'facet.field': 'speaker_i&facet.field=party_i&facet.field=org_i', # dirty hack
         'facet.range': 'datetime_dt',
         'facet.range.start': (f_date.strftime('%Y-%m-%d') if f_date else '2014-01-01')+'T00:00:00.000Z',
         'facet.range.gap': '%2B1MONTHS',
-        'facet.range.end': ( t_date.strftime('%Y-%m-%d') + 'T00:00:00.000Z' ) if t_date else 'NOW',
+        'facet.range.end': (t_date.strftime('%Y-%m-%d') + 'T00:00:00.000Z') if t_date else 'NOW',
         # 'sort': 'datetime_dt desc',
         'hl': 'true',
         'hl.fl': 'content_t',
@@ -124,22 +133,22 @@ def filterQuery(request, words, start_page=None):
         'rows': str(rows),
         'start': str(int(start_page) * rows) if start_page else '0',
     }
-    #print solr_params
+    # print solr_params
     url = solr_url
     for key in solr_params:
         url = url + '&' + key + '=' + solr_params[key]
 
-    #print url
+    # print url
 
     r = requests.get(url)
-    out = addOrganizations(enrichHighlights(enrichQuery(r.json(), show_all=True)))
+    out = addOrganizations(enrichHighlights(enrichQuery(r.json(),
+                           show_all=True)))
     return JsonResponse(out)
 
 
 def motionQuery(request, words, start_page=None):
 
     rows = 50
-    #solr_url = 'http://127.0.0.1:8983/solr/knedl/select?wt=json'
     solr_url = SOLR_URL+'/select?wt=json'
 
     q = words.replace('+', ' ')
@@ -161,14 +170,14 @@ def motionQuery(request, words, start_page=None):
     r = requests.get(url).json()
     ids = []
     try:
-        docs = r["response"]["docs"]
+        docs = r['response']['docs']
         for doc in docs:
-            ids.append(str(doc["voteid_i"]))
+            ids.append(str(doc['voteid_i']))
     except:
-        JsonResponse({"status": "no votes with this word"})
+        JsonResponse({'status': 'no votes with this word'})
 
     if len(ids) > 0:
-        url2 = ANALIZE_URL+ "/s/getMotionOfSessionVotes/"+",".join(ids)
+        url2 = ANALIZE_URL + '/s/getMotionOfSessionVotes/'+','.join(ids)
         resp = tryHard(url2).json()
 
     else:
@@ -179,10 +188,8 @@ def motionQuery(request, words, start_page=None):
 
 def mltQuery(request, speech_i):
 
-    solr_url = SOLR_URL + '/mlt?wt=json&mlt.count=5&q=id:g' + speech_i + '&fl=id,score,content_t,session_i,speaker_i,speech_i&fq=tip_t:govor'
-
-    print solr_url
-    print 'bla'
+    solr_url = ('' + SOLR_URL + '/mlt?wt=json&mlt.count=5&q=id:g' + speech_i + ''
+                '&fl=id,score,content_t,session_i,speaker_i,speech_i&fq=tip_t:govor')
 
     r = requests.get(solr_url)
 
@@ -191,96 +198,117 @@ def mltQuery(request, speech_i):
 
 def tfidfSessionQuery(request, session_i):
 
-    solr_url = SOLR_URL + '/tvrh/?q=id:s' + session_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
+    solr_url = ('' + SOLR_URL + '/tvrh/?q=id:s' + session_i + ''
+                '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t')
 
     r = requests.get(solr_url)
 
     try:
         output = enrichTFIDF(r.json())
-        output['session'] = requests.get('https://analize.parlameter.si/v1/utils/getSessionData/' + output['session']).json()
+        url = ('https://analize.parlameter.si/v1/utils/getSessionData/'
+               '' + output['session'] + '')
+        output['session'] = requests.get(url).json()
         return JsonResponse(output)
     except IndexError:
         raise Http404('No data for this session.')
 
 
-#TFIDF Speeker
+# TFIDF Speeker
 def tfidfSpeakerQuery(request, speaker_i):
 
-    solr_url = SOLR_URL + '/tvrh/?q=id:p' + speaker_i + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
+    solr_url = ('' + SOLR_URL + '/tvrh/?q=id:p' + speaker_i + ''
+                '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t')
 
     print solr_url
 
     r = requests.get(solr_url)
 
-    return JsonResponse(groupSpeakerTFIDF(r.json(), int(speaker_i)), safe=False)
+    return JsonResponse(groupSpeakerTFIDF(r.json(),
+                        int(speaker_i)),
+                        safe=False)
+
 
 def tfidfSpeakerQuery2(request, speaker_i):
-    speeches = tryHard(API_URL + '/getMPSpeechesIDs/' + speaker_i + "/" + datetime.today().strftime('%d.%m.%Y')).json()
+    nowStr = datetime.today().strftime('%d.%m.%Y')
+    url = API_URL + '/getMPSpeechesIDs/' + speaker_i + '/' + nowStr
+    speeches = tryHard(url).json()
 
     data = getTFIDFofSpeeches2(speeches, True)[:15]
 
     return JsonResponse(enrichPersonData(data, speaker_i), safe=False)
 
+
 def tfidfSpeakerQueryWithoutDigrams(request, speaker_i):
-    speeches = tryHard(API_URL + '/getMPSpeechesIDs/' + speaker_i + "/" + datetime.today().strftime('%d.%m.%Y')).json()
+    nowStr = datetime.today().strftime('%d.%m.%Y')
+    url = API_URL + '/getMPSpeechesIDs/' + speaker_i + '/' + nowStr
+    speeches = tryHard(url).json()
 
     data = getTFIDFofSpeeches2(speeches, False)[:25]
 
     return JsonResponse(enrichPersonData(data, speaker_i), safe=False)
 
+
 def tfidfSpeakerDateQuery(request, speaker_i, datetime_dt):
-    speeches = tryHard(API_URL + '/getMPSpeechesIDs/' + speaker_i + "/" + datetime_dt).json()
+    url = API_URL + '/getMPSpeechesIDs/' + speaker_i + '/' + datetime_dt
+    speeches = tryHard(url).json()
 
     data = getTFIDFofSpeeches2(speeches, True)[:10]
 
     return JsonResponse(enrichPersonData(data, speaker_i), safe=False)
 
 
-#TFIDF PG
+# TFIDF PG
 def tfidfPGQuery(request, party_i):
     date_str = datetime.now().strftime(API_DATE_FORMAT)
 
     return tfidfPGDateQuery(request, party_i, date_str)
 
+
 def tfidfPGDateQuery(request, party_i, datetime_dt):
-    speeches = tryHard(API_URL + '/getPGsSpeechesIDs/' + party_i + "/" + datetime_dt).json()
+    url = API_URL + '/getPGsSpeechesIDs/' + party_i + '/' + datetime_dt
+    speeches = tryHard(url).json()
 
     data = getTFIDFofSpeeches2(speeches, True)[:10]
 
     return JsonResponse(enrichPartyData(data, party_i), safe=False)
 
+
 def tfidfPGQueryWithoutDigrams(request, party_i):
-    speeches = tryHard(API_URL + '/getPGsSpeechesIDs/' + party_i + "/" + datetime.today().strftime(API_DATE_FORMAT)).json()
+    now_str = datetime.today().strftime(API_DATE_FORMAT)
+    url = API_URL + '/getPGsSpeechesIDs/' + party_i + '/' + now_str
+    speeches = tryHard(url).json()
 
     data = getTFIDFofSpeeches2(speeches, False)[:15]
 
     return JsonResponse(enrichPartyData(data, party_i), safe=False)
 
 
-
-#ALL TFIDF Speeker
+# ALL TFIDF Speeker
 def tfidfSpeakerQueryALL(request, speaker_i):
     date_str = datetime.now().strftime(API_DATE_FORMAT)
 
     return tfidfSpeakerDateQueryALL(request, speaker_i, date_str)
 
+
 def tfidfSpeakerDateQueryALL(request, speaker_i, datetime_dt):
-    speeches = tryHard(API_URL + '/getMPSpeechesIDs/' + speaker_i + "/" + datetime_dt).json()
+    url = API_URL + '/getMPSpeechesIDs/' + speaker_i + '/' + datetime_dt
+    speeches = tryHard(url).json()
 
     data = getTFIDFofSpeeches3(speeches, False)
 
     return JsonResponse(enrichPersonData(data, speaker_i), safe=False)
 
 
-#ALL TFIDF PG
+# ALL TFIDF PG
 def tfidfPGQueryALL(request, party_i):
     date_str = datetime.now().strftime(API_DATE_FORMAT)
 
     return tfidfPGDateQueryALL(request, party_i, date_str)
 
+
 def tfidfPGDateQueryALL(request, party_i, datetime_dt):
-    date_str = datetime.now().strftime(API_DATE_FORMAT)
-    speeches = tryHard(API_URL + '/getPGsSpeechesIDs/' + party_i + "/" + datetime_dt).json()
+    url = API_URL + '/getPGsSpeechesIDs/' + party_i + '/' + datetime_dt
+    speeches = tryHard(url).json()
 
     data = getTFIDFofSpeeches3(speeches, False)
 
@@ -300,9 +328,13 @@ def dfALL(request):
     return JsonResponse(groupDFALL(r.json()), safe=False)
 
 
-def dfDateALL(request, datetime_dt): #TODO
-
-    solr_url = SOLR_URL + '/tvrh/?q=tip_t:seja&tv.df=true&wt=json&fl=id&tv.fl=content_t&fq=datetime_dt:[*%20TO%20' + datetime.strptime(datetime_dt, '%d.%m.%Y').strftime('%Y-%m-%dT%H:%M:%SZ') + ']'
+# TODO
+def dfDateALL(request, datetime_dt):
+    dateObj = datetime.strptime(datetime_dt, '%d.%m.%Y')
+    dateStr = dateObj.strftime('%Y-%m-%dT%H:%M:%SZ')
+    solr_url = ('' + SOLR_URL + '/tvrh/?q=tip_t:seja&tv.df=true&wt=json&'
+                'fl=id&tv.fl=content_t&fq=datetime_dt:[*%20TO%20'
+                '' + dateStr + ']')
 
     print 'calling solr'
     r = requests.get(solr_url)
