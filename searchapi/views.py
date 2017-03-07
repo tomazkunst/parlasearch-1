@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from parlasearch.settings import SOLR_URL, API_URL, API_DATE_FORMAT, ANALIZE_URL
 import calendar
 
-from utils import enrichQuery, enrichHighlights, enrichDocs, enrichTFIDF, groupSpeakerTFIDF, groupPartyTFIDF, groupSpeakerTFIDFALL, groupPartyTFIDFALL, groupDFALL, tryHard, getTFIDFofSpeeches, enrichPersonData, enrichPartyData, getTFIDFofSpeeches2, getTFIDFofSpeeches3, add_months, addOrganizations
+from utils import enrichQuery, enrichHighlights, enrichDocs, enrichTFIDF, groupDFALL, tryHard, enrichPersonData, enrichPartyData, getTFIDFofSpeeches3, add_months, addOrganizations
 
 # Create your views here.
 
@@ -211,76 +211,6 @@ def tfidfSessionQuery(request, session_i):
         return JsonResponse(output)
     except IndexError:
         raise Http404('No data for this session.')
-
-
-# TFIDF Speeker
-def tfidfSpeakerQuery(request, speaker_i):
-
-    solr_url = ('' + SOLR_URL + '/tvrh/?q=id:p' + speaker_i + ''
-                '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t')
-
-    print solr_url
-
-    r = requests.get(solr_url)
-
-    return JsonResponse(groupSpeakerTFIDF(r.json(),
-                        int(speaker_i)),
-                        safe=False)
-
-
-def tfidfSpeakerQuery2(request, speaker_i):
-    nowStr = datetime.today().strftime('%d.%m.%Y')
-    url = API_URL + '/getMPSpeechesIDs/' + speaker_i + '/' + nowStr
-    speeches = tryHard(url).json()
-
-    data = getTFIDFofSpeeches2(speeches, True)[:15]
-
-    return JsonResponse(enrichPersonData(data, speaker_i), safe=False)
-
-
-def tfidfSpeakerQueryWithoutDigrams(request, speaker_i):
-    nowStr = datetime.today().strftime('%d.%m.%Y')
-    url = API_URL + '/getMPSpeechesIDs/' + speaker_i + '/' + nowStr
-    speeches = tryHard(url).json()
-
-    data = getTFIDFofSpeeches2(speeches, False)[:25]
-
-    return JsonResponse(enrichPersonData(data, speaker_i), safe=False)
-
-
-def tfidfSpeakerDateQuery(request, speaker_i, datetime_dt):
-    url = API_URL + '/getMPSpeechesIDs/' + speaker_i + '/' + datetime_dt
-    speeches = tryHard(url).json()
-
-    data = getTFIDFofSpeeches2(speeches, True)[:10]
-
-    return JsonResponse(enrichPersonData(data, speaker_i), safe=False)
-
-
-# TFIDF PG
-def tfidfPGQuery(request, party_i):
-    date_str = datetime.now().strftime(API_DATE_FORMAT)
-
-    return tfidfPGDateQuery(request, party_i, date_str)
-
-
-def tfidfPGDateQuery(request, party_i, datetime_dt):
-    url = API_URL + '/getPGsSpeechesIDs/' + party_i + '/' + datetime_dt
-    speeches = tryHard(url).json()
-
-    data = getTFIDFofSpeeches2(speeches, True)[:10]
-
-    return JsonResponse(enrichPartyData(data, party_i), safe=False)
-
-
-def tfidfPGQueryWithoutDigrams(request, party_i):
-    now_str = datetime.today().strftime(API_DATE_FORMAT)
-    url = API_URL + '/getPGsSpeechesIDs/' + party_i + '/' + now_str
-    speeches = tryHard(url).json()
-
-    data = getTFIDFofSpeeches2(speeches, False)[:15]
-
-    return JsonResponse(enrichPartyData(data, party_i), safe=False)
 
 
 # ALL TFIDF Speeker
