@@ -1,6 +1,6 @@
-# Searchalize
+# Parlasearch
 
-Searchalize je storitev za textovno iskanje po transkriptih in glasovanjih parlamenta.
+Parlasearch je storitev za textovno iskanje po transkriptih in glasovanjih parlamenta.
 
 ## Inštalacija
 
