@@ -9,12 +9,16 @@ from utils import enrichQuery, enrichHighlights, enrichDocs, enrichTFIDF, groupD
 
 # Create your views here.
 
+ZERO_TIME = 'T00:00:00.000Z'
 
 def regularQuery(request, words, start_page=None):
+    """
+    search query in transcripts
+    """
 
     rows = 50
     # solr_url = 'http://127.0.0.1:8983/solr/knedl/select?wt=json'
-    solr_url = SOLR_URL+'/select?wt=json'
+    solr_url = SOLR_URL + '/select?wt=json'
 
     q = words.replace('+', ' ')
 
@@ -67,62 +71,64 @@ def filterQuery(request, words, start_page=None):
     working_bodies = request.GET.get('wb', [])
     time_filter = request.GET.get('time_filter')
 
-    filters_speakers = []
-
-    filters_partys = []
-
-    filters_orgs = []
+    filters = []
 
     working_bodies = working_bodies.split(',') if working_bodies else []
-
+    # prepare speaker filter query
     if parties:
-        parties_str = 'party_i:(' + ' OR '.join(parties.split(',')) + ')'
-        filters_partys.append(parties_str)
+        filters_partys = 'party_i:(' + ' OR '.join(parties.split(',')) + ')'
+        filters.append(filters_partys)
     if people:
-        speakers = 'speaker_i:(' + ' OR '.join(people.split(',')) + ')'
-        filters_speakers.append(speakers)
+        filters_speakers = 'speaker_i:(' + ' OR '.join(people.split(',')) + ')'
+        filters.append(filters_speakers)
+
+    # prepare organization of session filter query
     if is_dz:
         working_bodies.append('95')
     if is_council:
         working_bodies.append('9')
     if working_bodies:
-        filters_orgs.append('org_i:(' + ' OR '.join(working_bodies) + ')')
+        filters.append('org_i:(' + ' OR '.join(working_bodies) + ')')
 
-    # print 'org_filter', filters_orgs
+    # prepare time filter query
     if time_filter:
         time_filter = [datetime.strptime(t_filter, API_DATE_FORMAT)
                        for t_filter in time_filter.split(',')]
 
-        time_filter = [(t_time.strftime('%Y-%m-%d') + 'T00:00:00.000Z',
-                        add_months(t_time, 1).strftime('%Y-%m-%d') + 'T00:00:00.000Z]')
+        time_filter = [(t_time.strftime('%Y-%m-%d') + ZERO_TIME,
+                        add_months(t_time,
+                                   1).strftime('%Y-%m-%d') + ZERO_TIME + ']')
                        for t_time in time_filter]
         time_str = ['[' + t_time(0) + ' TO ' + t_time(1)
                     for t_time in time_filter]
-
         time_query = 'datetime_dt:(' + ' OR '.join(time_str) + ')'
-    else:
-        time_query = None
+        filters.append(time_query)
 
     f_date = min(time_filter) if time_filter else None
     t_date = add_months(max(time_filter), 1) if time_filter else None
 
-    # print time_query
+    if f_date:
+        facetStartRange = f_date.strftime('%Y-%m-%d') + ZERO_TIME
+    else:
+        facetStartRange = '2014-01-01' + ZERO_TIME
 
-    # print people, parties
+    if t_date:
+        facetEndRange = t_date.strftime('%Y-%m-%d') + ZERO_TIME
+    else:
+        facetEndRange = 'NOW'
+
+    query = 'content_t:' + q.replace('IN', 'AND').replace('!', '%2B')
+    query += ' AND tip_t:govor'
 
     solr_params = {
-        'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '%2B') + ' AND tip_t:govor',
-        'fq': ' OR '.join(filters_partys)
-              + (' AND ' if filters_partys and filters_speakers else '') + ((' OR '.join(filters_speakers)) if filters_speakers else '')
-              + (' AND ' if (filters_partys or filters_speakers) and filters_orgs else '') + ((' OR '.join(filters_orgs)) if filters_orgs else '')
-              + (' AND ' if (filters_partys or filters_speakers or filters_orgs) and time_query else '') + (time_query if time_query else ''),
+        'q': query,
+        'fq': ' AND '.join(filters),
         'facet': 'true',
         'facet.field': 'speaker_i&facet.field=party_i&facet.field=org_i', # dirty hack
         'facet.range': 'datetime_dt',
-        'facet.range.start': (f_date.strftime('%Y-%m-%d') if f_date else '2014-01-01')+'T00:00:00.000Z',
+        'facet.range.start': facetStartRange,
         'facet.range.gap': '%2B1MONTHS',
-        'facet.range.end': (t_date.strftime('%Y-%m-%d') + 'T00:00:00.000Z') if t_date else 'NOW',
-        # 'sort': 'datetime_dt desc',
+        'facet.range.end': facetEndRange,
         'hl': 'true',
         'hl.fl': 'content_t',
         'hl.fragmenter': 'regex',
