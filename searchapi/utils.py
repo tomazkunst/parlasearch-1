@@ -32,7 +32,10 @@ def tryHard(url):
 
 
 def enrichQuery(data, show_all=False):
-
+    """
+    enrichQuery method add data of members and parlametary groups to ratings of
+    search resposnse
+    """
     data['facet_counts'].pop('facet_heatmaps', None)
     # data['facet_counts'].pop('facet_ranges', None)
     data['facet_counts'].pop('facet_queries', None)
@@ -42,6 +45,7 @@ def enrichQuery(data, show_all=False):
     url = 'https://analize.parlameter.si/v1/utils/getAllStaticData/'
     static_data = requests.get(url).json()
 
+    # enrich speakers
     for i, speaker in enumerate(data['facet_counts']['facet_fields']['speaker_i']):
         if i < 5 or show_all:
             try:
@@ -100,6 +104,9 @@ def enrichQuery(data, show_all=False):
 
 
 def trimHighlight(highlight):
+    """
+    trim speech content around highlighted words
+    """
     m = re.search('[A-ZĆČŽŠĐ^\.\?\!]*<em.*\/em>.*\.?', highlight, re.UNICODE)
     if m:
         return m.group() + '</em>'
@@ -108,6 +115,9 @@ def trimHighlight(highlight):
 
 
 def enrichHighlights(data):
+    """
+    enrichQuery method add data of members to highlights of search response
+    """
 
     results = []
 
@@ -210,6 +220,9 @@ def enrichDocs(data):
 
 
 def truncateTFIDF(data):
+    """
+    remove terms with to lowest frequency
+    """
     newdata = []
     for term in data:
         if ' ' not in term['term']:
@@ -224,6 +237,9 @@ def truncateTFIDF(data):
 
 
 def removeDigrams(data):
+    """
+    remove digrams
+    """
     newdata = []
     for i, term in enumerate(data):
         if ' ' not in term['term']:
@@ -233,6 +249,9 @@ def removeDigrams(data):
 
 
 def removeSingles(data):
+    """
+    ?
+    """
     newdata = []
     for i, term in enumerate(data):
         if term['scores']['tf'] > 10:
@@ -242,6 +261,9 @@ def removeSingles(data):
 
 
 def removeNumbers(data):
+    """
+    remove numbers
+    """
     newdata = []
     for i, term in enumerate(data):
         try:
@@ -254,6 +276,9 @@ def removeNumbers(data):
 
 
 def isDigram(word):
+    """
+    returns True if word is digram alse False
+    """
     if ' ' in word:
         return True
     else:
@@ -261,6 +286,9 @@ def isDigram(word):
 
 
 def isNumber(word):
+    """
+    returns True if word is number alse False
+    """
     try:
         float(word)
         return True
@@ -269,7 +297,9 @@ def isNumber(word):
 
 
 def enrichTFIDF(data):
-
+    """
+    make solr json preety and sort results by tf-idf
+    """
     results = []
 
     for i, term in enumerate(data['termVectors'][1][3]):
@@ -353,6 +383,9 @@ def groupDFALL(rawdata):
 
 
 def appendTFIDFALL(rawdata, data, with_digrams):
+    """
+    append tfidf from sorl json (rawdata) to dictionary of words (data)
+    """
     ex_words = data.keys()
 
     for i, speech in enumerate(rawdata['termVectors']):
@@ -380,6 +413,11 @@ def appendTFIDFALL(rawdata, data, with_digrams):
 
 
 def getTFIDFofSpeeches2(speeches, tfidf):
+    """
+    get tfidf of speeches and merge it (recalculate tfidf)
+    exclude words with to lowest term frequency
+    return sorted by tfidfs
+    """
     data = {}
     for speech_id in speeches:
         temp_data = cache.get('govor_'+str(speech_id))
@@ -406,6 +444,10 @@ def getTFIDFofSpeeches2(speeches, tfidf):
 
 
 def getTFIDFofSpeeches3(speeches, tfidf):
+    """
+    get tfidf of speeches and merge it (recalculate tfidf)
+    return sorted by tfidfs
+    """
     data = {}
     for speech_id in speeches:
         temp_data = cache.get('govor_'+str(speech_id))
@@ -437,6 +479,9 @@ def enrichPartyData(data, party_id):
 
 
 def add_months(sourcedate, months):
+    """
+    add months to sourcedate
+    """
     month = sourcedate.month - 1 + months
     year = int(sourcedate.year + month / 12)
     month = month % 12 + 1

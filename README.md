@@ -3,14 +3,18 @@
 Parlasearch je storitev za textovno iskanje po transkriptih in glasovanjih parlamenta.
 
 ## Inštalacija
+Pull project from github
+> git pull https://github.com/muki/parlasearch.git
 
-git pull https://github.com/muki/parlasearch.git
+Create virtual environment
+> virtualenv venv
 
-virtualenv venv
+Activate environment
+> source /venv/bin/activate
 
-source /venv/bin/activate
+Install python librarys
+> pip install -r requirements.txt
 
-pip install -r requirements.txt
-
-./manage.py runserver
+Run dev server
+> ./manage.py runserver
 
