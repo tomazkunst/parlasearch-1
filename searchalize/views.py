@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from kvalifikatorji.scripts import getCountListPG, getScores, problematicno, privzdignjeno, preprosto
+from kvalifikatorji.scripts import getCountListPG, getScores, problematicno, privzdignjeno, preprosto, getCountList
 from searchapi.utils import tryHard, enrichPartyData, getTFIDFofSpeeches2, enrichPersonData
 from parlasearch.settings import SOLR_URL, API_URL, API_DATE_FORMAT, ANALIZE_URL
 from datetime import datetime
@@ -11,6 +11,10 @@ import requests
 
 # Create your views here.
 def setStyleScoresPGsALL(date_=None):
+    """
+    Method for analyze Style scores of all parliamentray groups and POST data
+    to parlalize.
+    """
     if date_:
         date_of = datetime.strptime(date_, API_DATE_FORMAT).date()
     else:
@@ -65,7 +69,73 @@ def setStyleScoresPGsALL(date_=None):
     return r.content
 
 
+def setStyleScoresMPsALL(date_=None):
+    """
+    Method for analyze Style scores of all parliamentray groups and POST data
+    to parlalize.
+    """
+    if date_:
+        date_of = datetime.strptime(date_, API_DATE_FORMAT).date()
+    else:
+        date_of = datetime.now().date()
+        date_ = date_of.strftime(API_DATE_FORMAT)
+
+    mps = tryHard(API_URL+'/getMPs/'+date_).json()
+
+    print 'Starting MPs'
+    scores = {}
+    for mp in mps:
+
+        person_id = mp['id']
+
+        print 'MP id: ' + str(person_id)
+
+        # get word counts with solr
+        counter = Counter(getCountList(int(person_id), date_))
+        total = sum(counter.values())
+
+        scores_local = getScores([problematicno,
+                                  privzdignjeno,
+                                  preprosto
+                                  ],
+                                 counter,
+                                 total)
+
+        print scores_local
+        scores[person_id] = scores_local
+
+    print scores
+    average = {"problematicno": sum([score['problematicno']
+                                     for score
+                                     in scores.values()])/len(scores),
+               "privzdignjeno": sum([score['privzdignjeno']
+                                     for score
+                                     in scores.values()])/len(scores),
+               "preprosto": sum([score['preprosto']
+                                 for score
+                                 in scores.values()])/len(scores)}
+    data = []
+    for person, score in scores.items():
+        data.append({'member': person,
+                     'problematicno': score['problematicno'],
+                     'privzdignjeno': score['privzdignjeno'],
+                     'preprosto': score['preprosto'],
+                     'problematicno_average': average['problematicno'],
+                     'privzdignjeno_average': average['privzdignjeno'],
+                     'preprosto_average': average['preprosto']})
+    with open('tfidfs/style_score_MPs.json', 'w') as f:
+        f.write(json.dumps(data))
+    f.close()
+    r = requests.post(ANALIZE_URL + '/p/setAllMPsStyleScoresFromSearch/',
+                      json=data)
+    return r.content
+
+
 def setTFIDFforPGsALL(date_=None):
+    """
+    Method for analyze TFIDF of all parliamentray groups and POST data
+    to parlalize.
+    """
     if date_:
         date_of = datetime.strptime(date_, API_DATE_FORMAT).date()
     else:
@@ -96,6 +166,10 @@ def setTFIDFforPGsALL(date_=None):
 
 
 def setTFIDFforMPsALL(date_=None):
+    """
+    Method for analyze TFIDF of all parliamentray groups and POST data
+    to parlalize.
+    """
     if date_:
         date_of = datetime.strptime(date_, API_DATE_FORMAT).date()
     else:
