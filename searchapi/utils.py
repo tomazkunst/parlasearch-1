@@ -33,6 +33,9 @@ def tryHard(url):
 
 def enrichQuery(data, show_all=False):
     """
+    data: data "dictionary" to enrich
+    show_all:  if show all then return all speakers else top 5
+
     enrichQuery method add data of members and parlametary groups to ratings of
     search resposnse
     """
@@ -163,6 +166,11 @@ def enrichHighlights(data):
 
 
 def addOrganizations(data):
+    """
+    data: solr response of search
+
+    return list of organizations "working bodies" in which was the word spoken
+    """
     WBs = requests.get(ANALIZE_URL + '/s/getWorkingBodies/').json()
     orgs = {}
     for i, speaker in enumerate(data['facet_counts']['facet_fields']['org_i']):
@@ -177,46 +185,6 @@ def addOrganizations(data):
     data['has_dz_score'] = True if '95' in orgs.keys() else False
     data['has_council_score'] = True if '9' in orgs.keys() else False
     return data
-
-
-def enrichDocs(data):
-
-    results = []
-
-    for i, doc in enumerate(data['response']['docs']):
-
-        hkey = doc['id']
-        speechdata = getSpeechData(hkey.split('g')[1])
-
-        try:
-            sID = str(speechdata['speaker_id'])
-            url = 'https://analize.parlameter.si/v1/utils/getPersonData/' + sID
-            person_data = requests.get(url).json()
-            results.append({'person': person_data,
-                            'content_t': doc['content_t'],
-                            'date': speechdata['date'],
-                            'speech_id': int(hkey.split('g')[1]),
-                            'session_id': doc['session_i'],
-                            'session_name': speechdata['session_name'],
-                            'score': doc['score']})
-        except ValueError:
-            results.append({'person': {'party': {'acronym': 'unknown',
-                                                 'id': 'unknown',
-                                                 'name': 'unknown'},
-                                       'name': speechdata['speaker_id'],
-                                       'gov_id': 'unknown',
-                                       'id': speechdata['speaker_id']},
-                            'content_t': doc['content_t'],
-                            'date': speechdata['date'],
-                            'speech_id': int(hkey.split('g')[1]),
-                            'session_id': doc['session_i'],
-                            'session_name': speechdata['session_name']})
-
-    data['response']['docs'] = results
-
-    enrichedData = data
-
-    return enrichedData
 
 
 def truncateTFIDF(data):
@@ -329,7 +297,9 @@ def enrichTFIDF(data):
 
 
 def groupDFALL(rawdata):
-
+    """
+    group same terms for df all
+    """
     print 'beginning groupDFALL'
 
     allSessions = []
@@ -466,13 +436,68 @@ def getTFIDFofSpeeches3(speeches, tfidf):
     return data
 
 
+def tfidfSpeakerQueryALL(speaker_i):
+    """
+    Get counts of all words of speaker. Using for style socres.
+    """
+    date_str = datetime.now().strftime(API_DATE_FORMAT)
+
+    return tfidfSpeakerDateQueryALL(request, speaker_i, date_str)
+
+
+def tfidfSpeakerDateQueryALL(speaker_i, datetime_dt):
+    """
+    Get counts of all words of speaker. Using for style socres.
+    """
+    url = API_URL + '/getMPSpeechesIDs/' + speaker_i + '/' + datetime_dt
+    speeches = tryHard(url).json()
+
+    data = getTFIDFofSpeeches3(speeches, False)
+
+    return enrichPersonData(data, speaker_i)
+
+
+# ALL TFIDF PG / Using for style score
+def tfidfPGQueryALL(party_i):
+    """
+    Get counts of all words of perty. Using for style socres.
+    """
+    date_str = datetime.now().strftime(API_DATE_FORMAT)
+
+    return tfidfPGDateQueryALL(request, party_i, date_str)
+
+
+def tfidfPGDateQueryALL(party_i, datetime_dt):
+    """
+    Get counts of all words of party. Using for style socres.
+    """
+    url = API_URL + '/getPGsSpeechesIDs/' + party_i + '/' + datetime_dt
+    speeches = tryHard(url).json()
+
+    data = getTFIDFofSpeeches3(speeches, False)
+
+    return enrichPartyData(data, party_i)
+
+
 def enrichPersonData(data, person_id):
+    """
+    data: data to enrich
+    person_id: id of person
+
+    returns dictionary with person data and data as results
+    """
     url = ANALIZE_URL + '/utils/getPersonData/' + str(person_id)
     enrichedData = {'person': tryHard(url).json(), 'results': data}
     return enrichedData
 
 
 def enrichPartyData(data, party_id):
+    """
+    data: data to enrich
+    party_id: id of perty
+
+    returns dictionary with party data and data as results
+    """
     url = ANALIZE_URL + '/utils/getPgDataAPI/' + str(party_id)
     enrichedData = {'party': tryHard(url).json(), 'results': data}
     return enrichedData
@@ -480,7 +505,7 @@ def enrichPartyData(data, party_id):
 
 def add_months(sourcedate, months):
     """
-    add months to sourcedate
+    Add months to sourcedate.
     """
     month = sourcedate.month - 1 + months
     year = int(sourcedate.year + month / 12)
@@ -489,24 +514,12 @@ def add_months(sourcedate, months):
     return datetime.date(year, month, day)
 
 
-def tfidf_to_file():
-    url = 'https://data.parlameter.si/v1/getMembersOfPGsRanges/14.11.2016'
-    membersOfPGsRanges = tryHard(url).json()
-    IDs = [key for key, value in membersOfPGsRanges[-1]['members'].items()]
-    for ID in IDs:
-        with open('tfidfs/tfidf_pg_' + str(ID) + '.json', 'w') as f:
-            print 'delam zdej ', ID
-            now_str = datetime.datetime.now().strftime(API_DATE_FORMAT)
-            url = API_URL + '/getPGsSpeechesIDs/' + str(ID) + '/' + now_str
-            speeches = tryHard(url).json()
-
-            data = getTFIDFofSpeeches2(speeches, False)[:10]
-
-            read_data = f.write(json.dumps(enrichPartyData(data, ID)))
-        f.closed
-
-
 def getSpeechData(speech_id):
+    """
+    speech_id: id of speech
+
+    Returns data of speech. Data will be stored in cache for one week.
+    """
     data = cache.get('s_data_' + str(speech_id))
     if not data:
         url = 'https://data.parlameter.si/v1/getSpeechData/' + str(speech_id)
@@ -516,6 +529,9 @@ def getSpeechData(speech_id):
 
 
 def monitorMe(request):
+    """
+    Method for monitoring availability.
+    """
 
     r = requests.get('https://isci.parlameter.si/q/krompir')
     if r.status_code == 200:

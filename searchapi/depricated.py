@@ -1,6 +1,16 @@
 # views
 
 
+def mltQuery(request, speech_i):
+
+    solr_url = ('' + SOLR_URL + '/mlt?wt=json&mlt.count=5&q=id:g' + speech_i + ''
+                '&fl=id,score,content_t,session_i,speaker_i,speech_i&fq=tip_t:govor')
+
+    r = requests.get(solr_url)
+
+    return JsonResponse(enrichDocs(r.json()))
+
+
 # TFIDF PG
 def tfidfPGQuery(request, party_i):
     date_str = datetime.now().strftime(API_DATE_FORMAT)
@@ -294,3 +304,60 @@ def makeTFIDFObject(data):
             del data['termVectors'][1][3][i]
 
     return results
+
+
+def tfidf_to_file():
+    url = 'https://data.parlameter.si/v1/getMembersOfPGsRanges/14.11.2016'
+    membersOfPGsRanges = tryHard(url).json()
+    IDs = [key for key, value in membersOfPGsRanges[-1]['members'].items()]
+    for ID in IDs:
+        with open('tfidfs/tfidf_pg_' + str(ID) + '.json', 'w') as f:
+            print 'delam zdej ', ID
+            now_str = datetime.datetime.now().strftime(API_DATE_FORMAT)
+            url = API_URL + '/getPGsSpeechesIDs/' + str(ID) + '/' + now_str
+            speeches = tryHard(url).json()
+
+            data = getTFIDFofSpeeches2(speeches, False)[:10]
+
+            read_data = f.write(json.dumps(enrichPartyData(data, ID)))
+        f.closed
+
+
+def enrichDocs(data):
+
+    results = []
+
+    for i, doc in enumerate(data['response']['docs']):
+
+        hkey = doc['id']
+        speechdata = getSpeechData(hkey.split('g')[1])
+
+        try:
+            sID = str(speechdata['speaker_id'])
+            url = 'https://analize.parlameter.si/v1/utils/getPersonData/' + sID
+            person_data = requests.get(url).json()
+            results.append({'person': person_data,
+                            'content_t': doc['content_t'],
+                            'date': speechdata['date'],
+                            'speech_id': int(hkey.split('g')[1]),
+                            'session_id': doc['session_i'],
+                            'session_name': speechdata['session_name'],
+                            'score': doc['score']})
+        except ValueError:
+            results.append({'person': {'party': {'acronym': 'unknown',
+                                                 'id': 'unknown',
+                                                 'name': 'unknown'},
+                                       'name': speechdata['speaker_id'],
+                                       'gov_id': 'unknown',
+                                       'id': speechdata['speaker_id']},
+                            'content_t': doc['content_t'],
+                            'date': speechdata['date'],
+                            'speech_id': int(hkey.split('g')[1]),
+                            'session_id': doc['session_i'],
+                            'session_name': speechdata['session_name']})
+
+    data['response']['docs'] = results
+
+    enrichedData = data
+
+    return enrichedData
