@@ -5,14 +5,18 @@ from datetime import datetime, timedelta
 from parlasearch.settings import SOLR_URL, API_URL, API_DATE_FORMAT, ANALIZE_URL
 import calendar
 
-from utils import enrichQuery, enrichHighlights, enrichDocs, enrichTFIDF, groupDFALL, tryHard, enrichPersonData, enrichPartyData, getTFIDFofSpeeches3, add_months, addOrganizations
+from utils import enrichQuery, enrichHighlights, enrichTFIDF, groupDFALL, tryHard, add_months, addOrganizations
 
 # Create your views here.
 
 ZERO_TIME = 'T00:00:00.000Z'
 
+
 def regularQuery(request, words, start_page=None):
     """
+    words: word/words for search
+    start_page: pager in results
+
     search query in transcripts
     """
 
@@ -57,7 +61,22 @@ def regularQuery(request, words, start_page=None):
 
 
 def filterQuery(request, words, start_page=None):
+    """
+    words: word/words for search
+    start_page: pager in results
 
+    get parameters "filters":
+        -people: array of people ids for filter
+        -parties: array of party ids for filter
+        -from: 
+        -to:
+        -dz: if true filter speeches spoken on sessions of Drzavni zbor
+        -council: if true filter speeches spoken on sessions of president council
+        -wb: array of working bodies for filter
+        -time_fitler: Months of which can be words spoken
+
+    filter search query in transcripts
+    """
     rows = 50
     solr_url = SOLR_URL+'/select?wt=json'
 
@@ -153,6 +172,9 @@ def filterQuery(request, words, start_page=None):
 
 
 def motionQuery(request, words, start_page=None):
+    """
+    search query by motion text
+    """
 
     rows = 50
     solr_url = SOLR_URL+'/select?wt=json'
@@ -192,17 +214,10 @@ def motionQuery(request, words, start_page=None):
     return JsonResponse(resp, safe=False)
 
 
-def mltQuery(request, speech_i):
-
-    solr_url = ('' + SOLR_URL + '/mlt?wt=json&mlt.count=5&q=id:g' + speech_i + ''
-                '&fl=id,score,content_t,session_i,speaker_i,speech_i&fq=tip_t:govor')
-
-    r = requests.get(solr_url)
-
-    return JsonResponse(enrichDocs(r.json()))
-
-
 def tfidfSessionQuery(request, session_i):
+    """
+    method for TFIDF of session
+    """
 
     solr_url = ('' + SOLR_URL + '/tvrh/?q=id:s' + session_i + ''
                 '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t')
@@ -219,40 +234,10 @@ def tfidfSessionQuery(request, session_i):
         raise Http404('No data for this session.')
 
 
-# ALL TFIDF Speeker
-def tfidfSpeakerQueryALL(request, speaker_i):
-    date_str = datetime.now().strftime(API_DATE_FORMAT)
-
-    return tfidfSpeakerDateQueryALL(request, speaker_i, date_str)
-
-
-def tfidfSpeakerDateQueryALL(request, speaker_i, datetime_dt):
-    url = API_URL + '/getMPSpeechesIDs/' + speaker_i + '/' + datetime_dt
-    speeches = tryHard(url).json()
-
-    data = getTFIDFofSpeeches3(speeches, False)
-
-    return JsonResponse(enrichPersonData(data, speaker_i), safe=False)
-
-
-# ALL TFIDF PG
-def tfidfPGQueryALL(request, party_i):
-    date_str = datetime.now().strftime(API_DATE_FORMAT)
-
-    return tfidfPGDateQueryALL(request, party_i, date_str)
-
-
-def tfidfPGDateQueryALL(request, party_i, datetime_dt):
-    url = API_URL + '/getPGsSpeechesIDs/' + party_i + '/' + datetime_dt
-    speeches = tryHard(url).json()
-
-    data = getTFIDFofSpeeches3(speeches, False)
-
-    return JsonResponse(enrichPartyData(data, party_i), safe=False)
-
-
 def dfALL(request):
-
+    """
+    document frequerncy all
+    """
     solr_url = SOLR_URL + '/tvrh/?q=tip_t:seja&tv.df=true&wt=json&fl=id&tv.fl=content_t'
 
     # solr_url = SOLR_URL + '/tvrh/?q=tip_t:govor&tv.df=true&wt=json&fl=id&tv.fl=content_t'
@@ -266,6 +251,9 @@ def dfALL(request):
 
 # TODO
 def dfDateALL(request, datetime_dt):
+    """
+    document frequerncy all to date
+    """
     dateObj = datetime.strptime(datetime_dt, '%d.%m.%Y')
     dateStr = dateObj.strftime('%Y-%m-%dT%H:%M:%SZ')
     solr_url = ('' + SOLR_URL + '/tvrh/?q=tip_t:seja&tv.df=true&wt=json&'
