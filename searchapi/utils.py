@@ -90,9 +90,10 @@ def enrichQuery(data, show_all=False):
     return enrichedData
 
 def trimHighlight(highlight):
-    m = re.search('[A-ZĆČŽŠĐ^\.\?\!]*<em.*\/em>.*\.?', highlight, re.UNICODE)
+    reg_search = '([A-ZĆČŽŠĐ][^.,?!]*)?(?<!\\w)(?i)(<em.*\/em>)(?!\\w)[^.?!]*?[.?!]{1,2}\"?'
+    m = re.search(reg_search, highlight + 'pppp.', re.UNICODE)
     if m:
-        return m.group() + '</em>'
+        return m.group().replace("pppp.", "") + '</em>'
     else:
         return highlight
 
