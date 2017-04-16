@@ -117,7 +117,9 @@ def enrichHighlights(data):
                     'content_t': trimHighlight(content_t),
                     'date': speechdata['date'],
                     'speech_id': int(hkey.split('g')[1]),
-                    'session_id': speechdata['session_id']
+                    'session_id': speechdata['session_id'],
+                    'order': speechdata['order'],
+                    'start_time': speechdata['start_time']
                 })
             except (ValueError, KeyError) as e:
                 results.append({'person': {'party': {'acronym': 'unknown', 'id': 'unknown', 'name': 'unknown'}, 'name': 'unknown', 'gov_id': 'unknown', 'id': speechdata['speaker_id']}, 'content_t': trimHighlight(content_t), 'date': speechdata['date'], 'speech_id': int(hkey.split('g')[1])})
@@ -572,11 +574,11 @@ def tfidf_to_file():
 
 
 def getSpeechData(speech_id):
-    data = cache.get("s_data_" + str(speech_id))
+    data = cache.get("s_data_muki_" + str(speech_id))
     if not data:
         url = 'https://data.parlameter.si/v1/getSpeechData/' + str(speech_id)
         data = requests.get(url).json()
-        cache.set("s_data_" + str(speech_id), data, 60 * 60 * 24 * 7)
+        cache.set("s_data_muki_" + str(speech_id), data, 60 * 60 * 24 * 7)
     return data
 
 def monitorMe(request):
