@@ -16,7 +16,7 @@ def tryHard(url):
     counter = 0
     while data is None:
         try:
-            if counter > 10:
+            if counter > 2:
                 print "Ne gre vec"
                 return None
                 #client.captureMessage(url+" je zahinavu več ko 10x.")
@@ -25,7 +25,7 @@ def tryHard(url):
             print url
             print "try Harder"
             counter += 1
-            time.sleep(30)
+            time.sleep(5)
             pass
     return data
 
