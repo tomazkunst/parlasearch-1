@@ -11,6 +11,7 @@ import json
 
 from django.http import HttpResponse
 
+
 def tryHard(url):
     data = None
     counter = 0
@@ -19,11 +20,11 @@ def tryHard(url):
             if counter > 2:
                 print "Ne gre vec"
                 return None
-                #client.captureMessage(url+" je zahinavu več ko 10x.")
+                # client.captureMessage(url+' je zahinavu več ko 10x.')
             data = requests.get(url)
         except:
             print url
-            print "try Harder"
+            print 'try Harder'
             counter += 1
             time.sleep(5)
             pass
@@ -31,29 +32,39 @@ def tryHard(url):
 
 
 def enrichQuery(data, show_all=False):
+    """
+    data: data "dictionary" to enrich
+    show_all:  if show all then return all speakers else top 5
 
+    enrichQuery method add data of members and parlametary groups to ratings of
+    search resposnse
+    """
     data['facet_counts'].pop('facet_heatmaps', None)
     # data['facet_counts'].pop('facet_ranges', None)
     data['facet_counts'].pop('facet_queries', None)
     data['facet_counts'].pop('facet_intervals', None)
 
     results = []
+    url = 'https://analize.parlameter.si/v1/utils/getAllStaticData/'
+    static_data = requests.get(url).json()
 
-    static_data = requests.get('https://analize.parlameter.si/v1/utils/getAllStaticData/').json()
-
+    # enrich speakers
     for i, speaker in enumerate(data['facet_counts']['facet_fields']['speaker_i']):
         if i < 5 or show_all:
             try:
-                results.append({'person': static_data['persons'][str(speaker)], 'score': str(data['facet_counts']['facet_fields']['speaker_i'][i + 1])})
+                score = data['facet_counts']['facet_fields']['speaker_i']
+                results.append({'person': static_data['persons'][str(speaker)],
+                                'score': str(score[i + 1])})
                 del data['facet_counts']['facet_fields']['speaker_i'][i]
             except (ValueError, KeyError) as e:
+                score = data['facet_counts']['facet_fields']['speaker_i']
                 results.append({'person': {'party': {'acronym': 'unknown',
                                                      'id': 'unknown',
                                                      'name': 'unknown'},
                                            'name': 'unknown' + speaker,
                                            'gov_id': 'unknown',
                                            'id': speaker},
-                                'score': str(data['facet_counts']['facet_fields']['speaker_i'][i + 1])})
+                                'score': str(score[i + 1])})
                 del data['facet_counts']['facet_fields']['speaker_i'][i]
         else:
             del data['facet_counts']['facet_fields']['speaker_i'][i]
@@ -61,8 +72,10 @@ def enrichQuery(data, show_all=False):
     for result in results:
         result.update({'score': int(result['score'])})
 
-    data['facet_counts']['facet_fields']['speaker_i'] = sorted(results, key=lambda k: k['score'], reverse=True)
-
+    out = sorted(results,
+                 key=lambda k: k['score'],
+                 reverse=True)
+    data['facet_counts']['facet_fields']['speaker_i'] = out
 
     # enrich party
     results = []
@@ -70,26 +83,33 @@ def enrichQuery(data, show_all=False):
     for i, speaker in enumerate(data['facet_counts']['facet_fields']['party_i']):
         if i % 2 == 0:
             try:
+                score = data['facet_counts']['facet_fields']['party_i']
                 results.append({'party': static_data['partys'][str(speaker)],
-                                'score': str(data['facet_counts']['facet_fields']['party_i'][i + 1])})
+                                'score': str(score[i + 1])})
             except ValueError:
+                score = data['facet_counts']['facet_fields']['party_i']
                 results.append({'party': {'acronym': 'unknown',
                                           'is_coalition': unknown,
                                           'name': 'unknown',
                                           'id': speaker},
-                                'score': str(data['facet_counts']['facet_fields']['party_i'][i + 1])
+                                'score': str(score[i + 1])
                                 })
 
     for result in results:
         result.update({'score': int(result['score'])})
 
-    data['facet_counts']['facet_fields']['party_e'] = sorted(results, key=lambda k: k['score'], reverse=True)
+    out = sorted(results, key=lambda k: k['score'], reverse=True)
+    data['facet_counts']['facet_fields']['party_e'] = out
 
     enrichedData = data
 
     return enrichedData
 
+
 def trimHighlight(highlight):
+    """
+    trim speech content around highlighted words
+    """
     reg_search = '([A-ZĆČŽŠĐ][^.,?!]*)?(?<!\\w)(?i)(<em.*\/em>)(?!\\w)[^.?!]*?[.?!]{1,2}\"?'
     m = re.search(reg_search, highlight + 'pppp.', re.UNICODE)
     if m:
@@ -97,19 +117,26 @@ def trimHighlight(highlight):
     else:
         return highlight
 
+
 def enrichHighlights(data):
+    """
+    enrichQuery method add data of members to highlights of search response
+    """
 
     results = []
 
-    static_data = requests.get('https://analize.parlameter.si/v1/utils/getAllStaticData/').json()
+    url = 'https://analize.parlameter.si/v1/utils/getAllStaticData/'
+    static_data = requests.get(url).json()
 
     for hkey in data['highlighting'].keys():
 
         speechdata = getSpeechData(hkey.split('g')[1])
+        if 'content_t' in data['highlighting'][hkey].keys():
+            content_t = (data['highlighting'][hkey]['content_t'][0])
+        else:
+            content_t = None
 
-        content_t = (data['highlighting'][hkey]['content_t'][0]) if 'content_t' in data['highlighting'][hkey].keys() else None
-
-        if content_t != '' and content_t != None:
+        if content_t != '' and content_t is not None:
 
             try:
                 results.append({
@@ -122,9 +149,19 @@ def enrichHighlights(data):
                     'start_time': speechdata['start_time']
                 })
             except (ValueError, KeyError) as e:
-                results.append({'person': {'party': {'acronym': 'unknown', 'id': 'unknown', 'name': 'unknown'}, 'name': 'unknown', 'gov_id': 'unknown', 'id': speechdata['speaker_id']}, 'content_t': trimHighlight(content_t), 'date': speechdata['date'], 'speech_id': int(hkey.split('g')[1])})
+                results.append({'person': {'party': {'acronym': 'unknown',
+                                                     'id': 'unknown',
+                                                     'name': 'unknown'},
+                                           'name': 'unknown',
+                                           'gov_id': 'unknown',
+                                           'id': speechdata['speaker_id']},
+                                'content_t': trimHighlight(content_t),
+                                'date': speechdata['date'],
+                                'speech_id': int(hkey.split('g')[1])})
 
-    data['highlighting'] = sortedResults = sorted(results, key=lambda k: k['date'], reverse=True)
+    data['highlighting'] = sortedResults = sorted(results,
+                                                  key=lambda k: k['date'],
+                                                  reverse=True)
 
     enrichedData = data
 
@@ -132,6 +169,11 @@ def enrichHighlights(data):
 
 
 def addOrganizations(data):
+    """
+    data: solr response of search
+
+    return list of organizations "working bodies" in which was the word spoken
+    """
     WBs = requests.get(ANALIZE_URL + '/s/getWorkingBodies/').json()
     orgs = {}
     for i, speaker in enumerate(data['facet_counts']['facet_fields']['org_i']):
@@ -148,27 +190,10 @@ def addOrganizations(data):
     return data
 
 
-def enrichDocs(data):
-
-    results = []
-
-    for i, doc in enumerate(data['response']['docs']):
-
-        hkey = doc['id']
-        speechdata = getSpeechData(hkey.split('g')[1])
-
-        try:
-            results.append({'person': requests.get('https://analize.parlameter.si/v1/utils/getPersonData/' + str(speechdata['speaker_id'])).json(), 'content_t': doc['content_t'], 'date': speechdata['date'], 'speech_id': int(hkey.split('g')[1]), 'session_id': doc['session_i'], 'session_name': speechdata['session_name'], 'score': doc['score']})
-        except ValueError:
-            results.append({'person': {'party': {'acronym': 'unknown', 'id': 'unknown', 'name': 'unknown'}, 'name': speechdata['speaker_id'], 'gov_id': 'unknown', 'id': speechdata['speaker_id']}, 'content_t': doc['content_t'], 'date': speechdata['date'], 'speech_id': int(hkey.split('g')[1]), 'session_id': doc['session_i'], 'session_name': speechdata['session_name']})
-
-    data['response']['docs'] = results
-
-    enrichedData = data
-
-    return enrichedData
-
 def truncateTFIDF(data):
+    """
+    remove terms with to lowest frequency
+    """
     newdata = []
     for term in data:
         if ' ' not in term['term']:
@@ -178,10 +203,14 @@ def truncateTFIDF(data):
                     pass
                 except ValueError:
                     newdata.append(term)
-    
+
     return newdata
 
+
 def removeDigrams(data):
+    """
+    remove digrams
+    """
     newdata = []
     for i, term in enumerate(data):
         if ' ' not in term['term']:
@@ -189,7 +218,11 @@ def removeDigrams(data):
 
     return newdata
 
+
 def removeSingles(data):
+    """
+    ?
+    """
     newdata = []
     for i, term in enumerate(data):
         if term['scores']['tf'] > 10:
@@ -197,7 +230,11 @@ def removeSingles(data):
 
     return newdata
 
+
 def removeNumbers(data):
+    """
+    remove numbers
+    """
     newdata = []
     for i, term in enumerate(data):
         try:
@@ -208,21 +245,32 @@ def removeNumbers(data):
 
     return newdata
 
+
 def isDigram(word):
+    """
+    returns True if word is digram alse False
+    """
     if ' ' in word:
         return True
     else:
         return False
 
+
 def isNumber(word):
+    """
+    returns True if word is number alse False
+    """
     try:
         float(word)
         return True
     except ValueError:
         return False
 
-def enrichTFIDF(data):
 
+def enrichTFIDF(data):
+    """
+    make solr json preety and sort results by tf-idf
+    """
     results = []
 
     for i, term in enumerate(data['termVectors'][1][3]):
@@ -231,190 +279,30 @@ def enrichTFIDF(data):
             tkey = data['termVectors'][1][3][i]
             tvalue = data['termVectors'][1][3][i + 1]
 
-            results.append({'term': tkey, 'scores': {tvalue[0]: tvalue[1], tvalue[2]: tvalue[3], tvalue[4]: tvalue[5]}})
+            results.append({'term': tkey,
+                            'scores': {tvalue[0]: tvalue[1],
+                                       tvalue[2]: tvalue[3],
+                                       tvalue[4]: tvalue[5]}})
             del data['termVectors'][1][3][i]
         else:
             del data['termVectors'][1][3][i]
 
     truncatedResults = truncateTFIDF(results)
 
-    sortedResults = sorted(truncatedResults, key=lambda k: k['scores']['tf-idf'], reverse=True)[:25]
+    sortedResults = sorted(truncatedResults,
+                           key=lambda k: k['scores']['tf-idf'],
+                           reverse=True)[:25]
 
-    enrichedData = {'session': data['termVectors'][0].split('s')[1], 'results': sortedResults}
-
-    return enrichedData
-
-def makeTFIDFObject(data):
-
-    results = []
-
-    for i, term in enumerate(data):
-        if i % 2 == 0:
-
-            tkey = data[i]
-            tvalue = data[i + 1]
-
-            results.append({'term': tkey, 'scores': {tvalue[0]: tvalue[1], tvalue[2]: tvalue[3], tvalue[4]: tvalue[5]}})
-            del data['termVectors'][1][3][i]
-        else:
-            del data['termVectors'][1][3][i]
-
-    return results
-
-def groupSpeakerTFIDF(rawdata, person_i):
-
-    allSpeeches = []
-
-    for i, speech in enumerate(rawdata['termVectors']):
-        if i % 2 == 1:
-
-            for i, term in enumerate(speech[3]):
-                if i % 2 == 0:
-
-                    tkey = speech[3][i]
-                    tvalue = speech[3][i + 1]
-
-                    allSpeeches.append({'term': tkey, 'scores': {tvalue[0]: tvalue[1], tvalue[2]: tvalue[3], tvalue[4]: tvalue[5]}})
-
-    dkeys = []
-    newdata = []
-
-    for term in allSpeeches:
-
-        tkey = term['term']
-
-        if tkey not in dkeys:
-            dkeys.append(tkey)
-            newdata.append(term)
-        else:
-            for i, ndterm in enumerate(newdata):
-                if ndterm['term'] == term['term']:
-                    newdata[i]['scores']['tf'] = newdata[i]['scores']['tf'] + term['scores']['tf']
-
-    truncatedResults = truncateTFIDF(newdata)
-
-    sortedResults = sorted(truncatedResults, key=lambda k: k['scores']['tf-idf'], reverse=True)[:10]
-
-    enrichedData = {'person': requests.get('https://analize.parlameter.si/v1/utils/getPersonData/' + str(person_i)).json(), 'results': sortedResults}
+    enrichedData = {'session': data['termVectors'][0].split('s')[1],
+                    'results': sortedResults}
 
     return enrichedData
 
-def groupSpeakerTFIDFALL(rawdata, person_i):
-
-    allSpeeches = []
-
-    for i, speech in enumerate(rawdata['termVectors']):
-        if i % 2 == 1:
-
-            for i, term in enumerate(speech[3]):
-                if i % 2 == 0:
-
-                    tkey = speech[3][i]
-                    tvalue = speech[3][i + 1]
-
-                    allSpeeches.append({'term': tkey, 'scores': {tvalue[0]: tvalue[1], tvalue[2]: tvalue[3], tvalue[4]: tvalue[5]}})
-
-    dkeys = []
-    newdata = []
-
-    for term in allSpeeches:
-
-        tkey = term['term']
-
-        if tkey not in dkeys:
-            dkeys.append(tkey)
-            newdata.append(term)
-        else:
-            for i, ndterm in enumerate(newdata):
-                if ndterm['term'] == term['term']:
-                    newdata[i]['scores']['tf'] = newdata[i]['scores']['tf'] + term['scores']['tf']
-
-    truncatedResults = removeNumbers(removeSingles(removeDigrams(newdata)))
-
-    sortedResults = sorted(truncatedResults, key=lambda k: k['scores']['tf-idf'], reverse=True)
-
-    enrichedData = {'person': requests.get('https://analize.parlameter.si/v1/utils/getPersonData/' + str(person_i)).json(), 'results': sortedResults}
-
-    return enrichedData
-
-def groupPartyTFIDF(rawdata, party_i):
-
-    allSpeeches = []
-
-    for i, speech in enumerate(rawdata['termVectors']):
-        if i % 2 == 1:
-
-            for i, term in enumerate(speech[3]):
-                if i % 2 == 0:
-
-                    tkey = speech[3][i]
-                    tvalue = speech[3][i + 1]
-
-                    allSpeeches.append({'term': tkey, 'scores': {tvalue[0]: tvalue[1], tvalue[2]: tvalue[3], tvalue[4]: tvalue[5]}})
-
-    dkeys = []
-    newdata = []
-
-    for term in allSpeeches:
-
-        tkey = term['term']
-
-        if tkey not in dkeys:
-            dkeys.append(tkey)
-            newdata.append(term)
-        else:
-            for i, ndterm in enumerate(newdata):
-                if ndterm['term'] == term['term']:
-                    newdata[i]['scores']['tf'] = newdata[i]['scores']['tf'] + term['scores']['tf']
-
-    truncatedResults = removeNumbers(removeSingles(removeDigrams(newdata)))
-
-    sortedResults = sorted(truncatedResults, key=lambda k: k['scores']['tf-idf'], reverse=True)[:10]
-
-    enrichedData = {'party': requests.get('https://analize.parlameter.si/v1/utils/getPgDataAPI/' + str(party_i)).json(), 'results': sortedResults}
-
-    return enrichedData
-
-def groupPartyTFIDFALL(rawdata, party_i):
-
-    allSpeeches = []
-
-    for i, speech in enumerate(rawdata['termVectors']):
-        if i % 2 == 1:
-
-            for i, term in enumerate(speech[3]):
-                if i % 2 == 0:
-
-                    tkey = speech[3][i]
-                    tvalue = speech[3][i + 1]
-
-                    allSpeeches.append({'term': tkey, 'scores': {tvalue[0]: tvalue[1], tvalue[2]: tvalue[3], tvalue[4]: tvalue[5]}})
-
-    dkeys = []
-    newdata = []
-
-    for term in allSpeeches:
-
-        tkey = term['term']
-
-        if tkey not in dkeys:
-            dkeys.append(tkey)
-            newdata.append(term)
-        else:
-            for i, ndterm in enumerate(newdata):
-                if ndterm['term'] == term['term']:
-                    newdata[i]['scores']['tf'] = newdata[i]['scores']['tf'] + term['scores']['tf']
-
-    truncatedResults = removeNumbers(removeSingles(removeDigrams(newdata)))
-
-    sortedResults = sorted(truncatedResults, key=lambda k: k['scores']['tf-idf'], reverse=True)
-
-    enrichedData = {'party': requests.get('https://analize.parlameter.si/v1/utils/getPgDataAPI/' + str(party_i)).json(), 'results': sortedResults}
-
-    return enrichedData
 
 def groupDFALL(rawdata):
-
+    """
+    group same terms for df all
+    """
     print 'beginning groupDFALL'
 
     allSessions = []
@@ -456,124 +344,185 @@ def groupDFALL(rawdata):
     #     #         if ndterm['term'] == term['term']:
     #     #             newdata[i]['df'] = newdata[i]['df'] + term['df']
 
-    newdata = {v['term']:v for v in allSessions}.values()
+    newdata = {v['term']: v for v in allSessions}.values()
 
     truncatedResults = removeNumbers(removeDigrams(newdata))
 
-    sortedResults = sorted(truncatedResults, key=lambda k: k['df'], reverse=True)
-
-    # enrichedData = {'party': requests.get('https://analize.parlameter.si/v1/utils/getPgDataAPI/' + str(party_i)).json(), 'results': sortedResults}
+    sortedResults = sorted(truncatedResults,
+                           key=lambda k: k['df'],
+                           reverse=True)
 
     return sortedResults
 
+
 def appendTFIDFALL(rawdata, data, with_digrams):
+    """
+    append tfidf from sorl json (rawdata) to dictionary of words (data)
+    """
     ex_words = data.keys()
 
     for i, speech in enumerate(rawdata['termVectors']):
         if i % 2 == 1:
-            if len(speech)<4:
+            if len(speech) < 4:
                 continue
             for i, term in enumerate(speech[3]):
                 if i % 2 == 0:
-                    if len(speech)<4:
+                    if len(speech) < 4:
                         continue
                     tkey = speech[3][i]
                     tvalue = speech[3][i + 1]
 
-                    if isNumber(tkey) or ( not with_digrams and isDigram(tkey)):
+                    if isNumber(tkey) or (not with_digrams and isDigram(tkey)):
                         continue
 
                     if tkey in ex_words:
-                        data[tkey]["scores"]["tf"] += tvalue[1]
+                        data[tkey]['scores']['tf'] += tvalue[1]
 
                     else:
-                        data[tkey] = {"term": tkey, "scores":{tvalue[0]: tvalue[1], tvalue[2]: tvalue[3]}}
+                        data[tkey] = {'term': tkey,
+                                      'scores': {tvalue[0]: tvalue[1], # tf
+                                                 tvalue[2]: tvalue[3]}} # df
                         ex_words.append(tkey)
 
 
-def getTFIDFofSpeeches(speeches, tfidf):
-    data = {}
-    speeches = ["g"+str(speech) for speech in speeches]
-
-    hundret_speeches = [speeches[i:i+20] for i in range(0, len(speeches), 20)]
-    for speech_ids in hundret_speeches:
-        print SOLR_URL + '/tvrh/?q=id:(' + " ".join(speech_ids) + ')&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t'
-        temp_data = tryHard(SOLR_URL + '/tvrh/?q=id:('+ " ".join(speech_ids) + ')&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t').json()
-        appendTFIDFALL(temp_data, data, tfidf)
-
-    for word in data:
-        if data[word]['scores']['tf'] > 10:
-            data[word]["scores"]["tf-idf"] = float(data[word]["scores"]["tf"]) / data[word]["scores"]["df"]
-        else:
-            data[word]["scores"]["tf-idf"] = float(0)
-    data = sorted(data.values(), key=lambda k,: k["scores"]['tf-idf'], reverse=True)
-
-    return data
-
 def getTFIDFofSpeeches2(speeches, tfidf):
+    """
+    get tfidf of speeches and merge it (recalculate tfidf)
+    exclude words with to lowest term frequency
+    return sorted by tfidfs
+    """
     data = {}
     for speech_id in speeches:
-        temp_data = cache.get("govor_"+str(speech_id))
+        temp_data = cache.get('govor_'+str(speech_id))
         if not temp_data:
-            temp_data = tryHard(SOLR_URL + '/tvrh/?q=id:g' + str(speech_id) + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t').json()
-            cache.set("govor_"+str(speech_id), temp_data, None)
+            url = ('' + SOLR_URL + '/tvrh/?q=id:g' + str(speech_id) + ''
+                   '&tv.df=true&tv.tf=true&tv.tf_idf=true'
+                   '&wt=json&fl=id&tv.fl=content_t')
+            temp_data = tryHard(url).json()
+            cache.set('govor_'+str(speech_id), temp_data, None)
         appendTFIDFALL(temp_data, data, tfidf)
 
     for word in data:
         if data[word]['scores']['tf'] > 10:
-            data[word]["scores"]["tf-idf"] = float(data[word]["scores"]["tf"]) / data[word]["scores"]["df"]
+            tfidf = float(data[word]['scores']['tf']) / data[word]['scores']['df']
+            data[word]['scores']['tf-idf'] = tfidf
         else:
-            data[word]["scores"]["tf-idf"] = float(0)
+            data[word]['scores']['tf-idf'] = float(0)
 
-    data = sorted(data.values(), key=lambda k,: k["scores"]['tf-idf'], reverse=True)
+    data = sorted(data.values(),
+                  key=lambda k,: k['scores']['tf-idf'],
+                  reverse=True)
 
     return data
+
 
 def getTFIDFofSpeeches3(speeches, tfidf):
+    """
+    get tfidf of speeches and merge it (recalculate tfidf)
+    return sorted by tfidfs
+    """
     data = {}
     for speech_id in speeches:
-        temp_data = cache.get("govor_"+str(speech_id))
+        temp_data = cache.get('govor_'+str(speech_id))
         if not temp_data:
-            temp_data = tryHard(SOLR_URL + '/tvrh/?q=id:g' + str(speech_id) + '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t').json()
-            cache.set("govor_"+str(speech_id), temp_data, None)
+            url = ('' + SOLR_URL + '/tvrh/?q=id:g' + str(speech_id) + ''
+                   '&tv.df=true&tv.tf=true&tv.tf_idf=true'
+                   '&wt=json&fl=id&tv.fl=content_t')
+            temp_data = tryHard(url).json()
+            cache.set('govor_'+str(speech_id), temp_data, None)
         appendTFIDFALL(temp_data, data, tfidf)
 
-    data = sorted(data.values(), key=lambda k,: k["scores"]['df'], reverse=True)
+    data = sorted(data.values(),
+                  key=lambda k,: k['scores']['df'],
+                  reverse=True)
 
     return data
 
+
+def tfidfSpeakerQueryALL(speaker_i):
+    """
+    Get counts of all words of speaker. Using for style socres.
+    """
+    date_str = datetime.now().strftime(API_DATE_FORMAT)
+
+    return tfidfSpeakerDateQueryALL(request, speaker_i, date_str)
+
+
+def tfidfSpeakerDateQueryALL(speaker_i, datetime_dt):
+    """
+    Get counts of all words of speaker. Using for style socres.
+    """
+    url = API_URL + '/getMPSpeechesIDs/' + speaker_i + '/' + datetime_dt
+    speeches = tryHard(url).json()
+
+    data = getTFIDFofSpeeches3(speeches, False)
+
+    return enrichPersonData(data, speaker_i)
+
+
+# ALL TFIDF PG / Using for style score
+def tfidfPGQueryALL(party_i):
+    """
+    Get counts of all words of perty. Using for style socres.
+    """
+    date_str = datetime.now().strftime(API_DATE_FORMAT)
+
+    return tfidfPGDateQueryALL(request, party_i, date_str)
+
+
+def tfidfPGDateQueryALL(party_i, datetime_dt):
+    """
+    Get counts of all words of party. Using for style socres.
+    """
+    url = API_URL + '/getPGsSpeechesIDs/' + party_i + '/' + datetime_dt
+    speeches = tryHard(url).json()
+
+    data = getTFIDFofSpeeches3(speeches, False)
+
+    return enrichPartyData(data, party_i)
+
+
 def enrichPersonData(data, person_id):
-    enrichedData = {'person': tryHard(ANALIZE_URL + '/utils/getPersonData/' + str(person_id)).json(), 'results': data}
+    """
+    data: data to enrich
+    person_id: id of person
+
+    returns dictionary with person data and data as results
+    """
+    url = ANALIZE_URL + '/utils/getPersonData/' + str(person_id)
+    enrichedData = {'person': tryHard(url).json(), 'results': data}
     return enrichedData
 
 
 def enrichPartyData(data, party_id):
-    enrichedData = {'party': tryHard(ANALIZE_URL + '/utils/getPgDataAPI/' + str(party_id)).json(), 'results': data}
+    """
+    data: data to enrich
+    party_id: id of perty
+
+    returns dictionary with party data and data as results
+    """
+    url = ANALIZE_URL + '/utils/getPgDataAPI/' + str(party_id)
+    enrichedData = {'party': tryHard(url).json(), 'results': data}
     return enrichedData
 
-def add_months(sourcedate,months):
+
+def add_months(sourcedate, months):
+    """
+    Add months to sourcedate.
+    """
     month = sourcedate.month - 1 + months
-    year = int(sourcedate.year + month / 12 )
+    year = int(sourcedate.year + month / 12)
     month = month % 12 + 1
-    day = min(sourcedate.day,calendar.monthrange(year,month)[1])
-    return datetime.date(year,month,day)
-
-
-def tfidf_to_file():
-    membersOfPGsRanges = tryHard('https://data.parlameter.si/v1/getMembersOfPGsRanges/14.11.2016').json()
-    IDs = [key for key, value in membersOfPGsRanges[-1]["members"].items()]
-    for ID in IDs:
-        with open('tfidfs/tfidf_pg_' + str(ID) + '.json', 'w') as f:
-	    print "delam zdej ", ID
-            speeches = tryHard(API_URL + '/getPGsSpeechesIDs/' + str(ID) + "/" + datetime.datetime.now().strftime(API_DATE_FORMAT)).json()
-
-            data = getTFIDFofSpeeches2 (speeches, False)[:10]
-
-            read_data = f.write(json.dumps(enrichPartyData(data, ID)))
-        f.closed
+    day = min(sourcedate.day, calendar.monthrange(year, month)[1])
+    return datetime.date(year, month, day)
 
 
 def getSpeechData(speech_id):
+    """
+    speech_id: id of speech
+
+    Returns data of speech. Data will be stored in cache for one week.
+    """
     data = cache.get("s_data_muki_" + str(speech_id))
     if not data:
         url = 'https://data.parlameter.si/v1/getSpeechData/' + str(speech_id)
@@ -581,7 +530,11 @@ def getSpeechData(speech_id):
         cache.set("s_data_muki_" + str(speech_id), data, 60 * 60 * 24 * 7)
     return data
 
+
 def monitorMe(request):
+    """
+    Method for monitoring availability.
+    """
 
     r = requests.get('https://isci.parlameter.si/q/krompir')
     if r.status_code == 200:
