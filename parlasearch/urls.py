@@ -16,14 +16,12 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from searchapi.views import motionQuery, tfidfPGQueryWithoutDigrams, regularQuery, filterQuery, mltQuery, tfidfSessionQuery, tfidfSpeakerQuery, tfidfSpeakerDateQuery, tfidfPGQuery, tfidfPGDateQuery, tfidfSpeakerQueryALL, tfidfPGQueryALL, dfALL, tfidfSpeakerDateQueryALL, tfidfPGDateQueryALL, dfDateALL, tfidfSpeakerQuery2, tfidfSpeakerQueryWithoutDigrams
+from searchapi.views import motionQuery, regularQuery, filterQuery, mltQuery, tfidfSessionQuery, tfidfSpeakerQuery, tfidfSpeakerDateQuery, tfidfPGQuery, tfidfPGDateQuery, tfidfSpeakerQueryALL, tfidfPGQueryALL, dfALL, tfidfSpeakerDateQueryALL, tfidfPGDateQueryALL, dfDateALL, tfidfSpeakerQuery2, tfidfSpeakerQueryWithoutDigrams
 
 from searchapi.utils import monitorMe
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-
-    url(ur'^mlt/(?P<speech_i>[0-9]+)', mltQuery),
 
     url(ur'^filter/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžČĆŠŽa-zA-Z0-9 \-\+!"%\.,]+)/(?P<start_page>\d+)', filterQuery),
     url(ur'^filter/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžČĆŠŽa-zA-Z0-9 \-\+!"%\.,]+)', filterQuery),
@@ -35,20 +33,6 @@ urlpatterns = [
     url(ur'^v/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžČĆŠŽa-zA-Z0-9 \-\+!"%\.,]+)', motionQuery),
 
     url(ur'^tfidf/s/(?P<session_i>[0-9]+)', tfidfSessionQuery),
-
-    url(ur'^tfidf/p/(?P<speaker_i>[0-9]+)/$', tfidfSpeakerQuery2),
-    url(ur'^tfidf/p/(?P<speaker_i>[0-9]+)/(?P<datetime_dt>[\w].+)/', tfidfSpeakerDateQuery),
-    url(ur'^tfidf/nodigrams/p/(?P<speaker_i>[0-9]+)/$', tfidfSpeakerQueryWithoutDigrams),
-
-    url(ur'^tfidf/ps/(?P<party_i>[0-9]+)/$', tfidfPGQuery),
-    url(ur'^tfidf/ps/(?P<party_i>[0-9]+)/(?P<datetime_dt>[\w].+)/', tfidfPGDateQuery),
-    url(ur'^tfidf/nodigrams/ps/(?P<party_i>[0-9]+)/$', tfidfPGQueryWithoutDigrams),
-
-    url(ur'^tfidfALL/p/(?P<speaker_i>[0-9]+)/$', tfidfSpeakerQueryALL),
-    url(ur'^tfidfALL/p/(?P<speaker_i>[0-9]+)/(?P<datetime_dt>[\w].+)/', tfidfSpeakerDateQueryALL),
-
-    url(ur'^tfidfALL/ps/(?P<party_i>[0-9]+)/$', tfidfPGQueryALL),
-    url(ur'^tfidfALL/ps/(?P<party_i>[0-9]+)/(?P<datetime_dt>[\w].+)/', tfidfPGDateQueryALL),
 
     url(ur'^dfall/$', dfALL),
     url(ur'^dfall/(?P<datetime_dt>[\w].+)/', dfDateALL),
