@@ -191,15 +191,11 @@ def setTFIDFforMPsALL(date_=None):
                 data = getTFIDFofSpeeches2(speeches, False)[:25]
                 e_data = enrichPersonData(data, str(member['id']))
                 data_for_post.append(e_data)
-
-                r = requests.post(api_url,
-                                  json=e_data)
-                print json.dumps(e_data), r
             except:
                 print 'neki je slo narobe'
         f.write(json.dumps(data_for_post))
     f.closed
-    r = requests.post(ANALIZE_URL + '/pg/setAllPGsTFIDFsFromSearch/',
+    r = requests.post(ANALIZE_URL + '/pg/setAllMPsTFIDFsFromSearch/',
                       json=data_for_post)
 
     return 'Pa sem naredu vse', r.content
