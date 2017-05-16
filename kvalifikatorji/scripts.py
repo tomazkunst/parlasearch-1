@@ -62,11 +62,8 @@ def getCountList(speaker_id, date_):
     method return term frequency for each word spoken by speaker
     """
     data = None
-    while data is None:
-        try:
-            data = tfidfSpeakerDateQueryALL(str(party_id), date_)
-        except:
-            pass
+
+    data = tfidfSpeakerDateQueryALL(str(speaker_id), date_)
 
     wordlist = data['results']
 
