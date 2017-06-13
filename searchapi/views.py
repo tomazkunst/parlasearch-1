@@ -205,7 +205,7 @@ def motionQuery(request, words, start_page=None):
         JsonResponse({'status': 'no votes with this word'})
 
     if len(ids) > 0:
-        url2 = ANALIZE_URL + '/s/getMotionOfSessionVotes/'+','.join(ids)
+        url2 = ANALIZE_URL + '/s/getVotesData/'+','.join(ids)
         resp = tryHard(url2).json()
 
     else:
