@@ -174,3 +174,5 @@ CACHES = {
         'LOCATION': '127.0.0.1:11211',
     }
 }
+
+PARLALIZE_API_KEY = "vednoboljsi112358"
