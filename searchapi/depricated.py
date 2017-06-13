@@ -137,7 +137,7 @@ def groupSpeakerTFIDF(rawdata, person_i):
                            key=lambda k: k['scores']['tf-idf'],
                            reverse=True)[:10]
 
-    url = 'https://analize.parlameter.si/v1/utils/getPersonData/' + str(person_i)
+    url = ANALIZE_URL + '/utils/getPersonData/' + str(person_i)
     person_data = requests.get(url).json()
     enrichedData = {'person': person_data, 'results': sortedResults}
 
@@ -184,7 +184,7 @@ def groupSpeakerTFIDFALL(rawdata, person_i):
                            key=lambda k: k['scores']['tf-idf'],
                            reverse=True)
 
-    url = 'https://analize.parlameter.si/v1/utils/getPersonData/' + str(person_i)
+    url = ANALIZE_URL + '/utils/getPersonData/' + str(person_i)
     person_data = requests.get(url).json()
     enrichedData = {'person': person_data, 'results': sortedResults}
 
@@ -231,7 +231,7 @@ def groupPartyTFIDF(rawdata, party_i):
                            key=lambda k: k['scores']['tf-idf'],
                            reverse=True)[:10]
 
-    url = 'https://analize.parlameter.si/v1/utils/getPgDataAPI/' + str(party_i)
+    url = ANALIZE_URL + '/utils/getPgDataAPI/' + str(party_i)
     party_data = requests.get(url).json()
     enrichedData = {'party': party_data, 'results': sortedResults}
 
@@ -278,7 +278,7 @@ def groupPartyTFIDFALL(rawdata, party_i):
                            key=lambda k: k['scores']['tf-idf'],
                            reverse=True)
 
-    url = 'https://analize.parlameter.si/v1/utils/getPgDataAPI/' + str(party_i)
+    url = ANALIZE_URL + '/utils/getPgDataAPI/' + str(party_i)
     party_data = requests.get(url).json()
     enrichedData = {'party': party_data, 'results': sortedResults}
 
@@ -307,7 +307,7 @@ def makeTFIDFObject(data):
 
 
 def tfidf_to_file():
-    url = 'https://data.parlameter.si/v1/getMembersOfPGsRanges/14.11.2016'
+    url = API_URL + '/getMembersOfPGsRanges/14.11.2016'
     membersOfPGsRanges = tryHard(url).json()
     IDs = [key for key, value in membersOfPGsRanges[-1]['members'].items()]
     for ID in IDs:
@@ -334,7 +334,7 @@ def enrichDocs(data):
 
         try:
             sID = str(speechdata['speaker_id'])
-            url = 'https://analize.parlameter.si/v1/utils/getPersonData/' + sID
+            url = ANALIZE_URL + '/utils/getPersonData/' + sID
             person_data = requests.get(url).json()
             results.append({'person': person_data,
                             'content_t': doc['content_t'],

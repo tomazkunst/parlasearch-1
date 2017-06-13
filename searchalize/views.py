@@ -142,7 +142,7 @@ def setTFIDFforPGsALL(date_=None):
         date_of = datetime.now().date()
         date_ = date_of.strftime(API_DATE_FORMAT)
 
-    url = 'https://data.parlameter.si/v1/getMembersOfPGsRanges/' + date_
+    url = API_URL + '/getMembersOfPGsRanges/' + date_
     membersOfPGsRanges = tryHard(url).json()
     with open('tfidfs/tdidf_pg_ALL.json', 'w') as f:
         IDs = [key for key, value in membersOfPGsRanges[-1]['members'].items()]
@@ -178,7 +178,7 @@ def setTFIDFforMPsALL(date_=None):
 
     api_url = ANALIZE_URL + '/p/setAllMPsTFIDFsFromSearch/'
 
-    members = tryHard('https://data.parlameter.si/v1/getMPs').json()
+    members = tryHard(API_URL + '/getMPs').json()
     with open('tfidfs/tdidf_MPs_ALL.json', 'w') as f:
         data_for_post = []
         for member in members:
