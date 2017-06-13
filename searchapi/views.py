@@ -226,7 +226,7 @@ def tfidfSessionQuery(request, session_i):
 
     try:
         output = enrichTFIDF(r.json())
-        url = ('https://analize.parlameter.si/v1/utils/getSessionData/'
+        url = (ANALIZE_URL + '/utils/getSessionData/'
                '' + output['session'] + '')
         output['session'] = requests.get(url).json()
         return JsonResponse(output)

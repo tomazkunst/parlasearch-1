@@ -135,6 +135,8 @@ ANALIZE_URL = 'https://analize.parlameter.si/v1'
 
 SOLR_URL = 'http://parlameter.si:8983/solr/knedl'
 
+BASE_URL = 'https://isci.parlameter.si'
+
 
 LOGGING = {
     'version': 1,

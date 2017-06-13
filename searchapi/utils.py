@@ -2,7 +2,7 @@
 
 import requests
 import re
-from parlasearch.settings import SOLR_URL, ANALIZE_URL, API_URL, API_DATE_FORMAT
+from parlasearch.settings import SOLR_URL, ANALIZE_URL, API_URL, API_DATE_FORMAT, BASE_URL
 from django.core.cache import cache
 import time
 import datetime
@@ -45,7 +45,7 @@ def enrichQuery(data, show_all=False):
     data['facet_counts'].pop('facet_intervals', None)
 
     results = []
-    url = 'https://analize.parlameter.si/v1/utils/getAllStaticData/'
+    url = ANALIZE_URL + '/utils/getAllStaticData/'
     static_data = requests.get(url).json()
 
     # enrich speakers
@@ -125,7 +125,7 @@ def enrichHighlights(data):
 
     results = []
 
-    url = 'https://analize.parlameter.si/v1/utils/getAllStaticData/'
+    url = ANALIZE_URL + '/utils/getAllStaticData/'
     static_data = requests.get(url).json()
 
     for hkey in data['highlighting'].keys():
@@ -525,7 +525,7 @@ def getSpeechData(speech_id):
     """
     data = cache.get("s_data_muki_" + str(speech_id))
     if not data:
-        url = 'https://data.parlameter.si/v1/getSpeechData/' + str(speech_id)
+        url = API_URL + '/getSpeechData/' + str(speech_id)
         data = requests.get(url).json()
         cache.set("s_data_muki_" + str(speech_id), data, 60 * 60 * 24 * 7)
     return data
@@ -536,7 +536,7 @@ def monitorMe(request):
     Method for monitoring availability.
     """
 
-    r = requests.get('https://isci.parlameter.si/q/krompir')
+    r = requests.get(BASE_URL + '/q/krompir')
     if r.status_code == 200:
         return HttpResponse('All iz well.')
     else:
