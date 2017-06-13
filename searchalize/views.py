@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from kvalifikatorji.scripts import getCountListPG, getScores, problematicno, privzdignjeno, preprosto, getCountList
 from searchapi.utils import tryHard, enrichPartyData, getTFIDFofSpeeches2, enrichPersonData
-from parlasearch.settings import SOLR_URL, API_URL, API_DATE_FORMAT, ANALIZE_URL
+from parlasearch.settings import SOLR_URL, API_URL, API_DATE_FORMAT, ANALIZE_URL, PARLALIZE_API_KEY
 from datetime import datetime
 from collections import Counter
 
@@ -64,7 +64,7 @@ def setStyleScoresPGsALL(date_=None):
     with open('tfidfs/style_score_PGs.json', 'w') as f:
         f.write(json.dumps(data))
     f.close()
-    r = requests.post(ANALIZE_URL + '/pg/setAllPGsStyleScoresFromSearch/',
+    r = requests.post(ANALIZE_URL + '/pg/setAllPGsStyleScoresFromSearch/?key=' + PARLALIZE_API_KEY,
                       json=data)
     return r.content
 
@@ -126,7 +126,7 @@ def setStyleScoresMPsALL(date_=None):
     with open('tfidfs/style_score_MPs.json', 'w') as f:
         f.write(json.dumps(data))
     f.close()
-    r = requests.post(ANALIZE_URL + '/p/setAllMPsStyleScoresFromSearch/',
+    r = requests.post(ANALIZE_URL + '/p/setAllMPsStyleScoresFromSearch/?key=' + PARLALIZE_API_KEY,
                       json=data)
     return r.content
 
@@ -159,7 +159,7 @@ def setTFIDFforPGsALL(date_=None):
                 print 'neki je slo narobe'
         f.write(json.dumps(data_for_post))
     f.closed
-    r = requests.post(ANALIZE_URL + '/pg/setAllPGsTFIDFsFromSearch/',
+    r = requests.post(ANALIZE_URL + '/pg/setAllPGsTFIDFsFromSearch/?key=' + PARLALIZE_API_KEY,
                       json=data_for_post)
     return r.content
     return 'Pa sem naredu vse'
@@ -176,7 +176,7 @@ def setTFIDFforMPsALL(date_=None):
         date_of = datetime.now().date()
         date_ = date_of.strftime(API_DATE_FORMAT)
 
-    api_url = ANALIZE_URL + '/p/setAllMPsTFIDFsFromSearch/'
+    api_url = ANALIZE_URL + '/p/setAllMPsTFIDFsFromSearch/?key=' + PARLALIZE_API_KEY
 
     members = tryHard(API_URL + '/getMPs').json()
     with open('tfidfs/tdidf_MPs_ALL.json', 'w') as f:
@@ -195,7 +195,7 @@ def setTFIDFforMPsALL(date_=None):
                 print 'neki je slo narobe'
         f.write(json.dumps(data_for_post))
     f.closed
-    r = requests.post(ANALIZE_URL + '/pg/setAllMPsTFIDFsFromSearch/',
+    r = requests.post(ANALIZE_URL + '/pg/setAllMPsTFIDFsFromSearch/?key=' + PARLALIZE_API_KEY,
                       json=data_for_post)
 
     return 'Pa sem naredu vse', r.content
