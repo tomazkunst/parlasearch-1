@@ -74,6 +74,42 @@ def regularQuery(request, words, start_page=None):
     * @apiSuccess {Integer} /.highlighting.person.id The person's Parladata id.
     * @apiSuccess {Boolean} /.highlighting.person.has_function Answers the question: Is this person the president or vice president of the national assembly (speaker of the house kind of thing).
 
+    * @apiSuccess {Object} /.responseHeader
+    * @apiSuccess {Integer} /.responseHeader.status
+    * @apiSuccess {Integer} /.responseHeader.QTime
+    * @apiSuccess {Object} /.responseHeader.params
+    * @apiSuccess {String} /.responseHeader.params.fq
+    * @apiSuccess {String} /.responseHeader.params.rows
+    * @apiSuccess {Object[]} /.responseHeader.params.facet.field
+
+    "responseHeader": {
+        "status": 0,
+        "QTime": 18,
+        "params": {
+            "fq": "tip_t:govor",
+            "rows": "50",
+            "facet.field": [
+                "speaker_i",
+                "party_i"
+            ],
+            "facet.range.gap": "+1MONTHS",
+            "wt": "json",
+            "hl.snippets": "1",
+            "facet.range.end": "NOW",
+            "hl.regex.pattern": "\\w[^\\.!\\?]{1,600}[\\.!\\?]",
+            "facet": "true",
+            "q": "content_t:parlameter",
+            "start": "0",
+            "facet.range": "datetime_dt",
+            "hl": "true",
+            "hl.fragsize": "5000",
+            "hl.mergeContiguous": "false",
+            "hl.fl": "content_t",
+            "hl.fragmenter": "regex",
+            "facet.range.start": "2014-01-01T00:00:00.000Z"
+        }
+    },
+
 
     * @apiExample {curl} Example:
         curl -i https://isci.parlameter.si/q/parlameter
