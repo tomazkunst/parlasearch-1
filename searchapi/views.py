@@ -14,7 +14,7 @@ ZERO_TIME = 'T00:00:00.000Z'
 
 def regularQuery(request, words, start_page=None):
     """
-    * @api {get} q/{word}/{?start_page} Search in transcripts and votes
+    * @api {get} q/{word}/{?start_page} Search in transcripts
     * @apiName regularQuery
     * @apiGroup Search
     * @apiDescription
@@ -22,7 +22,8 @@ def regularQuery(request, words, start_page=None):
     start_page: pager in results
 
     search query in transcripts
-    * @apiParam {date} date Optional date.
+    * @apiParam {word} search word.
+    * @apiParam {start_page} start page Optional.
 
     * @apiSuccess {Object} /
     * @apiSuccess {Object} /.facet_counts
@@ -365,15 +366,14 @@ def filterQuery(request, words, start_page=None):
     filter search query in transcripts
     """
     """
-    * @api {get} q/{word}/{?start_page} Search in transcripts and votes
-    * @apiName regularQuery
+    * @api {get} filter/{word}/{?start_page} Search votes
+    * @apiName filterQuery
     * @apiGroup Search
     * @apiDescription
-    words: word/words for search
-    start_page: pager in results
 
     search query in transcripts
-    * @apiParam {date} date Optional date.
+    * @apiParam {word} search word.
+    * @apiParam {start_page} start page Optional.
 
     * @apiSuccess {Object} /
     * @apiSuccess {Object} /.facet_counts
@@ -479,7 +479,7 @@ def filterQuery(request, words, start_page=None):
     * @apiSuccess {Boolean} /.has_dz_score
 
     * @apiExample {curl} Example:
-        curl -i https://isci.parlameter.si/q/parlameter
+        curl -i https://isci.parlameter.si/filter/parlameter
 
     * @apiSuccessExample {json} Example response:
     {
