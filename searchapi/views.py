@@ -733,9 +733,80 @@ def filterQuery(request, words, start_page=None):
 
 def motionQuery(request, words, start_page=None):
     """
+    * @api {get} v/{words}/{?start_page}/
+    * @apiName motionQuery
+    * @apiGroup Search
+    * @apiDescription
     search query by motion text
-    """
 
+    search query in transcripts
+    * @apiParam {words} words for filter.
+    * @apiParam {start_page} start page is Optional pagination parameter.
+
+    * @apiSuccess {Object[]} /
+    * @apiSuccess {Object} /.created_for
+    * @apiSuccess {String} /.session
+    * @apiSuccess {String} /.session.name
+    * @apiSuccess {String} /.session.date_ts
+    * @apiSuccess {Object[]} /.session.orgs
+    * @apiSuccess {String} /.session.orgs.acronym
+    * @apiSuccess {Boolean} /.session.orgs.is_coalition
+    * @apiSuccess {String} /.session.orgs.name
+    * @apiSuccess {Integer} /.session.orgs.id
+    * @apiSuccess {String} /.session.date
+    * @apiSuccess {Integer} /.session.id
+    * @apiSuccess {Boolean} /.session.in_review
+
+    * @apiSuccess {Object} /.results
+    * @apiSuccess {Integer} /.results.motion_id
+    * @apiSuccess {String} /.results.text
+    * @apiSuccess {Integer} /.results.abstain
+    * @apiSuccess {Integer} /.results.votes_for
+    * @apiSuccess {Integer} /.results.not_present
+    * @apiSuccess {Integer} /.results.against
+    * @apiSuccess {Boolean} /.results.result
+
+
+    * @apiExample {curl} Example:
+        curl -i https://isci.parlameter.si/v/zdravje
+
+    * @apiSuccessExample {json} Example response:
+    [
+        {
+            "created_for": "2016-12-12",
+            "session": {
+                "name": "25. redna seja",
+                "date_ts": "2016-12-12T01:00:00",
+                "org": {
+                    "acronym": "DZ",
+                    "is_coalition": false,
+                    "name": "Državni zbor",
+                    "id": 95
+                },
+                "date": "12. 12. 2016",
+                "orgs": [
+                    {
+                        "acronym": "DZ",
+                        "is_coalition": false,
+                        "name": "Državni zbor",
+                        "id": 95
+                    }
+                ],
+                "id": 7654,
+                "in_review": true
+            },
+            "results": {
+                "abstain": 5,
+                "text": "Predlog sklepa (razprava o odgovoru ministrice za zdravje Milojke Kolar Celarc na poslansko vprašanje Jelke Godec v zvezi s sklepom Ministrstva za zdravje.)",
+                "votes_for": 7,
+                "against": 47,
+                "motion_id": 6654,
+                "not_present": 31,
+                "result": false
+            }
+        },
+    ]
+    """
     rows = 50
     solr_url = SOLR_URL+'/select?wt=json'
 
@@ -776,7 +847,80 @@ def motionQuery(request, words, start_page=None):
 
 def tfidfSessionQuery(request, session_i):
     """
+    * @api {get} tfidf/s/{session_i}/
+    * @apiGroup TFIDF
+    * @apiDescription
     method for TFIDF of session
+
+    search query in transcripts
+    * @apiParam {session_i} session id.
+
+    * @apiSuccess {Object} /
+    * @apiSuccess {Object} /.session
+    * @apiSuccess {String} /.session.name
+    * @apiSuccess {String} /.session.date_ts
+    * @apiSuccess {Object[]} /.session.orgs
+    * @apiSuccess {String} /.session.orgs.acronym
+    * @apiSuccess {Boolean} /.session.orgs.is_coalition
+    * @apiSuccess {String} /.session.orgs.name
+    * @apiSuccess {Integer} /.session.orgs.id
+    * @apiSuccess {String} /.session.date
+    * @apiSuccess {Integer} /.session.id
+    * @apiSuccess {Boolean} /.session.in_review
+
+    * @apiSuccess {Object[]} /.results
+    * @apiSuccess {String} /.results.term
+    * @apiSuccess {Object} /.results.scores
+    * @apiSuccess {Integer} /.results.tf
+    * @apiSuccess {Integer} /.results.df
+    * @apiSuccess {Flaot} /.results.tf-idf
+
+
+    * @apiExample {curl} Example:
+        curl -i https://isci.parlameter.si/tfidf/s/9580
+
+    * @apiSuccessExample {json} Example response:
+    {
+        "session": {
+            "name": "30. redna seja",
+            "date_ts": "2017-05-22T02:00:00",
+            "org": {
+                "acronym": "DZ",
+                "is_coalition": false,
+                "name": "Državni zbor",
+                "id": 95
+            },
+            "date": "22. 5. 2017",
+            "orgs": [
+                {
+                    "acronym": "DZ",
+                    "is_coalition": false,
+                    "name": "Državni zbor",
+                    "id": 95
+                }
+            ],
+            "id": 9580,
+            "in_review": true
+        },
+        "results": [
+            {
+                "term": "biopsihologija",
+                "scores": {
+                    "tf": 34,
+                    "df": 27,
+                    "tf-idf": 1.2592592592592593
+                }
+            },
+            {
+                "term": "biopsiholog",
+                "scores": {
+                    "tf": 15,
+                    "df": 15,
+                    "tf-idf": 1
+                }
+            }
+        ]
+    }
     """
 
     solr_url = ('' + SOLR_URL + '/tvrh/?q=id:s' + session_i + ''
@@ -796,7 +940,43 @@ def tfidfSessionQuery(request, session_i):
 
 def dfALL(request):
     """
+    * @api {get} dfall/
+    * @apiGroup TFIDF
+    * @apiDescription
     document frequerncy all
+
+    search query in transcripts
+
+    * @apiSuccess {Object[]} /
+    * @apiSuccess {Integer} /.df
+    * @apiSuccess {String} /.term
+
+    * @apiExample {curl} Example:
+        curl -i https://isci.parlameter.si/dfall/
+
+    * @apiSuccessExample {json} Example response:
+    [
+        {
+            "df": 79235,
+            "term": "hvala"
+        },
+        {
+            "df": 72746,
+            "term": "in"
+        },
+        {
+            "df": 72208,
+            "term": "za"
+        },
+        {
+            "df": 71292,
+            "term": "je"
+        },
+        {
+            "df": 70951,
+            "term": "da"
+        }
+    ]
     """
     solr_url = SOLR_URL + '/tvrh/?q=tip_t:seja&tv.df=true&wt=json&fl=id&tv.fl=content_t'
 
