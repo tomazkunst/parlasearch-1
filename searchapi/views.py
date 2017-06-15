@@ -24,16 +24,16 @@ def regularQuery(request, words, start_page=None):
     search query in transcripts
     * @apiParam {date} date Optional date.
 
-    * @apiSucess {Object} /
-    * @apiSucess {Object} /.facet_counts
-    * @apiSucess {Object} /.facet_counts.facet_ranges
-    * @apiSucess {Object} /.facet_counts.facet_ranges.datetime_dt
-    * @apiSucess {String} /.facet_counts.facet_ranges.datetime_dt.start
-    * @apiSucess {String} /.facet_counts.facet_ranges.datetime_dt.end
-    * @apiSucess {String} /.facet_counts.facet_ranges.datetime_dt.gap
-    * @apiSucess {String[]} /.facet_counts.facet_ranges.datetime_dt.counts
-    * @apiSucess {Object} /.facet_counts.facet_fields
-    * @apiSucess {Object[]} /.facet_counts.facet_fields.speaker_i
+    * @apiSuccess {Object} /
+    * @apiSuccess {Object} /.facet_counts
+    * @apiSuccess {Object} /.facet_counts.facet_ranges
+    * @apiSuccess {Object} /.facet_counts.facet_ranges.datetime_dt
+    * @apiSuccess {String} /.facet_counts.facet_ranges.datetime_dt.start
+    * @apiSuccess {String} /.facet_counts.facet_ranges.datetime_dt.end
+    * @apiSuccess {String} /.facet_counts.facet_ranges.datetime_dt.gap
+    * @apiSuccess {String[]} /.facet_counts.facet_ranges.datetime_dt.counts
+    * @apiSuccess {Object} /.facet_counts.facet_fields
+    * @apiSuccess {Object[]} /.facet_counts.facet_fields.speaker_i
 
     * @apiSuccess {Object} /.facet_counts.facet_fields.speaker_i.person MP's person object (comes with most calls).
     * @apiSuccess {Boolean} /.facet_counts.facet_fields.speaker_i.person.is_active Answer the question: Is this MP currently active?
@@ -51,13 +51,13 @@ def regularQuery(request, words, start_page=None):
     * @apiSuccess {Boolean} /.facet_counts.facet_fields.speaker_i.person.has_function Answers the question: Is this person the president or vice president of the national assembly (speaker of the house kind of thing).
     
     * @apiSuccess {Object} /.facet_counts.facet_fields.speaker_i.score
-    * @apiSucess {String[]} /.facet_counts.facet_fields.speaker_i
-    * @apiSucess {Object[]} /.highlighting
-    * @apiSucess {Object[]} /.highlighting.start_time
-    * @apiSucess {String} /.highlighting.content_t
-    * @apiSucess {String} /.highlighting.date
-    * @apiSucess {Integer} /.highlighting.speech_id
-    * @apiSucess {Integer} /.highlighting.order
+    * @apiSuccess {String} /.facet_counts.facet_fields.party_i
+    * @apiSuccess {Object[]} /.highlighting
+    * @apiSuccess {Object[]} /.highlighting.start_time
+    * @apiSuccess {String} /.highlighting.content_t
+    * @apiSuccess {String} /.highlighting.date
+    * @apiSuccess {Integer} /.highlighting.speech_id
+    * @apiSuccess {Integer} /.highlighting.order
 
     * @apiSuccess {Object} /.highlighting.person MP's person object (comes with most calls).
     * @apiSuccess {Boolean} /.highlighting.person.is_active Answer the question: Is this MP currently active?
@@ -363,6 +363,279 @@ def filterQuery(request, words, start_page=None):
         -time_fitler: Months of which can be words spoken
 
     filter search query in transcripts
+    """
+    """
+    * @api {get} q/{word}/{?start_page} Search in transcripts and votes
+    * @apiName regularQuery
+    * @apiGroup Search
+    * @apiDescription
+    words: word/words for search
+    start_page: pager in results
+
+    search query in transcripts
+    * @apiParam {date} date Optional date.
+
+    * @apiSuccess {Object} /
+    * @apiSuccess {Object} /.facet_counts
+    * @apiSuccess {Object} /.facet_counts.facet_ranges
+    * @apiSuccess {Object} /.facet_counts.facet_ranges.datetime_dt
+    * @apiSuccess {String} /.facet_counts.facet_ranges.datetime_dt.start
+    * @apiSuccess {String} /.facet_counts.facet_ranges.datetime_dt.end
+    * @apiSuccess {String} /.facet_counts.facet_ranges.datetime_dt.gap
+    * @apiSuccess {String[]} /.facet_counts.facet_ranges.datetime_dt.counts
+    * @apiSuccess {Object} /.facet_counts.facet_fields
+    * @apiSuccess {Object[]} /.facet_counts.facet_fields.speaker_i
+
+    * @apiSuccess {Object} /.facet_counts.facet_fields.speaker_i.person MP's person object (comes with most calls).
+    * @apiSuccess {Boolean} /.facet_counts.facet_fields.speaker_i.person.is_active Answer the question: Is this MP currently active?
+    * @apiSuccess {Integer[]} /.facet_counts.facet_fields.speaker_i.person.district List of Parladata ids for districts this person was elected in.
+    * @apiSuccess {String} /.facet_counts.facet_fields.speaker_i.person.name MP's full name.
+    * @apiSuccess {String} /.facet_counts.facet_fields.speaker_i.person.gov_id MP's id on www.dz-rs.si
+    * @apiSuccess {String} /.facet_counts.facet_fields.speaker_i.person.gender MP's gender (f/m) used for grammar
+    * @apiSuccess {Object} /.facet_counts.facet_fields.speaker_i.person.party This MP's standard party objects (comes with most calls).
+    * @apiSuccess {String} /.facet_counts.facet_fields.speaker_i.person.party.acronym The MP's party's acronym.
+    * @apiSuccess {Boolean} /.facet_counts.facet_fields.speaker_i.person.party.is_coalition Answers the question: Is this party in coalition with the government?
+    * @apiSuccess {Integer} /.facet_counts.facet_fields.speaker_i.person.party.id This party's Parladata (organization) id.
+    * @apiSuccess {String} /.facet_counts.facet_fields.speaker_i.person.party.name The party's name.
+    * @apiSuccess {String} /.facet_counts.facet_fields.speaker_i.person.type The person's parlalize type. Always "mp" for MPs.
+    * @apiSuccess {Integer} /.facet_counts.facet_fields.speaker_i.person.id The person's Parladata id.
+    * @apiSuccess {Boolean} /.facet_counts.facet_fields.speaker_i.person.has_function Answers the question: Is this person the president or vice president of the national assembly (speaker of the house kind of thing).
+
+    * @apiSuccess {Object} /.facet_counts.facet_fields.speaker_i.score
+    * @apiSuccess {String[]} /.facet_counts.facet_fields.org_i pairs of organization id and score
+    * @apiSuccess {String[]} /.facet_counts.facet_fields.party_i pairs of party id and score
+    * @apiSuccess {Object[]} /.facet_counts.facet_fields.party_e list of party objects
+    * @apiSuccess {Object} /.facet_counts.facet_fields.party_e.party
+    * @apiSuccess {String} /.facet_counts.facet_fields.party_e.party.acronym
+    * @apiSuccess {Integer} /.facet_counts.facet_fields.party_e.party.id
+    * @apiSuccess {Boolean} /.facet_counts.facet_fields.party_e.party.is_coalition
+    * @apiSuccess {String} /.facet_counts.facet_fields.party_e.party.name
+    * @apiSuccess {Integer} /.facet_counts.facet_fields.party_e.score
+
+    * @apiSuccess {Object[]} /.highlighting
+    * @apiSuccess {Object[]} /.highlighting.start_time
+    * @apiSuccess {String} /.highlighting.content_t
+    * @apiSuccess {String} /.highlighting.date
+    * @apiSuccess {Integer} /.highlighting.speech_id
+    * @apiSuccess {Integer} /.highlighting.order
+
+    * @apiSuccess {Object} /.highlighting.person MP's person object (comes with most calls).
+    * @apiSuccess {Boolean} /.highlighting.person.is_active Answer the question: Is this MP currently active?
+    * @apiSuccess {Integer[]} /.highlighting.person.district List of Parladata ids for districts this person was elected in.
+    * @apiSuccess {String} /.highlighting.person.name MP's full name.
+    * @apiSuccess {String} /.highlighting.person.gov_id MP's id on www.dz-rs.si
+    * @apiSuccess {String} /.highlighting.person.gender MP's gender (f/m) used for grammar
+    * @apiSuccess {Object} /.highlighting.person.party This MP's standard party objects (comes with most calls).
+    * @apiSuccess {String} /.highlighting.person.party.acronym The MP's party's acronym.
+    * @apiSuccess {Boolean} /.highlighting.person.party.is_coalition Answers the question: Is this party in coalition with the government?
+    * @apiSuccess {Integer} /.highlighting.person.party.id This party's Parladata (organization) id.
+    * @apiSuccess {String} /.highlighting.person.party.name The party's name.
+    * @apiSuccess {String} /.highlighting.person.type The person's parlalize type. Always "mp" for MPs.
+    * @apiSuccess {Integer} /.highlighting.person.id The person's Parladata id.
+    * @apiSuccess {Boolean} /.highlighting.person.has_function Answers the question: Is this person the president or vice president of the national assembly (speaker of the house kind of thing).
+
+    * @apiSuccess {Object} /.responseHeader
+    * @apiSuccess {Integer} /.responseHeader.status
+    * @apiSuccess {Integer} /.responseHeader.QTime
+    * @apiSuccess {Object} /.responseHeader.params
+    * @apiSuccess {String} /.responseHeader.params.fq
+    * @apiSuccess {String} /.responseHeader.params.rows
+    * @apiSuccess {Object[]} /.responseHeader.params.facet.field
+    * @apiSuccess {String} /.responseHeader.params.facet.range.gap
+    * @apiSuccess {String} /.responseHeader.params.wt
+    * @apiSuccess {String} /.responseHeader.params.hl.snippets
+    * @apiSuccess {String} /.responseHeader.params.facet.range.end
+    * @apiSuccess {String} /.responseHeader.params.hl.regex.pattern
+    * @apiSuccess {String} /.responseHeader.params.facet
+    * @apiSuccess {String} /.responseHeader.params.q
+    * @apiSuccess {String} /.responseHeader.params.start
+    * @apiSuccess {String} /.responseHeader.params.facet.range
+    * @apiSuccess {String} /.responseHeader.params.hl
+    * @apiSuccess {String} /.responseHeader.params.hl.fragsize
+    * @apiSuccess {String} /.responseHeader.params.hl.mergeContiguous
+    * @apiSuccess {String} /.responseHeader.params.hl.fl
+    * @apiSuccess {String} /.responseHeader.params.hl.fragmenter
+    * @apiSuccess {String} /.responseHeader.params.facet.range.start
+
+    * @apiSuccess {Object} /.response
+    * @apiSuccess {Integer} /.response.start
+    * @apiSuccess {Integer} /.response.numFound
+    * @apiSuccess {Object[]} /.response.docs
+    * @apiSuccess {Object[]} /.response.docs.tip_t
+    * @apiSuccess {Integer} /.response.docs.session_i
+    * @apiSuccess {Integer} /.response.docs.party_i
+    * @apiSuccess {String} /.response.docs.datetime_dt
+    * @apiSuccess {Integer} /.response.docs.speaker_i
+    * @apiSuccess {Object[]} /.response.docs.content_t
+    * @apiSuccess {Integer} /.response.docs._version_
+    * @apiSuccess {String} /.response.docs.id
+    * @apiSuccess {Integer} /.response.docs.org_i
+    * @apiSuccess {Object[]} /.organizations
+    * @apiSuccess {Integer} /.organizations.score
+    * @apiSuccess {Integer} /.organizations.id
+    * @apiSuccess {String} /.organizations.name
+
+    * @apiSuccess {Boolean} /.has_council_score
+    * @apiSuccess {Boolean} /.has_dz_score
+
+    * @apiExample {curl} Example:
+        curl -i https://isci.parlameter.si/q/parlameter
+
+    * @apiSuccessExample {json} Example response:
+    {
+        "facet_counts": {
+            "facet_ranges": {
+                "datetime_dt": {
+                    "start": "2014-09-01T00:00:00Z",
+                    "counts": [
+                        "2014-09-01T00:00:00Z",
+                        47,
+                        "2014-10-01T00:00:00Z",
+                        11
+                    ],
+                    "end": "2017-07-01T00:00:00Z",
+                    "gap": "+1MONTHS"
+                }
+            },
+            "facet_fields": {
+                "speaker_i": [
+                    {
+                        "person": {
+                            "name": "Tomaž Gantar",
+                            "district": [
+                                80
+                            ],
+                            "gender": "m",
+                            "is_active": false,
+                            "party": {
+                                "acronym": "DeSUS",
+                                "id": 3,
+                                "is_coalition": true,
+                                "name": "PS Demokratska Stranka Upokojencev Slovenije"
+                            },
+                            "type": "mp",
+                            "id": 22,
+                            "gov_id": "P251",
+                            "has_function": false
+                        },
+                        "score": 198
+                    }
+                ],
+                "org_i": [
+                    "95",
+                    1415,
+                    "27",
+                    625
+                ],
+                "party_e": [
+                    {
+                        "party": {
+                            "acronym": "SDS",
+                            "id": 5,
+                            "is_coalition": false,
+                            "name": "PS Slovenska Demokratska Stranka"
+                        },
+                        "score": 522
+                    }
+                ],
+                "party_i": [
+                    "5",
+                    522,
+                    "1",
+                    471
+                ]
+            }
+        },
+        "highlighting": [
+            {
+                "start_time": "2017-06-09T02:00:00",
+                "session_id": 9587,
+                "person": {
+                    "name": "Jožica Mavčec Zakotnik",
+                    "district": null,
+                    "gender": null,
+                    "is_active": null,
+                    "party": {
+                        "acronym": null,
+                        "id": null,
+                        "is_coalition": null,
+                        "name": null
+                    },
+                    "type": "visitor",
+                    "id": 3807,
+                    "gov_id": null,
+                    "has_function": false
+                },
+                "content_t": "da je Ministrstvo za <em>zdravje</em> od izbruha požara ves čas spremljalo delo zdravstvene službe pri zagotavljanju neposredne oskrbe prebivalcem. Službe za medicino dela, prometa in športa je ustrezno poskrbela za ugotavljanje izpostavljenosti gasilcev, članov civilne zaščite, drugega intervencijskega osebja ter delavcev na območju obrata podjetja Kemis. Vsem je bila takrat in je še vedno nudena posebna zdravstvena oskrba in zaščita. Za varovanje <em>zdravja</em> ljudi smo že med požarom in neprekinjeno do danes redno posredovali in objavljali priporočila kako naj preventivno ravnajo, da bi se izognili in v največji možni meri zmanjšali možnost izpostavljenosti snovem v okolju. Do prejetja prvih analiz teh nismo poznali. Smo pa ravnali tako, da smo upoštevali največjo možno zaščito ljudi. V primeru, da bi v dneh po nesreči obstajala večja akutna nevarnost za <em>zdravje</em>, bi na to opozorili.</em>",
+                "date": "2017-05-30",
+                "speech_id": 1263913,
+                "order": 340
+            }
+        ],
+        "responseHeader": {
+            "status": 0,
+            "QTime": 759,
+            "params": {
+                "fq": "",
+                "rows": "50",
+                "facet.field": [
+                    "speaker_i",
+                    "party_i",
+                    "org_i"
+                ],
+                "facet.range.gap": "+1MONTHS",
+                "wt": "json",
+                "hl.snippets": "1",
+                "facet.range.end": "NOW",
+                "hl.regex.pattern": "\\w[^\\.!\\?]{400,600}[\\.!\\?]",
+                "facet": "true",
+                "q": "content_t:zdravje AND tip_t:govor",
+                "start": "0",
+                "facet.range": "datetime_dt",
+                "hl": "true",
+                "hl.fragsize": "5000",
+                "hl.mergeContiguous": "false",
+                "hl.fl": "content_t",
+                "hl.fragmenter": "regex",
+                "facet.range.start": "2014-01-01T00:00:00.000Z"
+            }
+        },
+        "response": {
+            "start": 0,
+            "numFound": 2948,
+            "docs": [
+                {
+                    "tip_t": [
+                        "govor"
+                    ],
+                    "session_i": 6675,
+                    "party_i": 8,
+                    "datetime_dt": "2015-07-14T02:00:00Z",
+                    "speaker_i": 31,
+                    "content_t": [
+                        "Hvala lepa, predsedujoči podpredsednik, pozdravljena ministrica!"
+                    ],
+                    "_version_": 1558596112263151600,
+                    "id": "g583168",
+                    "org_i": 95
+                }
+            ]
+        },
+        "organizations": [
+            {
+                "score": 4,
+                "id": 105,
+                "name": "Komisija za nadzor obveščevalnih in varnostnih služb"
+            },
+            {
+                "score": 3,
+                "id": 11,
+                "name": "Komisija za narodni skupnosti"
+            }
+        ],
+        "has_council_score": true,
+        "has_dz_score": true
+    }
     """
     rows = 50
     solr_url = SOLR_URL+'/select?wt=json'
