@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 from django.shortcuts import render
 from kvalifikatorji.scripts import getCountListPG, getScores, problematicno, privzdignjeno, preprosto, getCountList
 from searchapi.utils import tryHard, enrichPartyData, getTFIDFofSpeeches2, enrichPersonData, enrichTFIDF
