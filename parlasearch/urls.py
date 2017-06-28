@@ -32,8 +32,6 @@ urlpatterns = [
     url(ur'^v/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžČĆŠŽa-zA-Z0-9 \-\+!"%\.,]+)/(?P<start_page>\d+)', motionQuery),
     url(ur'^v/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžČĆŠŽa-zA-Z0-9 \-\+!"%\.,]+)', motionQuery),
 
-    url(ur'^tfidf/s/(?P<session_i>[0-9]+)', tfidfSessionQuery),
-
     url(ur'^dfall/$', dfALL),
     url(ur'^dfall/(?P<datetime_dt>[\w].+)/', dfDateALL),
 
