@@ -361,3 +361,97 @@ def enrichDocs(data):
     enrichedData = data
 
     return enrichedData
+
+
+# url(ur'^tfidf/s/(?P<session_i>[0-9]+)', tfidfSessionQuery),
+def tfidfSessionQuery(request, session_i):
+    """
+    * @api {get} tfidf/s/{session_i}/
+    * @apiGroup TFIDF
+    * @apiDescription
+    method for TFIDF of session
+
+    search query in transcripts
+    * @apiParam {session_i} session id.
+
+    * @apiSuccess {Object} /
+    * @apiSuccess {Object} /.session
+    * @apiSuccess {String} /.session.name
+    * @apiSuccess {String} /.session.date_ts
+    * @apiSuccess {Object[]} /.session.orgs
+    * @apiSuccess {String} /.session.orgs.acronym
+    * @apiSuccess {Boolean} /.session.orgs.is_coalition
+    * @apiSuccess {String} /.session.orgs.name
+    * @apiSuccess {Integer} /.session.orgs.id
+    * @apiSuccess {String} /.session.date
+    * @apiSuccess {Integer} /.session.id
+    * @apiSuccess {Boolean} /.session.in_review
+
+    * @apiSuccess {Object[]} /.results
+    * @apiSuccess {String} /.results.term
+    * @apiSuccess {Object} /.results.scores
+    * @apiSuccess {Integer} /.results.tf
+    * @apiSuccess {Integer} /.results.df
+    * @apiSuccess {Flaot} /.results.tf-idf
+
+
+    * @apiExample {curl} Example:
+        curl -i https://isci.parlameter.si/tfidf/s/9580
+
+    * @apiSuccessExample {json} Example response:
+    {
+        "session": {
+            "name": "30. redna seja",
+            "date_ts": "2017-05-22T02:00:00",
+            "org": {
+                "acronym": "DZ",
+                "is_coalition": false,
+                "name": "Državni zbor",
+                "id": 95
+            },
+            "date": "22. 5. 2017",
+            "orgs": [
+                {
+                    "acronym": "DZ",
+                    "is_coalition": false,
+                    "name": "Državni zbor",
+                    "id": 95
+                }
+            ],
+            "id": 9580,
+            "in_review": true
+        },
+        "results": [
+            {
+                "term": "biopsihologija",
+                "scores": {
+                    "tf": 34,
+                    "df": 27,
+                    "tf-idf": 1.2592592592592593
+                }
+            },
+            {
+                "term": "biopsiholog",
+                "scores": {
+                    "tf": 15,
+                    "df": 15,
+                    "tf-idf": 1
+                }
+            }
+        ]
+    }
+    """
+
+    solr_url = ('' + SOLR_URL + '/tvrh/?q=id:s' + session_i + ''
+                '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t')
+
+    r = requests.get(solr_url)
+
+    try:
+        output = enrichTFIDF(r.json())
+        url = (ANALIZE_URL + '/utils/getSessionData/'
+               '' + output['session'] + '')
+        output['session'] = requests.get(url).json()
+        return JsonResponse(output)
+    except IndexError:
+        raise Http404('No data for this session.')
