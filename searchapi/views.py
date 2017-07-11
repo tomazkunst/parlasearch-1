@@ -671,6 +671,7 @@ def filterQuery(request, words, start_page=None):
         filters.append('org_i:(' + ' OR '.join(working_bodies) + ')')
 
     # prepare time filter query
+    time_filter_dates = None
     if time_filter:
         time_filter_dates = [datetime.strptime(t_filter, API_DATE_FORMAT)
                              for t_filter in time_filter.split(',')]
