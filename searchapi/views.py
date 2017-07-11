@@ -672,20 +672,20 @@ def filterQuery(request, words, start_page=None):
 
     # prepare time filter query
     if time_filter:
-        time_filter = [datetime.strptime(t_filter, API_DATE_FORMAT)
-                       for t_filter in time_filter.split(',')]
+        time_filter_dates = [datetime.strptime(t_filter, API_DATE_FORMAT)
+                             for t_filter in time_filter.split(',')]
 
         time_filter = [(t_time.strftime('%Y-%m-%d') + ZERO_TIME,
                         add_months(t_time,
                                    1).strftime('%Y-%m-%d') + ZERO_TIME + ']')
-                       for t_time in time_filter]
-        time_str = ['[' + t_time(0) + ' TO ' + t_time(1)
+                       for t_time in time_filter_dates]
+        time_str = ['[' + t_time[0] + ' TO ' + t_time[1]
                     for t_time in time_filter]
         time_query = 'datetime_dt:(' + ' OR '.join(time_str) + ')'
         filters.append(time_query)
 
-    f_date = min(time_filter) if time_filter else None
-    t_date = add_months(max(time_filter), 1) if time_filter else None
+    f_date = min(time_filter_dates) if time_filter_dates else None
+    t_date = add_months(max(time_filter_dates), 1) if time_filter_dates else None
 
     if f_date:
         facetStartRange = f_date.strftime('%Y-%m-%d') + ZERO_TIME
