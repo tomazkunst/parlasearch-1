@@ -816,7 +816,7 @@ def motionQuery(request, words, start_page=None):
 
     solr_params = {
         'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '%2B'),
-        'sort': 'score',
+        #'sort': 'score',
         'hl': 'true',
         'hl.fl': 'content_t',
         'fq': 'tip_t:v',
