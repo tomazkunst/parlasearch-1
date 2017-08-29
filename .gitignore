@@ -100,3 +100,7 @@ ENV/
 
 # Django settings
 settings.py
+
+# temporary files of analysis
+tfidfs/
+datadumps/
