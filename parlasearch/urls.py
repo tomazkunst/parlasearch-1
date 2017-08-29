@@ -19,6 +19,7 @@ from django.contrib import admin
 from searchapi.views import motionQuery, regularQuery, filterQuery, dfALL, dfDateALL
 
 from searchapi.utils import monitorMe
+from searchalize.tasks import runAsyncSetter
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
@@ -36,4 +37,6 @@ urlpatterns = [
     url(ur'^dfall/(?P<datetime_dt>[\w].+)/', dfDateALL),
 
     url(r'^monitoring/', monitorMe),
+
+    url(r'^tasks/', runAsyncSetter),
 ]

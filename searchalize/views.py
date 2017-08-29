@@ -202,7 +202,7 @@ def setTFIDFforMPsALL(date_=None):
     return 'Pa sem naredu vse', r.content
 
 
-def setTfidfOfSession(request, session_i):
+def setTfidfOfSession(session_i):
     solr_url = ('' + SOLR_URL + '/tvrh/?q=id:s' + session_i + ''
                 '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t')
 
