@@ -12,6 +12,8 @@ from .views import setStyleScoresPGsALL, setStyleScoresMPsALL, setTFIDFforPGsALL
 import json
 import requests
 
+status_api = settings.DASHBOARD_URL + '/api/status/'
+
 exports = {'setStyleScoresPGsALL': setStyleScoresPGsALL,
            'setStyleScoresMPsALL': setStyleScoresMPsALL,
            'setTFIDFforPGsALL': setTFIDFforPGsALL,
@@ -56,7 +58,7 @@ def run_search_analizes(expoert_tasks, status_id, attr=None):
         client.captureException()
 
 def sendStatus(status_id, type_, data):
-    requests.put('http://localhost:8888/api/status/'+str(status_id)+'/',
+    requests.put(status_api + str(status_id) + '/',
                  data= {
                             "status_type": type_,
                             "status_note": datetime.now().strftime(settings.API_DATE_FORMAT),
