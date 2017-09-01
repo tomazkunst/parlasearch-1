@@ -6,6 +6,7 @@ from datetime import datetime
 from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import PermissionDenied
 
 from .views import setStyleScoresPGsALL, setStyleScoresMPsALL, setTFIDFforPGsALL, setTFIDFforMPsALL, setTfidfOfSession
 
@@ -28,6 +29,10 @@ def runAsyncSetter(request):
         data = json.loads(request.body)
         print data
         status_id = data.pop('status_id')
+        if auth_key != settings.PARLALIZE_API_KEY:
+            print("auth fail")
+            sendStatus(status_id, "Fail", "Authorization fails", ['buuu'])
+            raise PermissionDenied
         if data['attr']:
             attr = data['attr']
         else:
