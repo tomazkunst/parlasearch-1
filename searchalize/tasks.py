@@ -52,12 +52,12 @@ def run_search_analizes(expoert_tasks, status_id, attr=None):
     else:
         data = {}
     try:
+        resp = ''
         for method in methods:
             print(method, data)
-            method(**data)
-            print('ivan')
+            resp = method(**data)
         print "naj se bi exportal"
-        sendStatus(status_id, 'Done', '[]')
+        sendStatus(status_id, 'Done', resp)
     except:
         sendStatus(status_id, 'Fails', '[]')
         client.captureException()
