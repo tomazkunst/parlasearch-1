@@ -54,7 +54,7 @@ def run_search_analizes(expoert_tasks, status_id, attr=None):
     try:
         for method in methods:
             print(method, data)
-            # method(**data)
+            method(**data)
             print('ivan')
         print "naj se bi exportal"
         sendStatus(status_id, 'Done', '[]')

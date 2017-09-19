@@ -28,6 +28,7 @@ def tryHard(url):
             counter += 1
             time.sleep(5)
             pass
+        counter += 1
     return data
 
 
