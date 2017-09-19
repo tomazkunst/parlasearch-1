@@ -29,6 +29,7 @@ def runAsyncSetter(request):
         data = json.loads(request.body)
         print data
         status_id = data.pop('status_id')
+        auth_key = request.META['HTTP_AUTHORIZATION']
         if auth_key != settings.PARLALIZE_API_KEY:
             print("auth fail")
             sendStatus(status_id, "Fail", "Authorization fails", ['buuu'])
