@@ -146,6 +146,7 @@ def enrichHighlights(data):
                     'date': speechdata['date'],
                     'speech_id': int(hkey.split('g')[1]),
                     'session_id': speechdata['session_id'],
+                    'session': static_data[speechdata['session_id']][str(speechdata['session_id'])],
                     'order': speechdata['order'],
                     'start_time': speechdata['start_time']
                 })
@@ -156,6 +157,19 @@ def enrichHighlights(data):
                                            'name': 'unknown',
                                            'gov_id': 'unknown',
                                            'id': speechdata['speaker_id']},
+                                'session': {'name': 'unknown',
+                                            'date_ts': 'unknown',
+                                            'updated_at': 'unknown',
+                                            'org': {'acronym': 'unknown',
+                                                    'is_coalition': 'unknown',
+                                                    'name': 'unknown',
+                                                    'id': 'unknown'
+                                            },
+                                            'date': 'unknown',
+                                            'orgs': [],
+                                            'id': speechdata['session_id'],
+                                            'in_review': 'unknown'
+                                            },
                                 'content_t': trimHighlight(content_t),
                                 'date': speechdata['date'],
                                 'speech_id': int(hkey.split('g')[1])})
