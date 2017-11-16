@@ -146,7 +146,7 @@ def enrichHighlights(data):
                     'date': speechdata['date'],
                     'speech_id': int(hkey.split('g')[1]),
                     'session_id': speechdata['session_id'],
-                    'session': static_data[speechdata['session_id']][str(speechdata['session_id'])],
+                    'session': static_data['sessions'][str(speechdata['session_id'])],
                     'order': speechdata['order'],
                     'start_time': speechdata['start_time']
                 })
