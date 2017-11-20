@@ -46,8 +46,7 @@ def enrichQuery(data, show_all=False):
     data['facet_counts'].pop('facet_intervals', None)
 
     results = []
-    url = ANALIZE_URL + '/utils/getAllStaticData/'
-    static_data = requests.get(url).json()
+    static_data = getAllStaticData()
 
     # enrich speakers
     for i, speaker in enumerate(data['facet_counts']['facet_fields']['speaker_i']):
@@ -125,9 +124,7 @@ def enrichHighlights(data):
     """
 
     results = []
-
-    url = ANALIZE_URL + '/utils/getAllStaticData/'
-    static_data = requests.get(url).json()
+    static_data = getAllStaticData()
 
     for hkey in data['highlighting'].keys():
 
@@ -556,3 +553,13 @@ def monitorMe(request):
         return HttpResponse('All iz well.')
     else:
         return HttpResponse('PANIC!')
+
+
+def getAllStaticData():
+    data = cache.get("all_static_data")
+    if not data:
+        print('ni date')
+        url = ANALIZE_URL + '/utils/getAllStaticData/'
+        data = requests.get(url).json()
+        cache.set("all_static_data", data, 60 * 60)
+    return data

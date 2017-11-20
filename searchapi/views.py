@@ -914,3 +914,7 @@ def dfDateALL(request, datetime_dt):
     print 'solr responded'
 
     return JsonResponse(groupDFALL(r.json()), safe=False)
+
+
+def index(request):
+    return JsonResponse({'status': 'ok'})
