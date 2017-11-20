@@ -558,8 +558,9 @@ def monitorMe(request):
 def getAllStaticData():
     data = cache.get("all_static_data")
     if not data:
-        print('ni date')
         url = ANALIZE_URL + '/utils/getAllStaticData/'
         data = requests.get(url).json()
-        cache.set("all_static_data", data, 60 * 60)
-    return data
+        cache.set("all_static_data", json.dumps(data), 60 * 60)
+        return data
+    else:
+        return json.loads(data)
