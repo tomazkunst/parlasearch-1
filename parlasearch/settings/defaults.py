@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Django settings for parlalize project.
 
@@ -21,14 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-DEVELOPMENT = False
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -41,6 +35,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'searchapi',
+    'searchalize',
     'raven.contrib.django.raven_compat',
     'corsheaders',
 )
@@ -77,22 +72,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'parlasearch.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/1.8/ref/settings/#databases
-
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': '',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
-    }
-}
-
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
@@ -105,24 +84,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.8/howto/static-files/
-
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
-
-if DEVELOPMENT:
-    API_URL = ""
-else:
-    API_URL = ""
-
-ANALIZE_URL = ''
-
-SOLR_URL = ''
-
-BASE_URL = ''
 
 
 LOGGING = {
@@ -144,22 +105,6 @@ LOGGING = {
     },
 }
 
-RAVEN_CONFIG = {
-    'dsn': '',
-    # If you are using git, you can also automatically configure the
-    # release based on the git info.
-#    'release': raven.fetch_git_sha(os.path.dirname(__file__)),
-}
-
 # CORS config
 CORS_ORIGIN_ALLOW_ALL = True
 API_DATE_FORMAT = '%d.%m.%Y'
-
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '',
-    }
-}
-
-PARLALIZE_API_KEY = ""
