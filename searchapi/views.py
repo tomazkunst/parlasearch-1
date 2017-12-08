@@ -914,3 +914,42 @@ def dfDateALL(request, datetime_dt):
     print 'solr responded'
 
     return JsonResponse(groupDFALL(r.json()), safe=False)
+
+
+def index(request):
+    return JsonResponse({'status': 'ok'})
+
+
+def legislationQuery(request, words, start_page=None):
+    rows = 50
+    # solr_url = 'http://127.0.0.1:8983/solr/knedl/select?wt=json'
+    solr_url = SOLR_URL + '/select?wt=json'
+
+    q = words.replace('+', ' ')
+
+    solr_params = {
+        'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '+'),
+        # 'sort': 'datetime_dt desc',
+        'hl': 'true',
+        'hl.fl': 'content_t',
+        'hl.fragmenter': 'regex',
+        'hl.regex.pattern': '\w[^\.!\?]{1,600}[\.!\?]',
+        'hl.fragsize': '5000',
+        'hl.mergeContiguous': 'false',
+        'hl.snippets': '1',
+        'fq': 'tip_t:l',
+        'rows': str(rows),
+        'start': str(int(start_page) * rows) if start_page else '0',
+    }
+
+    # print q + 'asd'
+
+    url = solr_url
+    for key in solr_params:
+        url = url + '&' + key + '=' + solr_params[key]
+
+    # print url
+
+    r = requests.get(url)
+
+    return JsonResponse(enrichHighlights(enrichQuery(r.json())))
