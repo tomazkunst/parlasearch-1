@@ -928,10 +928,10 @@ def legislationQuery(request, words, start_page=None):
     q = words.replace('+', ' ')
 
     solr_params = {
-        'q': 'content_t:' + q.replace('IN', 'AND').replace('!', '+'),
+        'q': '(content_t:' + q.replace('IN', 'AND').replace('!', '+')+') OR ('+'text_t:' + q.replace('IN', 'AND').replace('!', '+')+')',
         # 'sort': 'datetime_dt desc',
         'hl': 'true',
-        'hl.fl': 'content_t',
+        'hl.fl': 'content_t text_t',
         'hl.fragmenter': 'regex',
         'hl.regex.pattern': '\w[^\.!\?]{1,600}[\.!\?]',
         'hl.fragsize': '5000',
@@ -951,5 +951,4 @@ def legislationQuery(request, words, start_page=None):
     # print url
 
     r = requests.get(url)
-
-    return JsonResponse(enrichHighlights(enrichQuery(r.json())))
+    return JsonResponse(r.json())

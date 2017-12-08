@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from searchapi.views import motionQuery, regularQuery, filterQuery, dfALL, dfDateALL, index
+from searchapi.views import motionQuery, regularQuery, filterQuery, dfALL, dfDateALL, index, legislationQuery
 
 from searchapi.utils import monitorMe
 from searchalize.tasks import runAsyncSetter
