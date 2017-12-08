@@ -99,8 +99,13 @@ ENV/
 .ropeproject
 
 # Django settings
-settings.py
+#settings.py
 
 # temporary files of analysis
 tfidfs/
 datadumps/
+
+# settings files
+parlasearch/settings/stage.py
+parlasearch/settings/prod.py
+parlasearch/settings/__init__.py
