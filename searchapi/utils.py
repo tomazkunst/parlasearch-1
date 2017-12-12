@@ -86,7 +86,7 @@ def enrichQuery(data, show_all=False):
                 score = data['facet_counts']['facet_fields']['party_i']
                 results.append({'party': static_data['partys'][str(speaker)],
                                 'score': str(score[i + 1])})
-            except ValueError:
+            except ValueError, KeyError:
                 score = data['facet_counts']['facet_fields']['party_i']
                 results.append({'party': {'acronym': 'unknown',
                                           'is_coalition': unknown,
