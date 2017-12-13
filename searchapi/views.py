@@ -652,13 +652,13 @@ def filterQuery(request, words, start_page=None):
     time_filter = request.GET.get('time_filter')
 
     filters_out = {
-        'people': people.split(','),
-        'parties': parties.split(','),
+        'people': people.split(',') if people else None,
+        'parties': parties.split(',') if parties else None,
         'from': from_date,
         'to': to_date,
         'is_dz': is_dz,
         'council': is_council,
-        'wb': working_bodies.split(','),
+        'wb': working_bodies.split(',') if working_bodies else None,
         'time_filter': time_filter,
         }
 
