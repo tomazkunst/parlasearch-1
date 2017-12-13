@@ -8,6 +8,7 @@ import time
 import datetime
 import calendar
 import json
+import copy
 
 from django.http import HttpResponse
 
@@ -120,13 +121,31 @@ def trimHighlight(highlight):
         return highlight
 
 
+def enrichResponseDocs(data):
+    static_data = getAllStaticData()
+    highlights = copy.deepcopy(data['response']['docs'])
+    for speech in highlights:
+        speech['session'] = static_data['sessions'][speech['session_i']]
+        speech['person'] = static_data['persons'][speech['speaker_i']]
+        speech['speech_id'] = int(speech_id.pop('id')[1:])
+        speech['date'] = datetime.strptime(speech['datetime_dt'], '%Y-%m-%dT%XZ').strftime(API_DATE_FORMAT)
+        speech['start_time'] = speech['datetime_dt']
+
+    data['highlighting'] = sortedResults = sorted(highlights,
+                                                  key=lambda k: k['date'],
+                                                  reverse=True)
+
+    return data
+
+
+
 def enrichHighlights(data):
     """
     enrichQuery method add data of members to highlights of search response
     """
 
     if 'highlighting' not in data.keys():
-        return data
+        return enrichResponseDocs(data)
 
     results = []
     static_data = getAllStaticData()
