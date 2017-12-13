@@ -40,6 +40,8 @@ def enrichQuery(data, show_all=False):
     enrichQuery method add data of members and parlametary groups to ratings of
     search resposnse
     """
+    if 'facet_counts' not in data.keys():
+        return data
     data['facet_counts'].pop('facet_heatmaps', None)
     # data['facet_counts'].pop('facet_ranges', None)
     data['facet_counts'].pop('facet_queries', None)
@@ -122,6 +124,9 @@ def enrichHighlights(data):
     """
     enrichQuery method add data of members to highlights of search response
     """
+
+    if 'highlighting' not in data.keys():
+        return data
 
     results = []
     static_data = getAllStaticData()
