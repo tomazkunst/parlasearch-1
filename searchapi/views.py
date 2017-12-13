@@ -651,6 +651,19 @@ def filterQuery(request, words, start_page=None):
     working_bodies = request.GET.get('wb', [])
     time_filter = request.GET.get('time_filter')
 
+    filters_out = {
+        'people': people.split(','),
+        'parties': parties.split(','),
+        'from': from_date,
+        'to': to_date,
+        'is_dz': is_dz,
+        'council': is_council,
+        'wb': working_bodies.split(','),
+        'time_filter': time_filter,
+        }
+
+
+
     filters = []
 
     working_bodies = working_bodies.split(',') if working_bodies else []
@@ -730,6 +743,7 @@ def filterQuery(request, words, start_page=None):
     r = requests.get(url)
     out = addOrganizations(enrichHighlights(enrichQuery(r.json(),
                            show_all=True)))
+    out.update({'filters': filters_out})
     return JsonResponse(out)
 
 
