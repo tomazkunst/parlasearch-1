@@ -349,7 +349,7 @@ def regularQuery(request, words, start_page=None):
     return JsonResponse(enrichHighlights(enrichQuery(r.json())))
 
 
-def filterQuery(request, words, start_page=None):
+def filterQuery(request, words='', start_page=None):
     """
     words: word/words for search
     start_page: pager in results
