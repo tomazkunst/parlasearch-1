@@ -711,6 +711,9 @@ def filterQuery(request, words='', start_page=None):
     else:
         facetEndRange = 'NOW'
 
+    if not q:
+        q = '*'
+
     query = 'content_t:' + q.replace('IN', 'AND').replace('!', '%2B')
     query += ' AND tip_t:govor'
 
