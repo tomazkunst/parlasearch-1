@@ -89,10 +89,10 @@ def enrichQuery(data, show_all=False):
                 score = data['facet_counts']['facet_fields']['party_i']
                 results.append({'party': static_data['partys'][str(speaker)],
                                 'score': str(score[i + 1])})
-            except ValueError, KeyError:
+            except (ValueError, KeyError) as e:
                 score = data['facet_counts']['facet_fields']['party_i']
                 results.append({'party': {'acronym': 'unknown',
-                                          'is_coalition': unknown,
+                                          'is_coalition': 'unknown',
                                           'name': 'unknown',
                                           'id': speaker},
                                 'score': str(score[i + 1])
@@ -125,15 +125,19 @@ def enrichResponseDocs(data):
     static_data = getAllStaticData()
     highlights = copy.deepcopy(data['response']['docs'])
     for speech in highlights:
-        speech['session'] = static_data['sessions'][speech['session_i']]
-        speech['person'] = static_data['persons'][speech['speaker_i']]
-        speech['speech_id'] = int(speech_id.pop('id')[1:])
-        speech['date'] = datetime.strptime(speech['datetime_dt'], '%Y-%m-%dT%XZ').strftime(API_DATE_FORMAT)
+        try:    
+            speech['session'] = static_data['sessions'][str(speech['session_i'])]
+            speech['person'] = static_data['persons'][str(speech['speaker_i'])]
+        except:
+            continue
+        speech['speech_id'] = int(speech.pop('id')[1:])
         speech['start_time'] = speech['datetime_dt']
+        speech['date'] = datetime.datetime.strptime(speech.pop('datetime_dt'), '%Y-%m-%dT%XZ').strftime(API_DATE_FORMAT)
+        speech.pop('tip_t')
+        speech['session_id'] = speech.pop('session_i')
+        speech['content_t'] = speech['content_t'][0]        
 
-    data['highlighting'] = sortedResults = sorted(highlights,
-                                                  key=lambda k: k['date'],
-                                                  reverse=True)
+    data['highlighting'] = highlights
 
     return data
 
@@ -195,10 +199,10 @@ def enrichHighlights(data):
                                 'date': speechdata['date'],
                                 'speech_id': int(hkey.split('g')[1])})
 
-    data['highlighting'] = sortedResults = sorted(results,
-                                                  key=lambda k: k['date'],
-                                                  reverse=True)
-
+    #data['highlighting'] = sortedResults = sorted(results,
+    #                                              key=lambda k: k['date'],
+    #                                              reverse=True)
+    data['highlighting'] = results
     enrichedData = data
 
     return enrichedData
