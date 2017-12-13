@@ -125,11 +125,14 @@ def enrichResponseDocs(data):
     static_data = getAllStaticData()
     highlights = copy.deepcopy(data['response']['docs'])
     for speech in highlights:
-        speech['session'] = static_data['sessions'][speech['session_i']]
-        speech['person'] = static_data['persons'][speech['speaker_i']]
-        speech['speech_id'] = int(speech_id.pop('id')[1:])
-        speech['date'] = datetime.strptime(speech['datetime_dt'], '%Y-%m-%dT%XZ').strftime(API_DATE_FORMAT)
+        speech['session'] = static_data['sessions'][str(speech['session_i'])]
+        speech['person'] = static_data['persons'][str(speech['speaker_i'])]
+        speech['speech_id'] = int(speech.pop('id')[1:])
         speech['start_time'] = speech['datetime_dt']
+        speech['date'] = datetime.datetime.strptime(speech.pop('datetime_dt'), '%Y-%m-%dT%XZ').strftime(API_DATE_FORMAT)
+        speech.pop('tip_t')
+        speech['session_id'] = speech.pop('session_i')
+        speech['content_t'] = speech['content_t'][0]        
 
     data['highlighting'] = sortedResults = sorted(highlights,
                                                   key=lambda k: k['date'],
