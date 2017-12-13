@@ -713,9 +713,10 @@ def filterQuery(request, words='', start_page=None):
 
     if not q:
         q = '*'
-
+    
     query = 'content_t:' + q.replace('IN', 'AND').replace('!', '%2B')
-    query += ' AND tip_t:govor'
+    #query += ' AND tip_t:govor'
+    filters.append('tip_t:govor')
 
     solr_params = {
         'q': query,
@@ -736,6 +737,9 @@ def filterQuery(request, words='', start_page=None):
         'rows': str(rows),
         'start': str(int(start_page) * rows) if start_page else '0',
     }
+    if q == '*':
+        solr_params.update({'sort': 'datetime_dt desc'})
+        solr_params.update({'hl': 'false'})
     # print solr_params
     url = solr_url
     for key in solr_params:
