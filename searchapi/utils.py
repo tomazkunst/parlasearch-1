@@ -8,6 +8,7 @@ import time
 import datetime
 import calendar
 import json
+import copy
 
 from django.http import HttpResponse
 
@@ -28,6 +29,7 @@ def tryHard(url):
             counter += 1
             time.sleep(5)
             pass
+        counter += 1
     return data
 
 
@@ -39,14 +41,15 @@ def enrichQuery(data, show_all=False):
     enrichQuery method add data of members and parlametary groups to ratings of
     search resposnse
     """
+    if 'facet_counts' not in data.keys():
+        return data
     data['facet_counts'].pop('facet_heatmaps', None)
     # data['facet_counts'].pop('facet_ranges', None)
     data['facet_counts'].pop('facet_queries', None)
     data['facet_counts'].pop('facet_intervals', None)
 
     results = []
-    url = ANALIZE_URL + '/utils/getAllStaticData/'
-    static_data = requests.get(url).json()
+    static_data = getAllStaticData()
 
     # enrich speakers
     for i, speaker in enumerate(data['facet_counts']['facet_fields']['speaker_i']):
@@ -86,10 +89,10 @@ def enrichQuery(data, show_all=False):
                 score = data['facet_counts']['facet_fields']['party_i']
                 results.append({'party': static_data['partys'][str(speaker)],
                                 'score': str(score[i + 1])})
-            except ValueError:
+            except (ValueError, KeyError) as e:
                 score = data['facet_counts']['facet_fields']['party_i']
                 results.append({'party': {'acronym': 'unknown',
-                                          'is_coalition': unknown,
+                                          'is_coalition': 'unknown',
                                           'name': 'unknown',
                                           'id': speaker},
                                 'score': str(score[i + 1])
@@ -118,15 +121,38 @@ def trimHighlight(highlight):
         return highlight
 
 
+def enrichResponseDocs(data):
+    static_data = getAllStaticData()
+    highlights = copy.deepcopy(data['response']['docs'])
+    for speech in highlights:
+        try:    
+            speech['session'] = static_data['sessions'][str(speech['session_i'])]
+            speech['person'] = static_data['persons'][str(speech['speaker_i'])]
+        except:
+            continue
+        speech['speech_id'] = int(speech.pop('id')[1:])
+        speech['start_time'] = speech['datetime_dt']
+        speech['date'] = datetime.datetime.strptime(speech.pop('datetime_dt'), '%Y-%m-%dT%XZ').strftime(API_DATE_FORMAT)
+        speech.pop('tip_t')
+        speech['session_id'] = speech.pop('session_i')
+        speech['content_t'] = speech['content_t'][0]        
+
+    data['highlighting'] = highlights
+
+    return data
+
+
+
 def enrichHighlights(data):
     """
     enrichQuery method add data of members to highlights of search response
     """
 
-    results = []
+    if 'highlighting' not in data.keys():
+        return enrichResponseDocs(data)
 
-    url = ANALIZE_URL + '/utils/getAllStaticData/'
-    static_data = requests.get(url).json()
+    results = []
+    static_data = getAllStaticData()
 
     for hkey in data['highlighting'].keys():
 
@@ -145,6 +171,7 @@ def enrichHighlights(data):
                     'date': speechdata['date'],
                     'speech_id': int(hkey.split('g')[1]),
                     'session_id': speechdata['session_id'],
+                    'session': static_data['sessions'][str(speechdata['session_id'])],
                     'order': speechdata['order'],
                     'start_time': speechdata['start_time']
                 })
@@ -155,14 +182,27 @@ def enrichHighlights(data):
                                            'name': 'unknown',
                                            'gov_id': 'unknown',
                                            'id': speechdata['speaker_id']},
+                                'session': {'name': 'unknown',
+                                            'date_ts': 'unknown',
+                                            'updated_at': 'unknown',
+                                            'org': {'acronym': 'unknown',
+                                                    'is_coalition': 'unknown',
+                                                    'name': 'unknown',
+                                                    'id': 'unknown'
+                                            },
+                                            'date': 'unknown',
+                                            'orgs': [],
+                                            'id': speechdata['session_id'],
+                                            'in_review': 'unknown'
+                                            },
                                 'content_t': trimHighlight(content_t),
                                 'date': speechdata['date'],
                                 'speech_id': int(hkey.split('g')[1])})
 
-    data['highlighting'] = sortedResults = sorted(results,
-                                                  key=lambda k: k['date'],
-                                                  reverse=True)
-
+    #data['highlighting'] = sortedResults = sorted(results,
+    #                                              key=lambda k: k['date'],
+    #                                              reverse=True)
+    data['highlighting'] = results
     enrichedData = data
 
     return enrichedData
@@ -541,3 +581,14 @@ def monitorMe(request):
         return HttpResponse('All iz well.')
     else:
         return HttpResponse('PANIC!')
+
+
+def getAllStaticData():
+    data = cache.get("all_static_data")
+    if not data:
+        url = ANALIZE_URL + '/utils/getAllStaticData/'
+        data = requests.get(url).json()
+        cache.set("all_static_data", json.dumps(data), 60 * 60)
+        return data
+    else:
+        return json.loads(data)

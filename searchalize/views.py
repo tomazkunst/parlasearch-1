@@ -1,6 +1,7 @@
+# -*- coding: UTF-8 -*-
 from django.shortcuts import render
 from kvalifikatorji.scripts import getCountListPG, getScores, problematicno, privzdignjeno, preprosto, getCountList
-from searchapi.utils import tryHard, enrichPartyData, getTFIDFofSpeeches2, enrichPersonData
+from searchapi.utils import tryHard, enrichPartyData, getTFIDFofSpeeches2, enrichPersonData, enrichTFIDF
 from parlasearch.settings import SOLR_URL, API_URL, API_DATE_FORMAT, ANALIZE_URL, PARLALIZE_API_KEY
 from datetime import datetime
 from collections import Counter
@@ -199,3 +200,20 @@ def setTFIDFforMPsALL(date_=None):
                       json=data_for_post)
 
     return 'Pa sem naredu vse', r.content
+
+
+def setTfidfOfSession(session_i):
+    solr_url = ('' + SOLR_URL + '/tvrh/?q=id:s' + session_i + ''
+                '&tv.df=true&tv.tf=true&tv.tf_idf=true&wt=json&fl=id&tv.fl=content_t')
+
+    r = requests.get(solr_url)
+
+    try:
+        output = enrichTFIDF(r.json())
+
+        r = requests.post(ANALIZE_URL + '/s/setTFIDF/?key=' + PARLALIZE_API_KEY,
+                          json=output)
+
+        return r.content
+    except IndexError:
+        return 'No data for this session.'
