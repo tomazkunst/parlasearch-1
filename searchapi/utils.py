@@ -103,7 +103,7 @@ def enrichQuery(data, show_all=False):
     results.append({'party': {'acronym': 'unknown',
                               'is_coalition': 'unknown',
                               'name': 'unknown',
-                              'id': None},
+                              'id': -1},
                     'score': str(others)
                     })
     for result in results:
