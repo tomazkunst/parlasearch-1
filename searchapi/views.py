@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from parlasearch.settings import SOLR_URL, API_URL, API_DATE_FORMAT, ANALIZE_URL
 import calendar
 
-from utils import enrichQuery, enrichHighlights, enrichTFIDF, groupDFALL, tryHard, add_months, addOrganizations
+from utils import enrichQuery, enrichHighlights, enrichTFIDF, groupDFALL, tryHard, add_months, addOrganizations, remove_law_or_act
 
 # Create your views here.
 
@@ -951,6 +951,8 @@ def legislationQuery(request, words, start_page=None):
     solr_url = SOLR_URL + '/select?wt=json'
 
     q = words.replace('+', ' ')
+
+    words = remove_law_or_act(words)
 
     solr_params = {
         'q': '(content_t:' + q.replace('IN', 'AND').replace('!', '+')+') OR ('+'text_t:' + q.replace('IN', 'AND').replace('!', '+')+')',

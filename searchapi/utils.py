@@ -594,3 +594,14 @@ def getAllStaticData():
         return data
     else:
         return json.loads(data)
+
+
+def remove_law_or_act(words):
+    zak_ak = ['zakon', 'akt']
+    words = words.lower()
+    for word in zak_ak:
+        if word != words.strip():
+            words = words.replace(word, '')
+
+    words = words.replace('  ', ' ').strip()
+    return words
