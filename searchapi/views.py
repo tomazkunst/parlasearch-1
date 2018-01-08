@@ -866,7 +866,7 @@ def motionQuery(request, words, start_page=None):
 
     else:
         resp = []
-
+    out_data = range(len(resp))
     for mot in resp:
         out_data[sort_ids.index(mot['results']['motion_id'])] = mot
     return JsonResponse(out_data, safe=False)
