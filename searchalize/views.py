@@ -196,7 +196,7 @@ def setTFIDFforMPsALL(date_=None):
                 print 'neki je slo narobe'
         f.write(json.dumps(data_for_post))
     f.closed
-    r = requests.post(ANALIZE_URL + '/pg/setAllMPsTFIDFsFromSearch/?key=' + PARLALIZE_API_KEY,
+    r = requests.post(api_url,
                       json=data_for_post)
 
     return 'Pa sem naredu vse', r.content
