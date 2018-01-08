@@ -83,6 +83,7 @@ def enrichQuery(data, show_all=False):
     # enrich party
     results = []
 
+    others = 0
     for i, speaker in enumerate(data['facet_counts']['facet_fields']['party_i']):
         if i % 2 == 0:
             try:
@@ -91,13 +92,20 @@ def enrichQuery(data, show_all=False):
                                 'score': str(score[i + 1])})
             except (ValueError, KeyError) as e:
                 score = data['facet_counts']['facet_fields']['party_i']
+                others += score[i + 1]
+                continue
                 results.append({'party': {'acronym': 'unknown',
                                           'is_coalition': 'unknown',
                                           'name': 'unknown',
                                           'id': speaker},
                                 'score': str(score[i + 1])
                                 })
-
+    results.append({'party': {'acronym': 'unknown',
+                              'is_coalition': 'unknown',
+                              'name': 'unknown',
+                              'id': None},
+                    'score': str(others)
+                    })
     for result in results:
         result.update({'score': int(result['score'])})
 
