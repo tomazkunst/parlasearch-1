@@ -952,7 +952,7 @@ def legislationQuery(request, words, start_page=None):
 
     q = words.replace('+', ' ')
 
-    words = remove_law_or_act(words)
+    q = remove_law_or_act(q)
 
     solr_params = {
         'q': '(content_t:' + q.replace('IN', 'AND').replace('!', '+')+') OR ('+'text_t:' + q.replace('IN', 'AND').replace('!', '+')+')',
