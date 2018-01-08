@@ -851,10 +851,12 @@ def motionQuery(request, words, start_page=None):
 
     r = requests.get(url).json()
     ids = []
+    sort_ids = []
     try:
         docs = r['response']['docs']
         for doc in docs:
             ids.append(str(doc['voteid_i']))
+            sort_ids.append(doc['voteid_i'])
     except:
         JsonResponse({'status': 'no votes with this word'})
 
@@ -865,7 +867,9 @@ def motionQuery(request, words, start_page=None):
     else:
         resp = []
 
-    return JsonResponse(resp, safe=False)
+    for mot in resp:
+        out_data[sort_ids.index(mot['results']['motion_id'])] = mot
+    return JsonResponse(out_data, safe=False)
 
 
 def dfALL(request):
