@@ -597,7 +597,7 @@ def getAllStaticData():
 
 
 def remove_law_or_act(words):
-    zak_ak = ['zakon', 'akt']
+    zak_ak = ['zakon o', 'zakon', 'akt']
     words = words.lower()
     for word in zak_ak:
         if word != words.strip():
