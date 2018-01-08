@@ -159,8 +159,8 @@ def enrichHighlights(data):
     #    speechdata = getSpeechData(hkey.split('g')[1])
     for hkey in ids_order:
         speechdata = getSpeechData(hkey)
-        if 'content_t' in data['highlighting'][hkey].keys():
-            content_t = (data['highlighting'][hkey]['content_t'][0])
+        if 'content_t' in data['highlighting']['g'+str(hkey)].keys():
+            content_t = (data['highlighting']['g'+str(hkey)]['content_t'][0])
         else:
             content_t = None
 
@@ -171,7 +171,7 @@ def enrichHighlights(data):
                     'person': static_data['persons'][str(speechdata['speaker_id'])],
                     'content_t': trimHighlight(content_t),
                     'date': speechdata['date'],
-                    'speech_id': int(hkey.split('g')[1]),
+                    'speech_id': int(hkey),
                     'session_id': speechdata['session_id'],
                     'session': static_data['sessions'][str(speechdata['session_id'])],
                     'order': speechdata['order'],
@@ -199,7 +199,7 @@ def enrichHighlights(data):
                                             },
                                 'content_t': trimHighlight(content_t),
                                 'date': speechdata['date'],
-                                'speech_id': int(hkey.split('g')[1])})
+                                'speech_id': hkey})
 
     #data['highlighting'] = sortedResults = sorted(results,
     #                                              key=lambda k: k['date'],
