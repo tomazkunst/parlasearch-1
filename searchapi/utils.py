@@ -154,9 +154,11 @@ def enrichHighlights(data):
     results = []
     static_data = getAllStaticData()
 
-    for hkey in data['highlighting'].keys():
-
-        speechdata = getSpeechData(hkey.split('g')[1])
+    ids_order = [int(i['id'][1:]) for i in data['response']['docs']]
+    #for hkey in data['highlighting'].keys():
+    #    speechdata = getSpeechData(hkey.split('g')[1])
+    for hkey in ids_order:
+        speechdata = getSpeechData(hkey)
         if 'content_t' in data['highlighting'][hkey].keys():
             content_t = (data['highlighting'][hkey]['content_t'][0])
         else:
