@@ -869,7 +869,8 @@ def motionQuery(request, words, start_page=None):
     out_data = [None for i in range(rows)]
     for mot in resp:
         out_data[sort_ids.index(mot['results']['motion_id'])] = mot
-    out_data.remove(None)
+    while None in out_data:
+        out_data.remove(None)
     return JsonResponse(out_data, safe=False)
 
 
