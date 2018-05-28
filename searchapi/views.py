@@ -754,7 +754,7 @@ def filterQuery(request, words='', start_page=None):
     return JsonResponse(out)
 
 
-def motionQuery(request, words, start_page=None):
+def motionQueryBase(request, words, start_page=None):
     """
     * @api {get} v/{words}/{?start_page}/
     * @apiName motionQuery
@@ -871,7 +871,20 @@ def motionQuery(request, words, start_page=None):
         out_data[sort_ids.index(mot['results']['motion_id'])] = mot
     while None in out_data:
         out_data.remove(None)
+
+    return out_data
+
+
+def motionQuery(request, words, start_page=None):
+    out_data = motionQueryBase(request, words, start_page)
     return JsonResponse(out_data, safe=False)
+
+
+def motionQuery2(request, words, start_page=None):
+    out_data = motionQueryBase(request, words, start_page)
+    output = {'data': out_data,
+              'search_query': words}
+    return JsonResponse(output, safe=False)
 
 
 def dfALL(request):
