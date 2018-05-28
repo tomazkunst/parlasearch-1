@@ -346,7 +346,7 @@ def regularQuery(request, words, start_page=None):
 
     r = requests.get(url)
 
-    return JsonResponse(enrichHighlights(enrichQuery(r.json())))
+    return JsonResponse(enrichHighlights(enrichQuery(r.json(), True)))
 
 
 def filterQuery(request, words='', start_page=None):
