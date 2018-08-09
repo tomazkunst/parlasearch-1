@@ -45,7 +45,8 @@ urlpatterns = [
 
     url(r'^monitoring/', monitorMe),
 
-    url(r'^tasks/', runAsyncSetter),
     url(r'^tasks/status/', get_celery_status),
+    url(r'^tasks/', runAsyncSetter),
+    
     
 ]
