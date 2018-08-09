@@ -1,5 +1,4 @@
 from __future__ import absolute_import, unicode_literals
-from celery import shared_task
 from raven.contrib.django.raven_compat.models import client
 from datetime import datetime
 
@@ -7,66 +6,50 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import PermissionDenied
+from django.forms.models import model_to_dict
 
-from .views import setStyleScoresPGsALL, setStyleScoresMPsALL, setTFIDFforPGsALL, setTFIDFforMPsALL, setTfidfOfSession
+from . import views
+
+from django_celery_monitor.models import TaskState
+from celery import states, shared_task
 
 import json
 import requests
 
-status_api = settings.DASHBOARD_URL + '/api/status/'
-
-exports = {'setStyleScoresPGsALL': setStyleScoresPGsALL,
-           'setStyleScoresMPsALL': setStyleScoresMPsALL,
-           'setTFIDFforPGsALL': setTFIDFforPGsALL,
-           'setTFIDFforMPsALL':setTFIDFforMPsALL,
-           'setTfidfOfSession': setTfidfOfSession}
-
+#[{"method": "setStyleScoresMPsALL", "attr": null, "type": "setter"}]
 
 @csrf_exempt
 def runAsyncSetter(request):
-    print('ivan')
+    args = ['method', 'attr']
     if request.method == 'POST':
         data = json.loads(request.body)
-        print data
-        status_id = data.pop('status_id')
         auth_key = request.META['HTTP_AUTHORIZATION']
         if auth_key != settings.PARLALIZE_API_KEY:
-            print("auth fail")
-            sendStatus(status_id, "Fail", "Authorization fails", ['buuu'])
             raise PermissionDenied
-        if data['attr']:
-            attr = data['attr']
-        else:
-            attr = None
-        run_search_analizes.apply_async((data['setters'], status_id, attr), queue='parlasearch')
+
+        for setter in data:
+            list_args = [setter[element] for element in args if element in setter]
+            run_search_analizes.apply_async(list_args, queue='parlasearch')
         return JsonResponse({'status':'runned'})
     else:
         return JsonResponse({'status': 'this isnt post'})
 
 
 @shared_task
-def run_search_analizes(expoert_tasks, status_id, attr=None):
-    methods = [exports[task] for task in expoert_tasks]
-    sendStatus(status_id, 'Running', '[]')
-    if attr:
-        data = {'session_i': attr}
-    else:
-        data = {}
+def run_search_analizes(method_name, attr=None):
+    IDs = []
+    method = getattr(views, method_name)
     try:
-        resp = ''
-        for method in methods:
-            print(method, data)
-            resp = method(**data)
-        print "naj se bi exportal"
-        sendStatus(status_id, 'Done', resp)
+        if not attr:
+            method()
+        else:
+            method(attr)
     except:
-        sendStatus(status_id, 'Fails', '[]')
         client.captureException()
 
-def sendStatus(status_id, type_, data):
-    requests.put(status_api + str(status_id) + '/',
-                 data= {
-                            "status_type": type_,
-                            "status_note": datetime.now().strftime(settings.API_DATE_FORMAT),
-                            "status_done": data
-                        })
+
+def get_celery_status(request):
+    tasks = TaskState.objects.all().order_by('-tstamp')
+    objs = [model_to_dict(task) for task in tasks]
+    return JsonResponse(objs, safe=False)
+

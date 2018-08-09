@@ -14,11 +14,8 @@ DEVELOPMENT = False
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': 'localhost',
-        'NAME': 'parlalize',
-        'USER': 'parlauser',
-        'PASSWORD': 'parlapassword',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'data.sqlite3',
     }
 }
 

@@ -19,7 +19,7 @@ from django.contrib import admin
 from searchapi.views import motionQuery, regularQuery, filterQuery, dfALL, dfDateALL, index, legislationQuery, motionQuery2
 
 from searchapi.utils import monitorMe
-from searchalize.tasks import runAsyncSetter
+from searchalize.tasks import runAsyncSetter, get_celery_status
 
 urlpatterns = [
     url(r'^$', index),
@@ -46,4 +46,6 @@ urlpatterns = [
     url(r'^monitoring/', monitorMe),
 
     url(r'^tasks/', runAsyncSetter),
+    url(r'^tasks/status/', get_celery_status),
+    
 ]

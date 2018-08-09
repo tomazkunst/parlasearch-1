@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'searchalize',
     'raven.contrib.django.raven_compat',
     'corsheaders',
+    'django_celery_monitor',
 )
 
 MIDDLEWARE_CLASSES = (
