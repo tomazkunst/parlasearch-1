@@ -162,6 +162,8 @@ def enrichHighlights(data):
     results = []
     static_data = getAllStaticData()
 
+    orders = {sp['id']: sp['the_order'] for sp in data['response']['docs']}
+
     ids_order = [int(i['id'][1:]) for i in data['response']['docs']]
     #for hkey in data['highlighting'].keys():
     #    speechdata = getSpeechData(hkey.split('g')[1])
@@ -169,7 +171,7 @@ def enrichHighlights(data):
         speechdata = getSpeechData(hkey)
         if 'content_t' in data['highlighting']['g'+str(hkey)].keys():
             content_t = (data['highlighting']['g'+str(hkey)]['content_t'][0])
-            the_order = (data['highlighting']['g'+str(hkey)]['the_order'])
+            the_order = orders['g'+str(hkey)]
         else:
             content_t = None
             the_order = None
