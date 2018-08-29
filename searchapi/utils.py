@@ -169,8 +169,10 @@ def enrichHighlights(data):
         speechdata = getSpeechData(hkey)
         if 'content_t' in data['highlighting']['g'+str(hkey)].keys():
             content_t = (data['highlighting']['g'+str(hkey)]['content_t'][0])
+            the_order = (data['highlighting']['g'+str(hkey)]['the_order'])
         else:
             content_t = None
+            the_order = None
 
         if content_t != '' and content_t is not None:
 
@@ -184,7 +186,7 @@ def enrichHighlights(data):
                     'session': static_data['sessions'][str(speechdata['session_id'])],
                     'order': speechdata['order'],
                     'start_time': speechdata['start_time'],
-                    'the_order': speechdata['the_order']
+                    'the_order': the_order
                 })
             except (ValueError, KeyError) as e:
                 results.append({'person': {'party': {'acronym': 'unknown',
