@@ -183,7 +183,8 @@ def enrichHighlights(data):
                     'session_id': speechdata['session_id'],
                     'session': static_data['sessions'][str(speechdata['session_id'])],
                     'order': speechdata['order'],
-                    'start_time': speechdata['start_time']
+                    'start_time': speechdata['start_time'],
+                    'the_order': speechdata['the_order']
                 })
             except (ValueError, KeyError) as e:
                 results.append({'person': {'party': {'acronym': 'unknown',
@@ -207,7 +208,8 @@ def enrichHighlights(data):
                                             },
                                 'content_t': trimHighlight(content_t),
                                 'date': speechdata['date'],
-                                'speech_id': hkey})
+                                'speech_id': hkey,
+                                'the_order': speechdata['the_order']})
 
     #data['highlighting'] = sortedResults = sorted(results,
     #                                              key=lambda k: k['date'],
