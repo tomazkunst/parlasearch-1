@@ -113,7 +113,7 @@ def enrichQuery(data, show_all=False):
     data['facet_counts']['facet_fields']['party_e'] = out
 
     for speech in data['response']['docs']:
-        speech['the_order'] = speech['the_order']['']
+        speech['the_order'] = speech['the_order'][0]
 
     enrichedData = data
 
