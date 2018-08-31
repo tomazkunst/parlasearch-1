@@ -112,6 +112,9 @@ def enrichQuery(data, show_all=False):
     out = sorted(results, key=lambda k: k['score'], reverse=True)
     data['facet_counts']['facet_fields']['party_e'] = out
 
+    for speech in data['response']['docs']:
+        speech['the_order'] = speech['the_order']['']
+
     enrichedData = data
 
     return enrichedData
