@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from parlasearch.settings import SOLR_URL, API_URL, API_DATE_FORMAT, ANALIZE_URL
 import calendar
 
-from utils import enrichQuery, enrichHighlights, enrichTFIDF, groupDFALL, tryHard, add_months, addOrganizations, remove_law_or_act
+from utils import enrichQuery, enrichHighlights, enrichTFIDF, groupDFALL, tryHard, add_months, addOrganizations, remove_law_or_act, getAllStaticData
 
 # Create your views here.
 
@@ -751,6 +751,11 @@ def filterQuery(request, words='', start_page=None):
     out = addOrganizations(enrichHighlights(enrichQuery(r.json(),
                            show_all=True)))
     out.update({'filters': filters_out})
+
+    p_ids = people.split(',') if people else []
+    if len(p_ids) == 1:
+        out.update({'person': getAllStaticData()['persons'][str(p_ids[0])]})
+
     return JsonResponse(out)
 
 
