@@ -754,7 +754,11 @@ def filterQuery(request, words='', start_page=None):
 
     p_ids = people.split(',') if people else []
     if len(p_ids) == 1:
-        out.update({'person': getAllStaticData()['persons'][str(p_ids[0])]})
+        try:
+            out.update({'person': getAllStaticData()['persons'][str(p_ids[0])]})
+        except:
+            # if key error happens
+            pass
 
     return JsonResponse(out)
 
