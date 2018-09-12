@@ -217,6 +217,8 @@ def enrichHighlights(data):
                                 'date': speechdata['date'],
                                 'speech_id': hkey,
                                 'the_order': speechdata['the_order']})
+            except:
+                pass
 
     #data['highlighting'] = sortedResults = sorted(results,
     #                                              key=lambda k: k['date'],
