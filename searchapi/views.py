@@ -759,6 +759,14 @@ def filterQuery(request, words='', start_page=None):
         except:
             # if key error happens
             pass
+    
+    org_ids = parties.split(',') if parties else []
+    if len(org_ids) == 1:
+        try:
+            out.update({'party': getAllStaticData()['partys'][str(org_ids[0])]})
+        except:
+            # if key error happens
+            pass
 
     return JsonResponse(out)
 
