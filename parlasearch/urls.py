@@ -25,20 +25,20 @@ urlpatterns = [
     url(r'^$', index),
     url(r'^admin/', include(admin.site.urls)),
 
-    url(ur'^filter/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžČĆŠŽa-zA-Z0-9 \-\+!"%\.,\*]+)/(?P<start_page>\d+)', filterQuery),
-    url(ur'^filter/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžČĆŠŽa-zA-Z0-9 \-\+!"%\.,\*]+)', filterQuery),
+    url(ur'^filter/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžłęąńóśźżŻŹŚÓŃČĆŠŽŁĘĄa-zA-Z0-9 \-\+!"%\.,\*]+)/(?P<start_page>\d+)', filterQuery),
+    url(ur'^filter/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžłęąńóśźżŻŹŚÓŃČĆŠŽŁĘĄa-zA-Z0-9 \-\+!"%\.,\*]+)', filterQuery),
 
-    url(ur'^q/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžČĆŠŽa-zA-Z0-9 \-\+!"%\.,]+)/(?P<start_page>\d+)', regularQuery),
+    url(ur'^q/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžłęąńóśźżŻŹŚÓŃČĆŠŽŁĘĄa-zA-Z0-9 \-\+!"%\.,]+)/(?P<start_page>\d+)', regularQuery),
     url(ur'^q/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžČĆŠŽa-zA-Z0-9 \-\+!"%\.,]+)', regularQuery),
 
-    url(ur'^v/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžČĆŠŽa-zA-Z0-9 \-\+!"%\.,]+)/(?P<start_page>\d+)', motionQuery),
-    url(ur'^v/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžČĆŠŽa-zA-Z0-9 \-\+!"%\.,]+)', motionQuery),
+    url(ur'^v/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžłęąńóśźżŻŹŚÓŃČĆŠŽŁĘĄa-zA-Z0-9 \-\+!"%\.,]+)/(?P<start_page>\d+)', motionQuery),
+    url(ur'^v/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžłęąńóśźżŻŹŚÓŃČĆŠŽŁĘĄa-zA-Z0-9 \-\+!"%\.,]+)', motionQuery),
 
-    url(ur'^v2/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžČĆŠŽa-zA-Z0-9 \-\+!"%\.,]+)/(?P<start_page>\d+)', motionQuery2),
-    url(ur'^v2/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžČĆŠŽa-zA-Z0-9 \-\+!"%\.,]+)', motionQuery2),
+    url(ur'^v2/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžłęąńóśźżŻŹŚÓŃČĆŠŽŁĘĄa-zA-Z0-9 \-\+!"%\.,]+)/(?P<start_page>\d+)', motionQuery2),
+    url(ur'^v2/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžłęąńóśźżŻŹŚÓŃČĆŠŽŁĘĄa-zA-Z0-9 \-\+!"%\.,]+)', motionQuery2),
 
-    url(ur'^l/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžČĆŠŽa-zA-Z0-9 \-\+!"%\.,]+)/(?P<start_page>\d+)', legislationQuery),
-    url(ur'^l/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžČĆŠŽa-zA-Z0-9 \-\+!"%\.,]+)', legislationQuery),
+    url(ur'^l/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžłęąńóśźżŻŹŚÓŃČĆŠŽŁĘĄa-zA-Z0-9 \-\+!"%\.,]+)/(?P<start_page>\d+)', legislationQuery),
+    url(ur'^l/(?P<words>[ÖÜØÄÂÁÉÓÚÍÎöüøäâáéóúíîčćšžłęąńóśźżŻŹŚÓŃČĆŠŽŁĘĄa-zA-Z0-9 \-\+!"%\.,]+)', legislationQuery),
 
     url(ur'^dfall/$', dfALL),
     url(ur'^dfall/(?P<datetime_dt>[\w].+)/', dfDateALL),
