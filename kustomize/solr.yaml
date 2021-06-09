@@ -110,10 +110,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - bosna.parlasolr.lb.djnd.si
-      secretName: bosna-parlasolr-tls
+        - hrvaska.parlasolr.lb.djnd.si
+      secretName: hrvaska-parlasolr-tls
   rules:
-  - host: bosna.parlasolr.lb.djnd.si
+  - host: hrvaska.parlasolr.lb.djnd.si
     http:
       paths:
       - path: /

@@ -60,10 +60,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - bosna.parlasearch.lb.djnd.si
-    secretName: bosna-parlasearch-tls
+    - hrvaska.parlasearch.lb.djnd.si
+    secretName: hrvaska-parlasearch-tls
   rules:
-  - host: bosna.parlasearch.lb.djnd.si
+  - host: hrvaska.parlasearch.lb.djnd.si
     http:
       paths:
       - path: /

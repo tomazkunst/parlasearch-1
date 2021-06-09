@@ -5,6 +5,7 @@ on:
       - 'k8s'
       - 'slovenija'
       - 'bosna'
+      - 'hrvaska'
 jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
