@@ -8,8 +8,8 @@ images:
   -
     name: parlasearch
     newName: rg.fr-par.scw.cloud/djnd/parlasearch
-    newTag: '71d75d6d2a17f8ba66bfa43b1bef8a404763ecd2'
+    newTag: '36c96d35de4b91566baaf33718e785978ef8044e'
   -
     name: parlasolr
     newName: rg.fr-par.scw.cloud/djnd/parlasolr
-    newTag: '71d75d6d2a17f8ba66bfa43b1bef8a404763ecd2'
+    newTag: '36c96d35de4b91566baaf33718e785978ef8044e'
