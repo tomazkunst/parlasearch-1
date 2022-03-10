@@ -133,6 +133,7 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/proxy-body-size: "10m"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "120"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
     # nginx.ingress.kubernetes.io/whitelist-source-range: 91.236.1.209/32
 spec:
   tls:
